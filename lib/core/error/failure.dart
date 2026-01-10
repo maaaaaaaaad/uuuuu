@@ -19,3 +19,11 @@ class NetworkFailure extends Failure {
 class AuthFailure extends Failure {
   const AuthFailure(super.message);
 }
+
+class KakaoLoginFailure extends Failure {
+  const KakaoLoginFailure(super.message);
+}
+
+class NoTokenFailure extends Failure {
+  const NoTokenFailure() : super('저장된 토큰이 없습니다');
+}
