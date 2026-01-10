@@ -13,7 +13,7 @@ class JelloMarkApp extends StatelessWidget {
       title: 'JelloMark',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
       home: const HomePage(),
