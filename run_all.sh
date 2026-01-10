@@ -26,18 +26,28 @@ sleep 3
 echo "[3/4] Starting Medium Phone (port 5554)..."
 if ! $ADB_BIN devices | grep -q "emulator-5554"; then
     $EMULATOR_BIN -avd $ANDROID_MEDIUM_AVD -port 5554 &>/dev/null &
-    sleep 10
 fi
 
 echo "[4/4] Starting Small Phone (port 5556)..."
 if ! $ADB_BIN devices | grep -q "emulator-5556"; then
     $EMULATOR_BIN -avd $ANDROID_SMALL_AVD -port 5556 &>/dev/null &
-    sleep 10
 fi
 
 echo ""
-echo "Waiting for all devices to be ready..."
-sleep 5
+echo "Waiting for Android emulators to fully boot..."
+# Wait for emulator-5554 to be ready
+while ! $ADB_BIN -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | grep -q "1"; do
+    sleep 2
+done
+echo "  - emulator-5554 ready"
+
+# Wait for emulator-5556 to be ready
+while ! $ADB_BIN -s emulator-5556 shell getprop sys.boot_completed 2>/dev/null | grep -q "1"; do
+    sleep 2
+done
+echo "  - emulator-5556 ready"
+
+sleep 3
 
 echo ""
 echo "Connected devices:"
@@ -90,11 +100,11 @@ SCRIPT
 chmod +x /tmp/run_android_small.sh
 
 open -a Terminal /tmp/run_ios_large.sh
-sleep 2
+sleep 3
 open -a Terminal /tmp/run_ios_small.sh
-sleep 2
+sleep 3
 open -a Terminal /tmp/run_android_medium.sh
-sleep 2
+sleep 3
 open -a Terminal /tmp/run_android_small.sh
 
 echo ""
