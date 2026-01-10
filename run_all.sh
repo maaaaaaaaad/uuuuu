@@ -1,26 +1,21 @@
 #!/bin/bash
-# Run Flutter app on 4 devices (2 iOS + 2 Android)
-# Opens four terminal windows - all support hot reload!
 
 FLUTTER_BIN="/Users/vector/dev/flutter/bin/flutter"
 PROJECT_DIR="/Users/vector/dev/jellomark"
+EMULATOR_BIN=~/Library/Android/sdk/emulator/emulator
+ADB_BIN=~/Library/Android/sdk/platform-tools/adb
 
-# iOS Devices
-IOS_LARGE="2C1F3472-8ED7-4516-B3DC-14DD1481B8B9"   # iPhone 17 Pro
-IOS_SMALL="2D2BFEDB-478A-4A1C-BAF7-53BF1C97E2FB"   # iPhone 16e
+IOS_LARGE="2C1F3472-8ED7-4516-B3DC-14DD1481B8B9"
+IOS_SMALL="2D2BFEDB-478A-4A1C-BAF7-53BF1C97E2FB"
 
-# Android Devices
-ANDROID_MEDIUM="emulator-5554"                      # Medium Phone API 36
-ANDROID_SMALL="emulator-5556"                       # Small Phone API 36
-ANDROID_MEDIUM_NAME="Medium_Phone_API_36.1"
-ANDROID_SMALL_NAME="Small_Phone"
+ANDROID_MEDIUM_AVD="Medium_Phone_API_36.1"
+ANDROID_SMALL_AVD="Small_Phone"
 
 echo "==================================="
 echo "Starting 4 devices..."
 echo "==================================="
 echo ""
 
-# Start iOS Simulators
 echo "[1/4] Booting iPhone 17 Pro..."
 xcrun simctl boot $IOS_LARGE 2>/dev/null
 echo "[2/4] Booting iPhone 16e..."
@@ -28,16 +23,15 @@ xcrun simctl boot $IOS_SMALL 2>/dev/null
 open -a Simulator
 sleep 3
 
-# Start Android Emulators
-echo "[3/4] Starting Medium Phone..."
-if ! ~/Library/Android/sdk/platform-tools/adb devices | grep -q "emulator-5554"; then
-    $FLUTTER_BIN emulators --launch $ANDROID_MEDIUM_NAME &
+echo "[3/4] Starting Medium Phone (port 5554)..."
+if ! $ADB_BIN devices | grep -q "emulator-5554"; then
+    $EMULATOR_BIN -avd $ANDROID_MEDIUM_AVD -port 5554 &>/dev/null &
     sleep 10
 fi
 
-echo "[4/4] Starting Small Phone..."
-if ! ~/Library/Android/sdk/platform-tools/adb devices | grep -q "emulator-5556"; then
-    $FLUTTER_BIN emulators --launch $ANDROID_SMALL_NAME &
+echo "[4/4] Starting Small Phone (port 5556)..."
+if ! $ADB_BIN devices | grep -q "emulator-5556"; then
+    $EMULATOR_BIN -avd $ANDROID_SMALL_AVD -port 5556 &>/dev/null &
     sleep 10
 fi
 
@@ -46,12 +40,15 @@ echo "Waiting for all devices to be ready..."
 sleep 5
 
 echo ""
+echo "Connected devices:"
+$ADB_BIN devices
+echo ""
+
 echo "==================================="
 echo "Opening four terminal windows..."
 echo "==================================="
 echo ""
 
-# Create temporary scripts for each device
 cat > /tmp/run_ios_large.sh << 'SCRIPT'
 #!/bin/bash
 cd /Users/vector/dev/jellomark
@@ -92,7 +89,6 @@ echo ""
 SCRIPT
 chmod +x /tmp/run_android_small.sh
 
-# Open terminal windows
 open -a Terminal /tmp/run_ios_large.sh
 sleep 2
 open -a Terminal /tmp/run_ios_small.sh
@@ -109,8 +105,8 @@ echo ""
 echo "Devices:"
 echo "  - iPhone 17 Pro (Large)"
 echo "  - iPhone 16e (Small)"
-echo "  - Android Medium Phone"
-echo "  - Android Small Phone"
+echo "  - Android Medium Phone (emulator-5554)"
+echo "  - Android Small Phone (emulator-5556)"
 echo ""
 echo "Each window: r=Hot Reload, R=Restart, q=Quit"
 echo "Stop all: ./stop_all.sh"
