@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/core/di/injection_container.dart';
+import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
+import 'package:jellomark/features/auth/domain/usecases/check_auth_status.dart';
 import 'package:jellomark/features/auth/domain/usecases/login_with_kakao.dart';
 import 'package:jellomark/features/auth/domain/usecases/logout.dart';
 
@@ -15,6 +17,13 @@ final loginWithKakaoUseCaseProvider = Provider<LoginWithKakaoUseCase>((ref) {
 final logoutUseCaseProvider = Provider<LogoutUseCase>((ref) {
   return LogoutUseCase(
     kakaoAuthService: sl<KakaoAuthService>(),
+    authRepository: sl<AuthRepository>(),
+  );
+});
+
+final checkAuthStatusUseCaseProvider = Provider<CheckAuthStatusUseCase>((ref) {
+  return CheckAuthStatusUseCase(
+    localDataSource: sl<AuthLocalDataSource>(),
     authRepository: sl<AuthRepository>(),
   );
 });
