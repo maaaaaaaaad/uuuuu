@@ -15,6 +15,7 @@ class JelloMarkApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
+        fontFamily: 'Esamanru',
       ),
       home: const HomePage(),
     );
@@ -44,7 +45,7 @@ class HomePage extends StatelessWidget {
             Text(
               'JelloMark',
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w400,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
