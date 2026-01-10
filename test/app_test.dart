@@ -18,7 +18,7 @@ void main() {
 
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
 
-      expect(materialApp.title, 'JelloMark');
+      expect(materialApp.title, '젤로마크');
       expect(materialApp.debugShowCheckedModeBanner, false);
     });
   });
