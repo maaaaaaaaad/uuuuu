@@ -41,6 +41,7 @@ dependencies:
   equatable: ^2.0.8
   dartz: ^0.10.1
   kakao_flutter_sdk_user: ^1.10.0
+  flutter_riverpod: ^2.6.1
 
 dev_dependencies:
   flutter_test:

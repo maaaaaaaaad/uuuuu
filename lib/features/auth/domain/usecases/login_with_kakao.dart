@@ -16,10 +16,8 @@ class LoginWithKakaoUseCase {
 
   Future<Either<Failure, TokenPair>> call() async {
     try {
-      // 1. 카카오 로그인으로 카카오 액세스 토큰 획득
       final kakaoAccessToken = await _kakaoAuthService.loginWithKakao();
 
-      // 2. 카카오 토큰으로 서버 인증
       return await _authRepository.loginWithKakao(kakaoAccessToken);
     } catch (e) {
       return Left(KakaoLoginFailure(e.toString()));
