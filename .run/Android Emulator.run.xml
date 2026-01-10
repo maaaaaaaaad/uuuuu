@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Android Emulator" type="FlutterRunConfigurationType" factoryName="Flutter">
+    <option name="filePath" value="$PROJECT_DIR$/lib/main.dart" />
+    <option name="launchingScript" value="" />
+    <option name="additionalArgs" value="-d emulator-5554" />
+    <method v="2" />
+  </configuration>
+</component>

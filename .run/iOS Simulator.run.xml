@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="iOS Simulator" type="FlutterRunConfigurationType" factoryName="Flutter">
+    <option name="filePath" value="$PROJECT_DIR$/lib/main.dart" />
+    <option name="launchingScript" value="" />
+    <option name="additionalArgs" value="-d 2C1F3472-8ED7-4516-B3DC-14DD1481B8B9" />
+    <method v="2" />
+  </configuration>
+</component>
