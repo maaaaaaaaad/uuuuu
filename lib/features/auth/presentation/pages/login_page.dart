@@ -1,25 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 
-class LoginPage extends ConsumerWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authNotifierProvider);
-
-    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
-      if (next.status == AuthStatus.error && next.errorMessage != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
-      }
-      if (next.status == AuthStatus.authenticated) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
-    });
-
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -39,9 +24,9 @@ class LoginPage extends ConsumerWidget {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: authState.status == AuthStatus.loading
-                      ? null
-                      : () => _onKakaoLoginPressed(ref),
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/home');
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFEE500),
                     foregroundColor: Colors.black87,
@@ -49,19 +34,13 @@ class LoginPage extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: authState.status == AuthStatus.loading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text(
-                          '카카오로 시작하기',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                  child: const Text(
+                    '카카오로 시작하기',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
@@ -70,9 +49,5 @@ class LoginPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  void _onKakaoLoginPressed(WidgetRef ref) {
-    ref.read(authNotifierProvider.notifier).loginWithKakao();
   }
 }

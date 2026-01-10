@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/config/theme.dart';
+import 'package:jellomark/features/auth/presentation/pages/login_page.dart';
+import 'package:jellomark/features/auth/presentation/pages/splash_page.dart';
+import 'package:jellomark/features/home/presentation/pages/home_page.dart';
 
 class JelloMarkApp extends StatelessWidget {
   const JelloMarkApp({super.key});
@@ -11,7 +14,11 @@ class JelloMarkApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: AppTheme.lightTheme,
-      home: const Scaffold(body: Center(child: Text('젤로마크'))),
+      home: const SplashPage(),
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/home': (context) => const HomePage(),
+      },
     );
   }
 }

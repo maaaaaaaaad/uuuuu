@@ -57,6 +57,8 @@ dev_dependencies:
   mockito: ^5.6.1
   build_runner: ^2.10.4
   http_mock_adapter: ^0.6.1
+  mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.14.4
 
 flutter_native_splash:
   background_image: assets/splash/splash-jellomark02.png
@@ -69,6 +71,12 @@ flutter_native_splash:
   ios: true
   android: true
   fullscreen: true
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app-icon-jellomark.png"
+  remove_alpha_ios: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
