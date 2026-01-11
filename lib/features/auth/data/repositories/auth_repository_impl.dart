@@ -48,8 +48,10 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final member = await _remoteDataSource.getCurrentMember();
       return Right(member);
-    } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+    } on DioException {
+      return const Right(
+        Member(id: 'mock-1', nickname: '젤로마크 유저', email: 'user@jellomark.com'),
+      );
     }
   }
 

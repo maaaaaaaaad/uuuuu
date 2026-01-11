@@ -27,3 +27,7 @@ class KakaoLoginFailure extends Failure {
 class NoTokenFailure extends Failure {
   const NoTokenFailure() : super('저장된 토큰이 없습니다');
 }
+
+class ValidationFailure extends Failure {
+  const ValidationFailure(super.message);
+}

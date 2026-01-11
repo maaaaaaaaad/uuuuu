@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
+import 'package:jellomark/features/member/presentation/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,9 +13,9 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _tabs = const [
-    Center(child: Text('홈 탭')),
+    HomeTab(),
     Center(child: Text('검색 탭')),
-    Center(child: Text('마이 탭')),
+    ProfilePage(),
   ];
 
   @override
