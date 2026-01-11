@@ -1,0 +1,119 @@
+import 'package:flutter/material.dart';
+
+class ShopImageGallery extends StatefulWidget {
+  final List<String> images;
+  final double height;
+  final void Function(int index)? onImageTap;
+
+  const ShopImageGallery({
+    super.key,
+    required this.images,
+    this.height = 250,
+    this.onImageTap,
+  });
+
+  @override
+  State<ShopImageGallery> createState() => _ShopImageGalleryState();
+}
+
+class _ShopImageGalleryState extends State<ShopImageGallery> {
+  int _currentPage = 0;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.images.isEmpty) {
+      return SizedBox(
+        height: widget.height,
+        child: Container(
+          color: Colors.grey[200],
+          child: const Center(
+            child: Icon(
+              Icons.store,
+              size: 64,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: widget.height,
+      child: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            itemCount: widget.images.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () => widget.onImageTap?.call(index),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    image: DecorationImage(
+                      image: NetworkImage(widget.images[index]),
+                      fit: BoxFit.cover,
+                      onError: (exception, stackTrace) {},
+                    ),
+                  ),
+                  child: widget.images[index].isEmpty
+                      ? const Center(
+                          child: Icon(Icons.image, size: 48, color: Colors.grey),
+                        )
+                      : null,
+                ),
+              );
+            },
+          ),
+          Positioned(
+            bottom: 16,
+            left: 0,
+            right: 0,
+            child: Container(
+              key: const Key('page_indicator'),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  widget.images.length,
+                  (index) => _buildIndicatorDot(index),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIndicatorDot(int index) {
+    final isActive = index == _currentPage;
+    return Container(
+      key: Key('indicator_dot_${index}_${isActive ? 'active' : 'inactive'}'),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      width: isActive ? 24 : 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+}
