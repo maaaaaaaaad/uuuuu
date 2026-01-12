@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FLUTTER_BIN="/Users/vector/dev/flutter/bin/flutter"
-PROJECT_DIR="/Users/vector/dev/jellomark"
+PROJECT_DIR="/Users/vector/dev/jellomark/jellomark-mobile"
 EMULATOR_BIN=~/Library/Android/sdk/emulator/emulator
 ADB_BIN=~/Library/Android/sdk/platform-tools/adb
 
@@ -65,7 +65,7 @@ echo ""
 
 cat > /tmp/run_ios_large.sh << SCRIPT
 #!/bin/bash
-cd /Users/vector/dev/jellomark
+cd /Users/vector/dev/jellomark/jellomark-mobile
 echo "=== iPhone 17 Pro (Large) ==="
 echo "환경: $ENV | API: $API_BASE_URL"
 echo "Hot Reload: r | Hot Restart: R | Quit: q"
@@ -76,7 +76,7 @@ chmod +x /tmp/run_ios_large.sh
 
 cat > /tmp/run_android_small.sh << SCRIPT
 #!/bin/bash
-cd /Users/vector/dev/jellomark
+cd /Users/vector/dev/jellomark/jellomark-mobile
 echo "=== Android Small Phone ==="
 echo "환경: $ENV | API: $API_BASE_URL"
 echo "Hot Reload: r | Hot Restart: R | Quit: q"

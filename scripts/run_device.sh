@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FLUTTER_PATH="/Users/vector/dev/flutter/bin/flutter"
-PROJECT_DIR="/Users/vector/dev/jellomark"
+PROJECT_DIR="/Users/vector/dev/jellomark/jellomark-mobile"
 
 ENV_FILE="$PROJECT_DIR/.env.dev"
 if [ ! -f "$ENV_FILE" ]; then
