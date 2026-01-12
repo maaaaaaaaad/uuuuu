@@ -1,27 +1,19 @@
-import 'package:flutter/foundation.dart';
-
 class EnvConfig {
-  final String name;
-  final String apiBaseUrl;
-  final bool isDebug;
-
-  const EnvConfig._({
-    required this.name,
-    required this.apiBaseUrl,
-    required this.isDebug,
-  });
-
-  static const EnvConfig development = EnvConfig._(
-    name: 'development',
-    apiBaseUrl: 'http://localhost:8080',
-    isDebug: true,
+  static const String env = String.fromEnvironment(
+    'ENV',
+    defaultValue: 'dev',
   );
 
-  static const EnvConfig production = EnvConfig._(
-    name: 'production',
-    apiBaseUrl: 'https://api.jellomark.com',
-    isDebug: false,
+  static const String apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://192.168.219.100:8080',
   );
 
-  static EnvConfig get current => kDebugMode ? development : production;
+  static const String kakaoNativeAppKey = String.fromEnvironment(
+    'KAKAO_NATIVE_APP_KEY',
+    defaultValue: '',
+  );
+
+  static bool get isDebug => env == 'dev';
+  static bool get isProduction => env == 'prod';
 }

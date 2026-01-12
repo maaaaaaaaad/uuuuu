@@ -1,13 +1,21 @@
 import 'package:dio/dio.dart';
+import 'package:jellomark/core/network/auth_interceptor.dart';
 
 class ApiClient {
   final Dio dio;
 
-  ApiClient({required String baseUrl}) : dio = Dio() {
+  ApiClient({
+    required String baseUrl,
+    AuthInterceptor? authInterceptor,
+  }) : dio = Dio() {
     dio.options.baseUrl = baseUrl;
     dio.options.connectTimeout = const Duration(seconds: 30);
     dio.options.receiveTimeout = const Duration(seconds: 30);
     dio.options.headers['Content-Type'] = 'application/json';
+
+    if (authInterceptor != null) {
+      dio.interceptors.add(authInterceptor);
+    }
   }
 
   Future<Response<T>> get<T>(

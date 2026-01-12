@@ -36,7 +36,8 @@ void main() {
         const updatedMember = Member(
           id: '1',
           nickname: '새닉네임',
-          email: 'test@test.com',
+          socialProvider: 'KAKAO',
+          socialId: 'test-kakao-id',
         );
         mockRepository.memberResult = updatedMember;
 

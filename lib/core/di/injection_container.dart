@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/core/network/api_client.dart';
+import 'package:jellomark/core/network/auth_interceptor.dart';
 import 'package:jellomark/core/storage/secure_token_storage.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -25,8 +26,19 @@ Future<void> initDependencies() async {
     () => FlutterSecureStorageWrapper(),
   );
 
+  sl.registerLazySingleton<TokenProvider>(
+    () => SecureTokenStorage(secureStorage: sl<SecureStorageWrapper>()),
+  );
+
+  sl.registerLazySingleton<AuthInterceptor>(
+    () => AuthInterceptor(tokenProvider: sl<TokenProvider>()),
+  );
+
   sl.registerLazySingleton<ApiClient>(
-    () => ApiClient(baseUrl: EnvConfig.current.apiBaseUrl),
+    () => ApiClient(
+      baseUrl: EnvConfig.apiBaseUrl,
+      authInterceptor: sl<AuthInterceptor>(),
+    ),
   );
 
   sl.registerLazySingleton<KakaoAuthService>(() => KakaoAuthServiceImpl());

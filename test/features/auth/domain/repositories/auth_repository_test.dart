@@ -31,7 +31,7 @@ class MockAuthRepository implements AuthRepository {
   @override
   Future<Either<Failure, Member>> getCurrentMember() async {
     return Right(
-      Member(id: 'member-123', nickname: '젤리', email: 'jelly@example.com'),
+      Member(id: 'member-123', nickname: '젤리', socialProvider: 'KAKAO', socialId: 'kakao-123456'),
     );
   }
 

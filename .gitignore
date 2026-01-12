@@ -47,3 +47,17 @@ app.*.map.json
 *.md
 .claude
 .mcp.json
+
+# Environment files (contains sensitive keys)
+.env.dev
+.env.prod
+.env.local
+.env
+
+# iOS environment config (contains sensitive keys)
+ios/Flutter/Dev.xcconfig
+ios/Flutter/Prod.xcconfig
+
+# Android local properties
+android/local.properties
+android/key.properties

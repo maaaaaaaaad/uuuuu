@@ -84,7 +84,8 @@ void main() {
       mockAuthRepository.memberResult = const Member(
         id: '1',
         nickname: '테스트유저',
-        email: 'test@test.com',
+        socialProvider: 'KAKAO',
+        socialId: 'test-kakao-id',
       );
 
       await tester.pumpWidget(createProfilePage());
@@ -97,7 +98,8 @@ void main() {
       mockAuthRepository.memberResult = const Member(
         id: '1',
         nickname: '테스트유저',
-        email: 'test@test.com',
+        socialProvider: 'KAKAO',
+        socialId: 'test-kakao-id',
       );
 
       await tester.pumpWidget(createProfilePage());
@@ -106,24 +108,26 @@ void main() {
       expect(find.text('테스트유저'), findsOneWidget);
     });
 
-    testWidgets('should display member email', (tester) async {
+    testWidgets('should display social provider info', (tester) async {
       mockAuthRepository.memberResult = const Member(
         id: '1',
         nickname: '테스트유저',
-        email: 'test@test.com',
+        socialProvider: 'KAKAO',
+        socialId: 'test-kakao-id',
       );
 
       await tester.pumpWidget(createProfilePage());
       await tester.pumpAndSettle();
 
-      expect(find.text('test@test.com'), findsOneWidget);
+      expect(find.text('KAKAO로 로그인'), findsOneWidget);
     });
 
     testWidgets('should show loading indicator while loading', (tester) async {
       mockAuthRepository.memberResult = const Member(
         id: '1',
         nickname: '테스트유저',
-        email: 'test@test.com',
+        socialProvider: 'KAKAO',
+        socialId: 'test-kakao-id',
       );
 
       await tester.pumpWidget(createProfilePage());
@@ -135,7 +139,8 @@ void main() {
       mockAuthRepository.memberResult = const Member(
         id: '1',
         nickname: '테스트유저',
-        email: 'test@test.com',
+        socialProvider: 'KAKAO',
+        socialId: 'test-kakao-id',
       );
 
       await tester.pumpWidget(createProfilePage());

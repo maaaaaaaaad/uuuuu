@@ -2,6 +2,19 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:jellomark/core/network/api_client.dart';
+import 'package:jellomark/core/network/auth_interceptor.dart';
+
+class MockTokenProvider implements TokenProvider {
+  String? token;
+
+  @override
+  Future<String?> getAccessToken() async => token;
+
+  @override
+  Future<void> clearTokens() async {
+    token = null;
+  }
+}
 
 void main() {
   group('ApiClient', () {
@@ -111,6 +124,31 @@ void main() {
         );
 
         expect(() => client.get('/error'), throwsA(isA<DioException>()));
+      });
+    });
+
+    group('AuthInterceptor', () {
+      test('should add AuthInterceptor when provided', () {
+        final mockTokenProvider = MockTokenProvider();
+        final authInterceptor = AuthInterceptor(tokenProvider: mockTokenProvider);
+        final client = ApiClient(
+          baseUrl: 'https://api.example.com',
+          authInterceptor: authInterceptor,
+        );
+
+        expect(
+          client.dio.interceptors.whereType<AuthInterceptor>().length,
+          1,
+        );
+      });
+
+      test('should not have AuthInterceptor when not provided', () {
+        final client = ApiClient(baseUrl: 'https://api.example.com');
+
+        expect(
+          client.dio.interceptors.whereType<AuthInterceptor>().length,
+          0,
+        );
       });
     });
   });

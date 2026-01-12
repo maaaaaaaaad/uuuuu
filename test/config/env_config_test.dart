@@ -3,42 +3,30 @@ import 'package:jellomark/config/env_config.dart';
 
 void main() {
   group('EnvConfig', () {
-    group('development', () {
-      test('should have development environment name', () {
-        expect(EnvConfig.development.name, 'development');
-      });
-
-      test('should have development API base URL', () {
-        expect(EnvConfig.development.apiBaseUrl, 'http://localhost:8080');
-      });
-
-      test('should be in debug mode', () {
-        expect(EnvConfig.development.isDebug, isTrue);
-      });
+    test('should have env value', () {
+      expect(EnvConfig.env, isNotNull);
+      expect(EnvConfig.env, isNotEmpty);
     });
 
-    group('production', () {
-      test('should have production environment name', () {
-        expect(EnvConfig.production.name, 'production');
-      });
-
-      test('should have production API base URL', () {
-        expect(EnvConfig.production.apiBaseUrl, isNotEmpty);
-      });
-
-      test('should not be in debug mode', () {
-        expect(EnvConfig.production.isDebug, isFalse);
-      });
+    test('should have apiBaseUrl value', () {
+      expect(EnvConfig.apiBaseUrl, isNotNull);
+      expect(EnvConfig.apiBaseUrl, isNotEmpty);
     });
 
-    group('current', () {
-      test('should return valid environment', () {
-        final current = EnvConfig.current;
+    test('should have kakaoNativeAppKey defined', () {
+      expect(EnvConfig.kakaoNativeAppKey, isNotNull);
+    });
 
-        expect(current, isNotNull);
-        expect(current.name, isNotEmpty);
-        expect(current.apiBaseUrl, isNotEmpty);
-      });
+    test('isDebug should return true when env is dev', () {
+      expect(EnvConfig.isDebug, EnvConfig.env == 'dev');
+    });
+
+    test('isProduction should return true when env is prod', () {
+      expect(EnvConfig.isProduction, EnvConfig.env == 'prod');
+    });
+
+    test('isDebug and isProduction should be mutually exclusive', () {
+      expect(EnvConfig.isDebug != EnvConfig.isProduction, isTrue);
     });
   });
 }

@@ -3,7 +3,20 @@
 FLUTTER_PATH="/Users/vector/dev/flutter/bin/flutter"
 PROJECT_DIR="/Users/vector/dev/jellomark"
 
+ENV_FILE="$PROJECT_DIR/.env.dev"
+if [ ! -f "$ENV_FILE" ]; then
+    echo "❌ $ENV_FILE 파일이 없습니다."
+    echo "   .env.example을 .env.dev로 복사하고 값을 채워주세요."
+    exit 1
+fi
+
+source "$ENV_FILE"
+
+DART_DEFINES="--dart-define=ENV=$ENV --dart-define=API_BASE_URL=$API_BASE_URL --dart-define=KAKAO_NATIVE_APP_KEY=$KAKAO_NATIVE_APP_KEY"
+
 echo "🔍 연결된 실기기 검색 중..."
+echo "   환경: $ENV"
+echo "   API: $API_BASE_URL"
 echo ""
 
 DEVICES_OUTPUT=$($FLUTTER_PATH devices 2>/dev/null)
@@ -62,7 +75,7 @@ if [ -n "$IOS_DEVICE_ID" ] && [ -n "$ANDROID_DEVICE_ID" ]; then
 
 
     echo "🍎 iOS 빌드 시작..."
-    cd "$PROJECT_DIR" && $FLUTTER_PATH run -d "$IOS_DEVICE_ID" &
+    cd "$PROJECT_DIR" && $FLUTTER_PATH run -d "$IOS_DEVICE_ID" $DART_DEFINES &
     IOS_PID=$!
 
 
@@ -70,7 +83,7 @@ if [ -n "$IOS_DEVICE_ID" ] && [ -n "$ANDROID_DEVICE_ID" ]; then
 
 
     echo "🤖 Android 빌드 시작..."
-    cd "$PROJECT_DIR" && $FLUTTER_PATH run -d "$ANDROID_DEVICE_ID" &
+    cd "$PROJECT_DIR" && $FLUTTER_PATH run -d "$ANDROID_DEVICE_ID" $DART_DEFINES &
     ANDROID_PID=$!
 
     echo ""
@@ -88,10 +101,10 @@ if [ -n "$IOS_DEVICE_ID" ] && [ -n "$ANDROID_DEVICE_ID" ]; then
 elif [ -n "$IOS_DEVICE_ID" ]; then
     echo "📱 iOS 단독 실행"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    cd "$PROJECT_DIR" && $FLUTTER_PATH run -d "$IOS_DEVICE_ID"
+    cd "$PROJECT_DIR" && $FLUTTER_PATH run -d "$IOS_DEVICE_ID" $DART_DEFINES
 
 else
     echo "📱 Android 단독 실행"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    cd "$PROJECT_DIR" && $FLUTTER_PATH run -d "$ANDROID_DEVICE_ID"
+    cd "$PROJECT_DIR" && $FLUTTER_PATH run -d "$ANDROID_DEVICE_ID" $DART_DEFINES
 fi

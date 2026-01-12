@@ -43,7 +43,7 @@ void main() {
     });
 
     test('should return Member when repository call is successful', () async {
-      const member = Member(id: '1', nickname: '테스트유저', email: 'test@test.com');
+      const member = Member(id: '1', nickname: '테스트유저', socialProvider: 'KAKAO', socialId: 'test-kakao-id');
       mockRepository.memberResult = member;
 
       final result = await useCase();

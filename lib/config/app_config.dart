@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/core/di/injection_container.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 class AppConfig {
-  static const String _kakaoNativeAppKey = 'YOUR_KAKAO_NATIVE_APP_KEY';
-
   static Future<void> initializeApp() async {
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -20,7 +19,7 @@ class AppConfig {
       ),
     );
 
-    KakaoSdk.init(nativeAppKey: _kakaoNativeAppKey);
+    KakaoSdk.init(nativeAppKey: EnvConfig.kakaoNativeAppKey);
 
     await initDependencies();
   }

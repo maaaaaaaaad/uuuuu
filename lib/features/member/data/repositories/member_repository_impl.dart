@@ -10,7 +10,7 @@ class MemberRepositoryImpl implements MemberRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 500));
     return Right(
-      Member(id: '1', nickname: nickname, email: 'user@jellomark.com'),
+      Member(id: '1', nickname: nickname, socialProvider: 'KAKAO', socialId: 'mock-kakao-id'),
     );
   }
 }

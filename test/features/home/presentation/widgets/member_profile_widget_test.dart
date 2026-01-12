@@ -8,7 +8,8 @@ void main() {
     const testMember = Member(
       id: 'member-123',
       nickname: '젤리',
-      email: 'jelly@example.com',
+      socialProvider: 'KAKAO',
+      socialId: '1234567890',
     );
 
     testWidgets('should display member nickname', (tester) async {
@@ -21,14 +22,14 @@ void main() {
       expect(find.text('젤리'), findsOneWidget);
     });
 
-    testWidgets('should display member email', (tester) async {
+    testWidgets('should display social provider info', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(body: MemberProfileWidget(member: testMember)),
         ),
       );
 
-      expect(find.text('jelly@example.com'), findsOneWidget);
+      expect(find.text('KAKAO로 로그인'), findsOneWidget);
     });
 
     testWidgets('should display profile avatar', (tester) async {

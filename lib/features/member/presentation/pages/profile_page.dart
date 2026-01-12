@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
+
+  Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
+    final logoutUseCase = ref.read(logoutUseCaseProvider);
+    await logoutUseCase();
+
+    if (context.mounted) {
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,7 +56,7 @@ class ProfilePage extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                member.email,
+                '${member.socialProvider}로 로그인',
                 style: Theme.of(
                   context,
                 ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
@@ -55,9 +65,7 @@ class ProfilePage extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/login');
-                  },
+                  onPressed: () => _handleLogout(context, ref),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,
                     side: const BorderSide(color: Colors.red),

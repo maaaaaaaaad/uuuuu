@@ -8,6 +8,8 @@ abstract class AuthRemoteDataSource {
   Future<TokenPairModel> refreshToken(String refreshToken);
 
   Future<MemberModel> getCurrentMember();
+
+  Future<void> logout();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -38,5 +40,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<MemberModel> getCurrentMember() async {
     final response = await _apiClient.get('/api/members/me');
     return MemberModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<void> logout() async {
+    await _apiClient.post('/api/auth/logout');
   }
 }

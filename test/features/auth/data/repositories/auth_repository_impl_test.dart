@@ -32,6 +32,11 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     if (exception != null) throw exception!;
     return memberResult!;
   }
+
+  @override
+  Future<void> logout() async {
+    if (exception != null) throw exception!;
+  }
 }
 
 class MockAuthLocalDataSource implements AuthLocalDataSource {
@@ -113,7 +118,8 @@ void main() {
         const member = MemberModel(
           id: 'member-123',
           nickname: '젤리',
-          email: 'jelly@example.com',
+          socialProvider: 'KAKAO',
+          socialId: 'kakao-123456',
         );
         mockRemoteDataSource.memberResult = member;
 

@@ -48,15 +48,19 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final member = await _remoteDataSource.getCurrentMember();
       return Right(member);
-    } on DioException {
-      return const Right(
-        Member(id: 'mock-1', nickname: '젤로마크 유저', email: 'user@jellomark.com'),
-      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        return const Left(AuthFailure('인증이 만료되었습니다'));
+      }
+      return Left(ServerFailure(_getErrorMessage(e)));
     }
   }
 
   @override
   Future<Either<Failure, void>> logout() async {
+    try {
+      await _remoteDataSource.logout();
+    } catch (_) {}
     await _localDataSource.clearTokens();
     return const Right(null);
   }

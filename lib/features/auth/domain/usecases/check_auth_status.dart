@@ -23,19 +23,26 @@ class CheckAuthStatusUseCase {
     final memberResult = await _authRepository.getCurrentMember();
 
     return memberResult.fold((failure) async {
-      if (failure is AuthFailure) {
-        final refreshResult = await _authRepository.refreshToken(
-          tokens.refreshToken,
-        );
+      final refreshResult = await _authRepository.refreshToken(
+        tokens.refreshToken,
+      );
 
-        return refreshResult.fold((refreshFailure) => Left(refreshFailure), (
-          _,
-        ) async {
+      return refreshResult.fold(
+        (refreshFailure) {
+          _localDataSource.clearTokens();
+          return Left(refreshFailure);
+        },
+        (_) async {
           final retryResult = await _authRepository.getCurrentMember();
-          return retryResult;
-        });
-      }
-      return Left(failure);
+          return retryResult.fold(
+            (retryFailure) {
+              _localDataSource.clearTokens();
+              return Left(retryFailure);
+            },
+            (member) => Right(member),
+          );
+        },
+      );
     }, (member) => Right(member));
   }
 }

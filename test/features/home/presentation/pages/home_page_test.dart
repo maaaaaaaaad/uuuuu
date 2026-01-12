@@ -17,7 +17,7 @@ class MockAuthRepository implements AuthRepository {
   @override
   Future<Either<Failure, Member>> getCurrentMember() async {
     return const Right(
-      Member(id: '1', nickname: '테스트', email: 'test@test.com'),
+      Member(id: '1', nickname: '테스트', socialProvider: 'KAKAO', socialId: 'test-kakao-id'),
     );
   }
 
@@ -43,7 +43,7 @@ class MockMemberRepository implements MemberRepository {
     required String nickname,
   }) async {
     return const Right(
-      Member(id: '1', nickname: '테스트', email: 'test@test.com'),
+      Member(id: '1', nickname: '테스트', socialProvider: 'KAKAO', socialId: 'test-kakao-id'),
     );
   }
 }

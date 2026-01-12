@@ -113,7 +113,8 @@ void main() {
       mockRepository.memberResult = const MemberModel(
         id: 'member-123',
         nickname: '젤리',
-        email: 'jelly@example.com',
+        socialProvider: 'KAKAO',
+        socialId: 'kakao-123456',
       );
 
       await tester.pumpWidget(createSplashPage());

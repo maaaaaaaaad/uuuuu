@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellomark/core/di/injection_container.dart' as di;
+import 'package:jellomark/core/network/auth_interceptor.dart';
 
 abstract class TestRepository {
   String getData();
@@ -69,6 +70,20 @@ void main() {
         final second = di.sl<TestRepository>();
 
         expect(identical(first, second), isFalse);
+      });
+    });
+
+    group('Auth Dependencies', () {
+      test('should register TokenProvider', () async {
+        await di.initDependencies();
+
+        expect(di.sl.isRegistered<TokenProvider>(), isTrue);
+      });
+
+      test('should register AuthInterceptor', () async {
+        await di.initDependencies();
+
+        expect(di.sl.isRegistered<AuthInterceptor>(), isTrue);
       });
     });
   });

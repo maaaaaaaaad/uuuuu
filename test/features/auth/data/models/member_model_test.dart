@@ -8,7 +8,8 @@ void main() {
       const model = MemberModel(
         id: 'member-123',
         nickname: '젤리',
-        email: 'jelly@example.com',
+        socialProvider: 'KAKAO',
+        socialId: '1234567890',
       );
 
       expect(model, isA<Member>());
@@ -19,14 +20,16 @@ void main() {
         final json = {
           'id': 'member-456',
           'nickname': '마크',
-          'email': 'mark@example.com',
+          'socialProvider': 'KAKAO',
+          'socialId': '9876543210',
         };
 
         final result = MemberModel.fromJson(json);
 
         expect(result.id, 'member-456');
         expect(result.nickname, '마크');
-        expect(result.email, 'mark@example.com');
+        expect(result.socialProvider, 'KAKAO');
+        expect(result.socialId, '9876543210');
       });
     });
 
@@ -35,14 +38,16 @@ void main() {
         const model = MemberModel(
           id: 'member-789',
           nickname: '테스트',
-          email: 'test@example.com',
+          socialProvider: 'KAKAO',
+          socialId: '1111111111',
         );
 
         final result = model.toJson();
 
         expect(result['id'], 'member-789');
         expect(result['nickname'], '테스트');
-        expect(result['email'], 'test@example.com');
+        expect(result['socialProvider'], 'KAKAO');
+        expect(result['socialId'], '1111111111');
       });
     });
   });

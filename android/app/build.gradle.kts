@@ -1,9 +1,24 @@
+import java.util.Base64
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+val kakaoNativeAppKey: String = project.findProperty("dart-defines")
+    ?.toString()
+    ?.split(",")
+    ?.mapNotNull { encoded ->
+        try {
+            String(Base64.getDecoder().decode(encoded))
+        } catch (e: Exception) {
+            null
+        }
+    }
+    ?.find { it.startsWith("KAKAO_NATIVE_APP_KEY=") }
+    ?.substringAfter("=")
+    ?: ""
 
 android {
     namespace = "com.jello.jellomark"
@@ -20,14 +35,13 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.jello.jellomark"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        manifestPlaceholders["NATIVE_APP_KEY"] = kakaoNativeAppKey
     }
 
     buildTypes {
