@@ -53,7 +53,7 @@ void main() {
       );
 
       final decoration = container.decoration as BoxDecoration?;
-      expect(decoration?.color?.opacity, lessThan(1.0));
+      expect(decoration?.color?.a, lessThan(1.0));
     });
 
     testWidgets('has rounded corners', (tester) async {
