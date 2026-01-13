@@ -8,7 +8,7 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop_filter.dart';
 import 'package:jellomark/features/beautishop/domain/entities/paged_beauty_shops.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops_usecase.dart';
-import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_page.dart';
+import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
 import 'package:jellomark/features/category/domain/entities/category.dart';
 import 'package:jellomark/features/category/domain/usecases/get_categories_usecase.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
@@ -253,7 +253,7 @@ void main() {
       expect(find.byKey(const Key('floating_search_icon')), findsNothing);
     });
 
-    testWidgets('navigates to ShopDetailPage when shop card is tapped', (
+    testWidgets('navigates to ShopDetailScreen when shop card is tapped', (
       tester,
     ) async {
       setupMocks();
@@ -270,7 +270,7 @@ void main() {
       await tester.tap(shopCard);
       await tester.pumpAndSettle();
 
-      expect(find.byType(ShopDetailPage), findsOneWidget);
+      expect(find.byType(ShopDetailScreen), findsOneWidget);
     });
   });
 }

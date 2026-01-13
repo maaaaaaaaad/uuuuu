@@ -28,13 +28,24 @@ class BeautyShopModel extends BeautyShop {
     required this.updatedAt,
   });
 
+  static const _englishToKoreanDays = {
+    'monday': '월',
+    'tuesday': '화',
+    'wednesday': '수',
+    'thursday': '목',
+    'friday': '금',
+    'saturday': '토',
+    'sunday': '일',
+  };
+
   factory BeautyShopModel.fromJson(Map<String, dynamic> json) {
     final categories = json['categories'] as List<dynamic>? ?? [];
     final tags = categories.map((c) => c['name'] as String).toList();
 
-    final operatingTime = Map<String, String>.from(
+    final rawOperatingTime = Map<String, String>.from(
       json['operatingTime'] as Map<String, dynamic>? ?? {},
     );
+    final operatingTime = _convertToKoreanDays(rawOperatingTime);
     final operatingHours = _formatOperatingHours(operatingTime);
 
     final createdAt = DateTime.parse(json['createdAt'] as String);
@@ -91,5 +102,18 @@ class BeautyShopModel extends BeautyShop {
       }
     }
     return parts.join(', ');
+  }
+
+  static Map<String, String> _convertToKoreanDays(Map<String, String> raw) {
+    final result = <String, String>{};
+    for (final entry in raw.entries) {
+      final koreanDay = _englishToKoreanDays[entry.key.toLowerCase()];
+      if (koreanDay != null) {
+        result[koreanDay] = entry.value;
+      } else {
+        result[entry.key] = entry.value;
+      }
+    }
+    return result;
   }
 }

@@ -17,6 +17,10 @@ import 'package:jellomark/features/category/data/repositories/category_repositor
 import 'package:jellomark/features/category/domain/repositories/category_repository.dart';
 import 'package:jellomark/features/category/domain/usecases/get_categories_usecase.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
+import 'package:jellomark/features/treatment/data/datasources/treatment_remote_datasource.dart';
+import 'package:jellomark/features/treatment/data/repositories/treatment_repository_impl.dart';
+import 'package:jellomark/features/treatment/domain/repositories/treatment_repository.dart';
+import 'package:jellomark/features/treatment/domain/usecases/get_shop_treatments_usecase.dart';
 
 final sl = GetIt.instance;
 
@@ -94,6 +98,20 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<GetCategoriesUseCase>(
     () => GetCategoriesUseCase(repository: sl<CategoryRepository>()),
+  );
+
+  sl.registerLazySingleton<TreatmentRemoteDataSource>(
+    () => TreatmentRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  sl.registerLazySingleton<TreatmentRepository>(
+    () => TreatmentRepositoryImpl(
+      remoteDataSource: sl<TreatmentRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetShopTreatmentsUseCase>(
+    () => GetShopTreatmentsUseCase(repository: sl<TreatmentRepository>()),
   );
 
   _initialized = true;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
-import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_page.dart';
+import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
 import 'package:jellomark/shared/utils/category_icon_mapper.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
@@ -50,7 +50,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ShopDetailPage.fromBeautyShop(shop: shop),
+        builder: (_) => ShopDetailScreen(shop: shop),
       ),
     );
   }
