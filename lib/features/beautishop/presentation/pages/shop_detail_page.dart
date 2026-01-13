@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_review.dart';
@@ -20,6 +21,82 @@ class ShopDetailPage extends StatelessWidget {
     required this.services,
     required this.reviews,
   });
+
+  factory ShopDetailPage.fromBeautyShop({
+    Key? key,
+    required BeautyShop shop,
+  }) {
+    final shopDetail = ShopDetail(
+      id: shop.id,
+      name: shop.name,
+      address: shop.address,
+      description: '${shop.name}은(는) 고객님께 최상의 서비스를 제공하기 위해 항상 노력하고 있습니다.',
+      phoneNumber: '02-1234-5678',
+      images: [
+        'https://picsum.photos/400/300?random=${shop.id}1',
+        'https://picsum.photos/400/300?random=${shop.id}2',
+        'https://picsum.photos/400/300?random=${shop.id}3',
+      ],
+      operatingHoursMap: const {
+        '월': '10:00 - 20:00',
+        '화': '10:00 - 20:00',
+        '수': '10:00 - 20:00',
+        '목': '10:00 - 20:00',
+        '금': '10:00 - 21:00',
+        '토': '10:00 - 18:00',
+        '일': '휴무',
+      },
+      rating: shop.rating,
+      reviewCount: shop.reviewCount,
+      distance: shop.distance,
+      tags: shop.tags,
+      discountRate: shop.discountRate,
+      isNew: shop.isNew,
+    );
+
+    final services = [
+      ServiceMenu(
+        id: '${shop.id}-service-1',
+        name: '기본 시술',
+        price: 50000,
+        durationMinutes: 60,
+        description: '기본 시술 서비스입니다.',
+      ),
+      ServiceMenu(
+        id: '${shop.id}-service-2',
+        name: '프리미엄 시술',
+        price: 80000,
+        durationMinutes: 90,
+        description: '프리미엄 시술 서비스입니다.',
+      ),
+    ];
+
+    final reviews = [
+      ShopReview(
+        id: '${shop.id}-review-1',
+        authorName: '김민지',
+        rating: 5.0,
+        content: '정말 만족스러웠어요! 다음에도 또 방문할게요.',
+        createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        serviceName: '기본 시술',
+      ),
+      ShopReview(
+        id: '${shop.id}-review-2',
+        authorName: '이수현',
+        rating: 4.5,
+        content: '친절하고 꼼꼼하게 해주셔서 좋았습니다.',
+        createdAt: DateTime.now().subtract(const Duration(days: 3)),
+        serviceName: '프리미엄 시술',
+      ),
+    ];
+
+    return ShopDetailPage(
+      key: key,
+      shopDetail: shopDetail,
+      services: services,
+      reviews: reviews,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

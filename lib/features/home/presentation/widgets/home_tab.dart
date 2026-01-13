@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
+import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_page.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/sections/shop_section.dart';
@@ -41,6 +42,19 @@ class _HomeTabState extends State<HomeTab> {
     }
   }
 
+  void _navigateToShopDetail(String shopId, List<BeautyShop> shops) {
+    final shop = shops.firstWhere(
+      (s) => s.id == shopId,
+      orElse: () => shops.first,
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ShopDetailPage.fromBeautyShop(shop: shop),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -66,24 +80,28 @@ class _HomeTabState extends State<HomeTab> {
                     title: '내 주변 인기 샵',
                     shops: _mockNearbyShops,
                     showMore: true,
+                    onShopTap: (id) => _navigateToShopDetail(id, _mockNearbyShops),
                   ),
                   const SizedBox(height: 24),
                   HorizontalShopSection(
                     title: '할인 중인 샵',
                     shops: _mockDiscountShops,
                     showMore: true,
+                    onShopTap: (id) => _navigateToShopDetail(id, _mockDiscountShops),
                   ),
                   const SizedBox(height: 24),
                   VerticalShopSection(
                     title: '추천 샵',
                     shops: _mockRecommendedShops,
                     showMore: true,
+                    onShopTap: (id) => _navigateToShopDetail(id, _mockRecommendedShops),
                   ),
                   const SizedBox(height: 24),
                   VerticalShopSection(
                     title: '새로 입점한 샵',
                     shops: _mockNewShops,
                     showMore: true,
+                    onShopTap: (id) => _navigateToShopDetail(id, _mockNewShops),
                   ),
                   const SizedBox(height: 32),
                 ],

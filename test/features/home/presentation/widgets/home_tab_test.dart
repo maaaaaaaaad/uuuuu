@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_page.dart';
 import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/units/banner_carousel.dart';
+import 'package:jellomark/shared/widgets/units/shop_card.dart';
 
 void main() {
   group('HomeTab', () {
@@ -182,6 +184,23 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('floating_search_icon')), findsNothing);
+    });
+
+    testWidgets('navigates to ShopDetailPage when shop card is tapped',
+        (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: HomeTab(),
+          ),
+        ),
+      );
+
+      final shopCard = find.byType(ShopCard).first;
+      await tester.tap(shopCard);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ShopDetailPage), findsOneWidget);
     });
   });
 }
