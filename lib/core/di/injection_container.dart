@@ -8,11 +8,15 @@ import 'package:jellomark/features/auth/data/datasources/auth_remote_datasource.
 import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
 import 'package:jellomark/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
-import 'package:jellomark/features/member/data/datasources/member_remote_datasource.dart';
-import 'package:jellomark/features/member/data/repositories/member_repository_impl.dart';
-import 'package:jellomark/features/member/domain/repositories/member_repository.dart';
+import 'package:jellomark/features/beautishop/data/datasources/beauty_shop_remote_datasource.dart';
+import 'package:jellomark/features/beautishop/data/repositories/beauty_shop_repository_impl.dart';
+import 'package:jellomark/features/beautishop/domain/repositories/beauty_shop_repository.dart';
+import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops_usecase.dart';
+import 'package:jellomark/features/category/data/datasources/category_remote_datasource.dart';
+import 'package:jellomark/features/category/data/repositories/category_repository_impl.dart';
+import 'package:jellomark/features/category/domain/repositories/category_repository.dart';
+import 'package:jellomark/features/category/domain/usecases/get_categories_usecase.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
-import 'package:jellomark/features/member/domain/usecases/update_member_profile.dart';
 
 final sl = GetIt.instance;
 
@@ -60,20 +64,36 @@ Future<void> initDependencies() async {
     ),
   );
 
-  sl.registerLazySingleton<MemberRemoteDataSource>(
-    () => MemberRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
-  );
-
-  sl.registerLazySingleton<MemberRepository>(
-    () => MemberRepositoryImpl(remoteDataSource: sl<MemberRemoteDataSource>()),
-  );
-
   sl.registerLazySingleton<GetCurrentMember>(
     () => GetCurrentMember(repository: sl<AuthRepository>()),
   );
 
-  sl.registerLazySingleton<UpdateMemberProfile>(
-    () => UpdateMemberProfile(repository: sl<MemberRepository>()),
+  sl.registerLazySingleton<BeautyShopRemoteDataSource>(
+    () => BeautyShopRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  sl.registerLazySingleton<BeautyShopRepository>(
+    () => BeautyShopRepositoryImpl(
+      remoteDataSource: sl<BeautyShopRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetFilteredShopsUseCase>(
+    () => GetFilteredShopsUseCase(repository: sl<BeautyShopRepository>()),
+  );
+
+  sl.registerLazySingleton<CategoryRemoteDataSource>(
+    () => CategoryRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  sl.registerLazySingleton<CategoryRepository>(
+    () => CategoryRepositoryImpl(
+      remoteDataSource: sl<CategoryRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetCategoriesUseCase>(
+    () => GetCategoriesUseCase(repository: sl<CategoryRepository>()),
   );
 
   _initialized = true;

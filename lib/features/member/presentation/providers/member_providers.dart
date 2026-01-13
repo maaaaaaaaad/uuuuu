@@ -2,14 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/core/di/injection_container.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
-import 'package:jellomark/features/member/domain/usecases/update_member_profile.dart';
 
 final getCurrentMemberUseCaseProvider = Provider<GetCurrentMember>((ref) {
   return sl<GetCurrentMember>();
-});
-
-final updateMemberProfileUseCaseProvider = Provider<UpdateMemberProfile>((ref) {
-  return sl<UpdateMemberProfile>();
 });
 
 final currentMemberProvider = FutureProvider<Member>((ref) async {

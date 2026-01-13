@@ -6,9 +6,7 @@ import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/auth/domain/entities/token_pair.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
-import 'package:jellomark/features/member/domain/repositories/member_repository.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
-import 'package:jellomark/features/member/domain/usecases/update_member_profile.dart';
 import 'package:jellomark/features/member/presentation/pages/profile_page.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 
@@ -51,27 +49,12 @@ class MockAuthRepository implements AuthRepository {
   Future<void> clearStoredTokens() async {}
 }
 
-class MockMemberRepository implements MemberRepository {
-  Member? memberResult;
-  Failure? failure;
-
-  @override
-  Future<Either<Failure, Member>> updateProfile({
-    required String nickname,
-  }) async {
-    if (failure != null) return Left(failure!);
-    return Right(memberResult!);
-  }
-}
-
 void main() {
   group('ProfilePage', () {
     late MockAuthRepository mockAuthRepository;
-    late MockMemberRepository mockMemberRepository;
 
     setUp(() {
       mockAuthRepository = MockAuthRepository();
-      mockMemberRepository = MockMemberRepository();
     });
 
     Widget createProfilePage() {
@@ -79,9 +62,6 @@ void main() {
         overrides: [
           getCurrentMemberUseCaseProvider.overrideWithValue(
             GetCurrentMember(repository: mockAuthRepository),
-          ),
-          updateMemberProfileUseCaseProvider.overrideWithValue(
-            UpdateMemberProfile(repository: mockMemberRepository),
           ),
         ],
         child: MaterialApp(

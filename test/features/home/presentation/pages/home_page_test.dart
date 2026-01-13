@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,13 +7,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/auth/domain/entities/token_pair.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
+import 'package:jellomark/features/beautishop/domain/entities/beauty_shop_filter.dart';
+import 'package:jellomark/features/beautishop/domain/entities/paged_beauty_shops.dart';
+import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops_usecase.dart';
+import 'package:jellomark/features/category/domain/usecases/get_categories_usecase.dart';
 import 'package:jellomark/features/home/presentation/pages/home_page.dart';
+import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
 import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
-import 'package:jellomark/features/member/domain/repositories/member_repository.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
-import 'package:jellomark/features/member/domain/usecases/update_member_profile.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
+import 'package:mocktail/mocktail.dart';
+
+import '../../../../helpers/mock_http_client.dart';
+
+class MockGetFilteredShopsUseCase extends Mock
+    implements GetFilteredShopsUseCase {}
+
+class MockGetCategoriesUseCase extends Mock implements GetCategoriesUseCase {}
+
+class FakeBeautyShopFilter extends Fake implements BeautyShopFilter {}
 
 class MockAuthRepository implements AuthRepository {
   @override
@@ -53,30 +68,31 @@ class MockAuthRepository implements AuthRepository {
   Future<void> clearStoredTokens() async {}
 }
 
-class MockMemberRepository implements MemberRepository {
-  @override
-  Future<Either<Failure, Member>> updateProfile({
-    required String nickname,
-  }) async {
-    return const Right(
-      Member(
-        id: '1',
-        nickname: '테스트',
-        socialProvider: 'KAKAO',
-        socialId: 'test-kakao-id',
-      ),
-    );
-  }
-}
-
 void main() {
   group('HomePage', () {
     late MockAuthRepository mockAuthRepository;
-    late MockMemberRepository mockMemberRepository;
+    late MockGetFilteredShopsUseCase mockGetFilteredShopsUseCase;
+    late MockGetCategoriesUseCase mockGetCategoriesUseCase;
+
+    setUpAll(() {
+      HttpOverrides.global = MockHttpOverrides();
+      registerFallbackValue(FakeBeautyShopFilter());
+    });
 
     setUp(() {
       mockAuthRepository = MockAuthRepository();
-      mockMemberRepository = MockMemberRepository();
+      mockGetFilteredShopsUseCase = MockGetFilteredShopsUseCase();
+      mockGetCategoriesUseCase = MockGetCategoriesUseCase();
+
+      when(() => mockGetCategoriesUseCase())
+          .thenAnswer((_) async => const Right([]));
+      when(() => mockGetFilteredShopsUseCase(any())).thenAnswer(
+        (_) async => const Right(PagedBeautyShops(
+          items: [],
+          hasNext: false,
+          totalElements: 0,
+        )),
+      );
     });
 
     Widget createHomePage() {
@@ -85,9 +101,10 @@ void main() {
           getCurrentMemberUseCaseProvider.overrideWithValue(
             GetCurrentMember(repository: mockAuthRepository),
           ),
-          updateMemberProfileUseCaseProvider.overrideWithValue(
-            UpdateMemberProfile(repository: mockMemberRepository),
-          ),
+          getFilteredShopsUseCaseProvider
+              .overrideWithValue(mockGetFilteredShopsUseCase),
+          getCategoriesUseCaseProvider
+              .overrideWithValue(mockGetCategoriesUseCase),
         ],
         child: const MaterialApp(home: HomePage()),
       );

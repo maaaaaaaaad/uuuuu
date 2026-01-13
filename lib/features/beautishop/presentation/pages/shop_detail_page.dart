@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/features/beautishop/data/models/beauty_shop_model.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
@@ -26,26 +27,32 @@ class ShopDetailPage extends StatelessWidget {
     Key? key,
     required BeautyShop shop,
   }) {
+    String phoneNumber = '';
+    String? description;
+    Map<String, String>? operatingHoursMap;
+    List<String> images = [];
+
+    if (shop is BeautyShopModel) {
+      phoneNumber = shop.phoneNumber;
+      description = shop.description;
+      operatingHoursMap = shop.operatingTimeMap;
+      if (shop.imageUrl != null) {
+        images = [shop.imageUrl!];
+      }
+    } else {
+      if (shop.imageUrl != null) {
+        images = [shop.imageUrl!];
+      }
+    }
+
     final shopDetail = ShopDetail(
       id: shop.id,
       name: shop.name,
       address: shop.address,
-      description: '${shop.name}은(는) 고객님께 최상의 서비스를 제공하기 위해 항상 노력하고 있습니다.',
-      phoneNumber: '02-1234-5678',
-      images: [
-        'https://picsum.photos/400/300?random=${shop.id}1',
-        'https://picsum.photos/400/300?random=${shop.id}2',
-        'https://picsum.photos/400/300?random=${shop.id}3',
-      ],
-      operatingHoursMap: const {
-        '월': '10:00 - 20:00',
-        '화': '10:00 - 20:00',
-        '수': '10:00 - 20:00',
-        '목': '10:00 - 20:00',
-        '금': '10:00 - 21:00',
-        '토': '10:00 - 18:00',
-        '일': '휴무',
-      },
+      description: description ?? '',
+      phoneNumber: phoneNumber,
+      images: images,
+      operatingHoursMap: operatingHoursMap,
       rating: shop.rating,
       reviewCount: shop.reviewCount,
       distance: shop.distance,
@@ -54,47 +61,11 @@ class ShopDetailPage extends StatelessWidget {
       isNew: shop.isNew,
     );
 
-    final services = [
-      ServiceMenu(
-        id: '${shop.id}-service-1',
-        name: '기본 시술',
-        price: 50000,
-        durationMinutes: 60,
-        description: '기본 시술 서비스입니다.',
-      ),
-      ServiceMenu(
-        id: '${shop.id}-service-2',
-        name: '프리미엄 시술',
-        price: 80000,
-        durationMinutes: 90,
-        description: '프리미엄 시술 서비스입니다.',
-      ),
-    ];
-
-    final reviews = [
-      ShopReview(
-        id: '${shop.id}-review-1',
-        authorName: '김민지',
-        rating: 5.0,
-        content: '정말 만족스러웠어요! 다음에도 또 방문할게요.',
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        serviceName: '기본 시술',
-      ),
-      ShopReview(
-        id: '${shop.id}-review-2',
-        authorName: '이수현',
-        rating: 4.5,
-        content: '친절하고 꼼꼼하게 해주셔서 좋았습니다.',
-        createdAt: DateTime.now().subtract(const Duration(days: 3)),
-        serviceName: '프리미엄 시술',
-      ),
-    ];
-
     return ShopDetailPage(
       key: key,
       shopDetail: shopDetail,
-      services: services,
-      reviews: reviews,
+      services: const [],
+      reviews: const [],
     );
   }
 
@@ -119,17 +90,25 @@ class ShopDetailPage extends StatelessWidget {
                         : null,
                     address: shopDetail.address,
                   ),
-                  const SizedBox(height: 24),
-                  ShopDescription(description: shopDetail.description),
-                  const SizedBox(height: 24),
-                  if (shopDetail.operatingHoursMap != null)
+                  if (shopDetail.description.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    ShopDescription(description: shopDetail.description),
+                  ],
+                  if (shopDetail.operatingHoursMap != null &&
+                      shopDetail.operatingHoursMap!.isNotEmpty) ...[
+                    const SizedBox(height: 24),
                     OperatingHoursCard(
                       operatingHours: shopDetail.operatingHoursMap!,
                     ),
-                  const SizedBox(height: 24),
-                  _buildServiceMenuSection(),
-                  const SizedBox(height: 24),
-                  _buildReviewSection(),
+                  ],
+                  if (services.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    _buildServiceMenuSection(),
+                  ],
+                  if (reviews.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    _buildReviewSection(),
+                  ],
                   const SizedBox(height: 80),
                 ],
               ),
@@ -143,7 +122,7 @@ class ShopDetailPage extends StatelessWidget {
 
   SliverAppBar _buildSliverAppBar(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 250,
+      expandedHeight: shopDetail.images.isNotEmpty ? 250 : kToolbarHeight,
       pinned: true,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
@@ -156,7 +135,9 @@ class ShopDetailPage extends StatelessWidget {
               kToolbarHeight + MediaQuery.of(context).padding.top;
           return FlexibleSpaceBar(
             title: isCollapsed ? Text(shopDetail.name) : null,
-            background: ShopImageGallery(images: shopDetail.images),
+            background: shopDetail.images.isNotEmpty
+                ? ShopImageGallery(images: shopDetail.images)
+                : Container(color: const Color(0xFFFFB5BA).withValues(alpha: 0.3)),
           );
         },
       ),
@@ -189,9 +170,9 @@ class ShopDetailPage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               '리뷰',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             if (shopDetail.reviewCount > 0)
               Text(
