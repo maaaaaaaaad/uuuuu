@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
+import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
 
 import '../../../../helpers/mock_http_client.dart';
@@ -43,6 +44,9 @@ void main() {
             }
             return Future.value(treatments ?? []);
           }),
+          shopReviewsNotifierProvider(shop.id).overrideWith(
+            (ref) => _MockShopReviewsNotifier(),
+          ),
         ],
         child: MaterialApp(
           home: ShopDetailScreen(shop: shop),
@@ -91,6 +95,9 @@ void main() {
               await Future<void>.value();
               return const <ServiceMenu>[];
             }),
+            shopReviewsNotifierProvider(testShop.id).overrideWith(
+              (ref) => _MockShopReviewsNotifier(),
+            ),
           ],
           child: MaterialApp(
             home: ShopDetailScreen(shop: testShop),
@@ -161,6 +168,9 @@ void main() {
         ProviderScope(
           overrides: [
             shopTreatmentsProvider('shop-1').overrideWith((ref) async => []),
+            shopReviewsNotifierProvider('shop-1').overrideWith(
+              (ref) => _MockShopReviewsNotifier(),
+            ),
           ],
           child: MaterialApp(
             home: Builder(
@@ -193,4 +203,22 @@ void main() {
       expect(find.byType(ShopDetailScreen), findsNothing);
     });
   });
+}
+
+class _MockShopReviewsNotifier extends ShopReviewsNotifier {
+  _MockShopReviewsNotifier() : super('mock-shop-id', _MockRef());
+
+  @override
+  ShopReviewsState get state => const ShopReviewsState();
+
+  @override
+  Future<void> loadInitial() async {}
+
+  @override
+  Future<void> loadMore() async {}
+}
+
+class _MockRef implements Ref {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
 }

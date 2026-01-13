@@ -9,6 +9,7 @@ import 'package:jellomark/features/beautishop/presentation/widgets/service_menu_
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_description.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_image_gallery.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
+import 'package:jellomark/features/review/presentation/widgets/review_section.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
 
 class ShopDetailScreen extends ConsumerWidget {
@@ -90,6 +91,8 @@ class ShopDetailScreen extends ConsumerWidget {
                   ],
                   const SizedBox(height: 24),
                   _buildServiceMenuSection(treatmentsAsync),
+                  const SizedBox(height: 24),
+                  ReviewSection(shopId: shop.id),
                   const SizedBox(height: 80),
                 ],
               ),

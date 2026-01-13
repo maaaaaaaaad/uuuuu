@@ -17,6 +17,13 @@ import 'package:jellomark/features/category/data/repositories/category_repositor
 import 'package:jellomark/features/category/domain/repositories/category_repository.dart';
 import 'package:jellomark/features/category/domain/usecases/get_categories_usecase.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
+import 'package:jellomark/features/review/data/datasources/review_remote_datasource.dart';
+import 'package:jellomark/features/review/data/repositories/review_repository_impl.dart';
+import 'package:jellomark/features/review/domain/repositories/review_repository.dart';
+import 'package:jellomark/features/review/domain/usecases/create_review_usecase.dart';
+import 'package:jellomark/features/review/domain/usecases/delete_review_usecase.dart';
+import 'package:jellomark/features/review/domain/usecases/get_shop_reviews_usecase.dart';
+import 'package:jellomark/features/review/domain/usecases/update_review_usecase.dart';
 import 'package:jellomark/features/treatment/data/datasources/treatment_remote_datasource.dart';
 import 'package:jellomark/features/treatment/data/repositories/treatment_repository_impl.dart';
 import 'package:jellomark/features/treatment/domain/repositories/treatment_repository.dart';
@@ -112,6 +119,32 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<GetShopTreatmentsUseCase>(
     () => GetShopTreatmentsUseCase(repository: sl<TreatmentRepository>()),
+  );
+
+  sl.registerLazySingleton<ReviewRemoteDataSource>(
+    () => ReviewRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  sl.registerLazySingleton<ReviewRepository>(
+    () => ReviewRepositoryImpl(
+      remoteDataSource: sl<ReviewRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetShopReviewsUseCase>(
+    () => GetShopReviewsUseCase(repository: sl<ReviewRepository>()),
+  );
+
+  sl.registerLazySingleton<CreateReviewUseCase>(
+    () => CreateReviewUseCase(repository: sl<ReviewRepository>()),
+  );
+
+  sl.registerLazySingleton<UpdateReviewUseCase>(
+    () => UpdateReviewUseCase(repository: sl<ReviewRepository>()),
+  );
+
+  sl.registerLazySingleton<DeleteReviewUseCase>(
+    () => DeleteReviewUseCase(repository: sl<ReviewRepository>()),
   );
 
   _initialized = true;

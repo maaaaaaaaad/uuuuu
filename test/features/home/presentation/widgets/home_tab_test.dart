@@ -13,6 +13,8 @@ import 'package:jellomark/features/category/domain/entities/category.dart';
 import 'package:jellomark/features/category/domain/usecases/get_categories_usecase.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
 import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
+import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
+import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
@@ -259,9 +261,18 @@ void main() {
       setupMocks();
 
       await tester.pumpWidget(
-        buildTestWidget(
-          filteredShopsUseCase: mockGetFilteredShopsUseCase,
-          categoriesUseCase: mockGetCategoriesUseCase,
+        ProviderScope(
+          overrides: [
+            getFilteredShopsUseCaseProvider
+                .overrideWithValue(mockGetFilteredShopsUseCase),
+            getCategoriesUseCaseProvider
+                .overrideWithValue(mockGetCategoriesUseCase),
+            shopTreatmentsProvider('1').overrideWith((ref) async => []),
+            shopReviewsNotifierProvider('1').overrideWith(
+              (ref) => _MockShopReviewsNotifier(),
+            ),
+          ],
+          child: const MaterialApp(home: Scaffold(body: HomeTab())),
         ),
       );
       await tester.pumpAndSettle();
@@ -273,4 +284,22 @@ void main() {
       expect(find.byType(ShopDetailScreen), findsOneWidget);
     });
   });
+}
+
+class _MockShopReviewsNotifier extends ShopReviewsNotifier {
+  _MockShopReviewsNotifier() : super('mock-shop-id', _MockRef());
+
+  @override
+  ShopReviewsState get state => const ShopReviewsState();
+
+  @override
+  Future<void> loadInitial() async {}
+
+  @override
+  Future<void> loadMore() async {}
+}
+
+class _MockRef implements Ref {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
 }
