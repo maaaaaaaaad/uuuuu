@@ -14,12 +14,12 @@ class HomeState extends Equatable {
   final List<Category> categories;
   final bool isLoading;
   final String? error;
-  final int recommendedPage;
   final int newShopsPage;
-  final bool hasMoreRecommended;
   final bool hasMoreNewShops;
-  final bool isLoadingMoreRecommended;
   final bool isLoadingMoreNewShops;
+  final bool hasMoreRecommended;
+
+  static const int recommendedDisplayLimit = 5;
 
   const HomeState({
     this.recommendedShops = const [],
@@ -28,13 +28,14 @@ class HomeState extends Equatable {
     this.categories = const [],
     this.isLoading = false,
     this.error,
-    this.recommendedPage = 0,
     this.newShopsPage = 0,
-    this.hasMoreRecommended = true,
     this.hasMoreNewShops = true,
-    this.isLoadingMoreRecommended = false,
     this.isLoadingMoreNewShops = false,
+    this.hasMoreRecommended = false,
   });
+
+  List<BeautyShop> get displayedRecommendedShops =>
+      recommendedShops.take(recommendedDisplayLimit).toList();
 
   HomeState copyWith({
     List<BeautyShop>? recommendedShops,
@@ -43,12 +44,10 @@ class HomeState extends Equatable {
     List<Category>? categories,
     bool? isLoading,
     String? error,
-    int? recommendedPage,
     int? newShopsPage,
-    bool? hasMoreRecommended,
     bool? hasMoreNewShops,
-    bool? isLoadingMoreRecommended,
     bool? isLoadingMoreNewShops,
+    bool? hasMoreRecommended,
   }) {
     return HomeState(
       recommendedShops: recommendedShops ?? this.recommendedShops,
@@ -57,14 +56,11 @@ class HomeState extends Equatable {
       categories: categories ?? this.categories,
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      recommendedPage: recommendedPage ?? this.recommendedPage,
       newShopsPage: newShopsPage ?? this.newShopsPage,
-      hasMoreRecommended: hasMoreRecommended ?? this.hasMoreRecommended,
       hasMoreNewShops: hasMoreNewShops ?? this.hasMoreNewShops,
-      isLoadingMoreRecommended:
-          isLoadingMoreRecommended ?? this.isLoadingMoreRecommended,
       isLoadingMoreNewShops:
           isLoadingMoreNewShops ?? this.isLoadingMoreNewShops,
+      hasMoreRecommended: hasMoreRecommended ?? this.hasMoreRecommended,
     );
   }
 
@@ -76,12 +72,10 @@ class HomeState extends Equatable {
     categories,
     isLoading,
     error,
-    recommendedPage,
     newShopsPage,
-    hasMoreRecommended,
     hasMoreNewShops,
-    isLoadingMoreRecommended,
     isLoadingMoreNewShops,
+    hasMoreRecommended,
   ];
 }
 
@@ -134,16 +128,18 @@ class HomeNotifier extends StateNotifier<HomeState> {
     const recommendedFilter = BeautyShopFilter(
       sortBy: 'RATING',
       sortOrder: 'DESC',
-      size: 10,
+      size: HomeState.recommendedDisplayLimit + 1,
     );
     final recommendedResult = await _getFilteredShopsUseCase(recommendedFilter);
     recommendedResult.fold(
       (failure) {},
       (pagedShops) {
+        final hasMore =
+            pagedShops.items.length > HomeState.recommendedDisplayLimit ||
+                pagedShops.hasNext;
         state = state.copyWith(
           recommendedShops: pagedShops.items,
-          hasMoreRecommended: pagedShops.hasNext,
-          recommendedPage: 0,
+          hasMoreRecommended: hasMore,
         );
       },
     );
@@ -166,38 +162,6 @@ class HomeNotifier extends StateNotifier<HomeState> {
     );
 
     state = state.copyWith(isLoading: false);
-  }
-
-  Future<void> loadMoreRecommended() async {
-    if (!state.hasMoreRecommended || state.isLoadingMoreRecommended) return;
-
-    state = state.copyWith(isLoadingMoreRecommended: true);
-
-    final nextPage = state.recommendedPage + 1;
-    final filter = BeautyShopFilter(
-      sortBy: 'RATING',
-      sortOrder: 'DESC',
-      size: 10,
-      page: nextPage,
-    );
-
-    final result = await _getFilteredShopsUseCase(filter);
-    result.fold(
-      (failure) {
-        state = state.copyWith(
-          isLoadingMoreRecommended: false,
-          error: failure.message,
-        );
-      },
-      (pagedShops) {
-        state = state.copyWith(
-          recommendedShops: [...state.recommendedShops, ...pagedShops.items],
-          hasMoreRecommended: pagedShops.hasNext,
-          recommendedPage: nextPage,
-          isLoadingMoreRecommended: false,
-        );
-      },
-    );
   }
 
   Future<void> loadMoreNewShops() async {
@@ -235,9 +199,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
   Future<void> refresh() async {
     state = state.copyWith(
       error: null,
-      recommendedPage: 0,
       newShopsPage: 0,
-      hasMoreRecommended: true,
       hasMoreNewShops: true,
     );
     await loadData();

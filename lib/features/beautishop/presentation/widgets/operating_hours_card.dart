@@ -14,8 +14,6 @@ class OperatingHoursCard extends StatelessWidget {
 
   String get _todayDay {
     final weekday = DateTime.now().weekday;
-    // DateTime.weekday: 1 = Monday, 7 = Sunday
-    // _daysOfWeek: 0 = 월, 6 = 일
     return _daysOfWeek[weekday - 1];
   }
 

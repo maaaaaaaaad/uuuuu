@@ -41,11 +41,9 @@ void main() {
       expect(state.categories, isEmpty);
       expect(state.isLoading, isFalse);
       expect(state.error, isNull);
-      expect(state.recommendedPage, 0);
       expect(state.newShopsPage, 0);
-      expect(state.hasMoreRecommended, true);
-      expect(state.hasMoreNewShops, true);
-      expect(state.isLoadingMoreRecommended, isFalse);
+      expect(state.hasMoreRecommended, isFalse);
+      expect(state.hasMoreNewShops, isTrue);
       expect(state.isLoadingMoreNewShops, isFalse);
     });
 
@@ -81,6 +79,19 @@ void main() {
       expect(newState.recommendedShops, shops);
       expect(newState.isLoading, isTrue);
       expect(newState.error, 'Error');
+    });
+
+    test('displayedRecommendedShops returns limited shops', () {
+      final shops = List.generate(
+        10,
+        (i) => BeautyShop(id: '$i', name: 'Shop$i', address: 'Addr'),
+      );
+      final state = HomeState(recommendedShops: shops);
+
+      expect(
+        state.displayedRecommendedShops.length,
+        HomeState.recommendedDisplayLimit,
+      );
     });
   });
 
@@ -308,7 +319,12 @@ void main() {
       verify(() => mockGetFilteredShopsUseCase(any())).called(3);
     });
 
-    test('loadData sets hasMore based on backend response', () async {
+    test('loadData sets hasMoreRecommended based on item count', () async {
+      final manyShops = List.generate(
+        HomeState.recommendedDisplayLimit + 1,
+        (i) => BeautyShop(id: '$i', name: 'Shop$i', address: 'Addr'),
+      );
+
       when(
         () => mockGetCategoriesUseCase(),
       ).thenAnswer((_) async => const Right([]));
@@ -317,19 +333,11 @@ void main() {
       ) async {
         final filter = invocation.positionalArguments[0] as BeautyShopFilter;
         if (filter.sortBy == 'RATING' && filter.minRating == null) {
-          return const Right(
+          return Right(
             PagedBeautyShops(
-              items: [BeautyShop(id: '1', name: 'Shop', address: 'Addr')],
-              hasNext: true,
-              totalElements: 100,
-            ),
-          );
-        } else if (filter.sortBy == 'CREATED_AT') {
-          return const Right(
-            PagedBeautyShops(
-              items: [BeautyShop(id: '2', name: 'New', address: 'Addr')],
-              hasNext: true,
-              totalElements: 50,
+              items: manyShops,
+              hasNext: false,
+              totalElements: manyShops.length,
             ),
           );
         }
@@ -354,77 +362,6 @@ void main() {
 
       final state = container.read(homeNotifierProvider);
       expect(state.hasMoreRecommended, isTrue);
-      expect(state.hasMoreNewShops, isTrue);
-      expect(state.recommendedPage, 0);
-      expect(state.newShopsPage, 0);
-    });
-
-    test('loadMoreRecommended appends shops and increments page', () async {
-      const initialShops = [
-        BeautyShop(id: '1', name: 'Shop1', address: 'Addr'),
-      ];
-      const moreShops = [BeautyShop(id: '2', name: 'Shop2', address: 'Addr')];
-
-      when(
-        () => mockGetCategoriesUseCase(),
-      ).thenAnswer((_) async => const Right([]));
-
-      int recommendedCallCount = 0;
-      when(() => mockGetFilteredShopsUseCase(any())).thenAnswer((
-        invocation,
-      ) async {
-        final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-        if (filter.sortBy == 'RATING' && filter.minRating == null) {
-          recommendedCallCount++;
-          if (recommendedCallCount == 1) {
-            return const Right(
-              PagedBeautyShops(
-                items: initialShops,
-                hasNext: true,
-                totalElements: 10,
-              ),
-            );
-          } else {
-            return const Right(
-              PagedBeautyShops(
-                items: moreShops,
-                hasNext: false,
-                totalElements: 10,
-              ),
-            );
-          }
-        }
-        return const Right(
-          PagedBeautyShops(items: [], hasNext: false, totalElements: 0),
-        );
-      });
-
-      final container = ProviderContainer(
-        overrides: [
-          getFilteredShopsUseCaseProvider.overrideWithValue(
-            mockGetFilteredShopsUseCase,
-          ),
-          getCategoriesUseCaseProvider.overrideWithValue(
-            mockGetCategoriesUseCase,
-          ),
-        ],
-      );
-
-      final notifier = container.read(homeNotifierProvider.notifier);
-      await notifier.loadData();
-
-      var state = container.read(homeNotifierProvider);
-      expect(state.recommendedShops, initialShops);
-      expect(state.recommendedPage, 0);
-      expect(state.hasMoreRecommended, isTrue);
-
-      await notifier.loadMoreRecommended();
-
-      state = container.read(homeNotifierProvider);
-      expect(state.recommendedShops.length, 2);
-      expect(state.recommendedShops, [...initialShops, ...moreShops]);
-      expect(state.recommendedPage, 1);
-      expect(state.hasMoreRecommended, isFalse);
     });
 
     test('loadMoreNewShops appends shops and increments page', () async {
@@ -497,7 +434,7 @@ void main() {
       expect(state.hasMoreNewShops, isFalse);
     });
 
-    test('loadMoreRecommended does not load if hasMore is false', () async {
+    test('loadMoreNewShops does not load if hasMore is false', () async {
       when(
         () => mockGetCategoriesUseCase(),
       ).thenAnswer((_) async => const Right([]));
@@ -523,13 +460,13 @@ void main() {
 
       clearInteractions(mockGetFilteredShopsUseCase);
 
-      await notifier.loadMoreRecommended();
+      await notifier.loadMoreNewShops();
 
       verifyNever(() => mockGetFilteredShopsUseCase(any()));
     });
 
     test(
-      'loadMoreRecommended sets isLoadingMoreRecommended during load',
+      'loadMoreNewShops sets isLoadingMoreNewShops during load',
       () async {
         when(
           () => mockGetCategoriesUseCase(),
@@ -540,7 +477,7 @@ void main() {
           invocation,
         ) async {
           final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-          if (filter.sortBy == 'RATING' && filter.minRating == null) {
+          if (filter.sortBy == 'CREATED_AT') {
             callCount++;
             if (callCount == 1) {
               return const Right(
@@ -576,17 +513,17 @@ void main() {
         final notifier = container.read(homeNotifierProvider.notifier);
         await notifier.loadData();
 
-        final future = notifier.loadMoreRecommended();
+        final future = notifier.loadMoreNewShops();
 
         expect(
-          container.read(homeNotifierProvider).isLoadingMoreRecommended,
+          container.read(homeNotifierProvider).isLoadingMoreNewShops,
           isTrue,
         );
 
         await future;
 
         expect(
-          container.read(homeNotifierProvider).isLoadingMoreRecommended,
+          container.read(homeNotifierProvider).isLoadingMoreNewShops,
           isFalse,
         );
       },
@@ -602,7 +539,7 @@ void main() {
         invocation,
       ) async {
         final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-        if (filter.sortBy == 'RATING' && filter.minRating == null) {
+        if (filter.sortBy == 'CREATED_AT') {
           callCount++;
           if (callCount == 1) {
             return const Right(
@@ -648,17 +585,17 @@ void main() {
 
       final notifier = container.read(homeNotifierProvider.notifier);
       await notifier.loadData();
-      await notifier.loadMoreRecommended();
+      await notifier.loadMoreNewShops();
 
       var state = container.read(homeNotifierProvider);
-      expect(state.recommendedPage, 1);
-      expect(state.hasMoreRecommended, isFalse);
+      expect(state.newShopsPage, 1);
+      expect(state.hasMoreNewShops, isFalse);
 
       await notifier.refresh();
 
       state = container.read(homeNotifierProvider);
-      expect(state.recommendedPage, 0);
-      expect(state.hasMoreRecommended, isTrue);
+      expect(state.newShopsPage, 0);
+      expect(state.hasMoreNewShops, isTrue);
     });
   });
 }

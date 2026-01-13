@@ -171,29 +171,29 @@ void main() {
       verify(() => mockGetFilteredShopsUseCase(any())).called(3);
     });
 
-    testWidgets('shows loading indicator when loading more recommended shops', (
+    testWidgets('shows loading indicator when loading more new shops', (
       tester,
     ) async {
       const categories = [Category(id: '1', name: 'Nail')];
-      const recommendedShops = [
-        BeautyShop(id: '1', name: 'Shop1', address: 'Seoul', rating: 4.8),
+      const newShops = [
+        BeautyShop(id: '1', name: 'NewShop1', address: 'Seoul', isNew: true),
       ];
 
       when(
         () => mockGetCategoriesUseCase(),
       ).thenAnswer((_) async => const Right(categories));
 
-      int callCount = 0;
+      int newShopsCallCount = 0;
       when(() => mockGetFilteredShopsUseCase(any())).thenAnswer((
         invocation,
       ) async {
         final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-        if (filter.sortBy == 'RATING' && filter.minRating == null) {
-          callCount++;
-          if (callCount == 1) {
+        if (filter.sortBy == 'CREATED_AT') {
+          newShopsCallCount++;
+          if (newShopsCallCount == 1) {
             return const Right(
               PagedBeautyShops(
-                items: recommendedShops,
+                items: newShops,
                 hasNext: true,
                 totalElements: 10,
               ),
@@ -202,7 +202,14 @@ void main() {
             await Future.delayed(const Duration(milliseconds: 100));
             return const Right(
               PagedBeautyShops(
-                items: [BeautyShop(id: '2', name: 'Shop2', address: 'Busan')],
+                items: [
+                  BeautyShop(
+                    id: '2',
+                    name: 'NewShop2',
+                    address: 'Busan',
+                    isNew: true,
+                  ),
+                ],
                 hasNext: false,
                 totalElements: 10,
               ),
@@ -222,39 +229,39 @@ void main() {
       await tester.pump();
 
       expect(
-        find.byKey(const Key('recommended_loading_indicator')),
+        find.byKey(const Key('new_shops_loading_indicator')),
         findsOneWidget,
       );
 
       await tester.pumpAndSettle();
     });
 
-    testWidgets('calls loadMoreRecommended when scrolling near bottom', (
+    testWidgets('calls loadMoreNewShops when scrolling near bottom', (
       tester,
     ) async {
       const categories = [Category(id: '1', name: 'Nail')];
-      const initialShops = [
-        BeautyShop(id: '1', name: 'Shop1', address: 'Seoul', rating: 4.8),
+      const initialNewShops = [
+        BeautyShop(id: '1', name: 'NewShop1', address: 'Seoul', isNew: true),
       ];
-      const moreShops = [
-        BeautyShop(id: '2', name: 'Shop2', address: 'Busan', rating: 4.7),
+      const moreNewShops = [
+        BeautyShop(id: '2', name: 'NewShop2', address: 'Busan', isNew: true),
       ];
 
       when(
         () => mockGetCategoriesUseCase(),
       ).thenAnswer((_) async => const Right(categories));
 
-      int recommendedCallCount = 0;
+      int newShopsCallCount = 0;
       when(() => mockGetFilteredShopsUseCase(any())).thenAnswer((
         invocation,
       ) async {
         final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-        if (filter.sortBy == 'RATING' && filter.minRating == null) {
-          recommendedCallCount++;
-          if (recommendedCallCount == 1) {
+        if (filter.sortBy == 'CREATED_AT') {
+          newShopsCallCount++;
+          if (newShopsCallCount == 1) {
             return const Right(
               PagedBeautyShops(
-                items: initialShops,
+                items: initialNewShops,
                 hasNext: true,
                 totalElements: 10,
               ),
@@ -262,7 +269,7 @@ void main() {
           } else {
             return const Right(
               PagedBeautyShops(
-                items: moreShops,
+                items: moreNewShops,
                 hasNext: false,
                 totalElements: 10,
               ),
@@ -281,29 +288,31 @@ void main() {
       await tester.drag(scrollable, const Offset(0, -5000));
       await tester.pumpAndSettle();
 
-      expect(recommendedCallCount, greaterThan(1));
-      expect(find.text('Shop2'), findsOneWidget);
+      expect(newShopsCallCount, greaterThan(1));
+      expect(find.text('NewShop2'), findsOneWidget);
     });
 
-    testWidgets('does not call loadMore when hasMore is false', (tester) async {
+    testWidgets('does not call loadMoreNewShops when hasMore is false', (
+      tester,
+    ) async {
       const categories = [Category(id: '1', name: 'Nail')];
-      const shops = [
-        BeautyShop(id: '1', name: 'Shop1', address: 'Seoul', rating: 4.8),
+      const newShops = [
+        BeautyShop(id: '1', name: 'NewShop1', address: 'Seoul', isNew: true),
       ];
 
       when(
         () => mockGetCategoriesUseCase(),
       ).thenAnswer((_) async => const Right(categories));
 
-      int callCount = 0;
+      int newShopsCallCount = 0;
       when(() => mockGetFilteredShopsUseCase(any())).thenAnswer((
         invocation,
       ) async {
         final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-        if (filter.sortBy == 'RATING' && filter.minRating == null) {
-          callCount++;
+        if (filter.sortBy == 'CREATED_AT') {
+          newShopsCallCount++;
           return const Right(
-            PagedBeautyShops(items: shops, hasNext: false, totalElements: 1),
+            PagedBeautyShops(items: newShops, hasNext: false, totalElements: 1),
           );
         }
         return const Right(
@@ -314,13 +323,13 @@ void main() {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
-      final initialCallCount = callCount;
+      final initialCallCount = newShopsCallCount;
 
       final scrollable = find.byKey(const Key('home_tab_scroll_view'));
       await tester.drag(scrollable, const Offset(0, -5000));
       await tester.pumpAndSettle();
 
-      expect(callCount, initialCallCount);
+      expect(newShopsCallCount, initialCallCount);
     });
   });
 }

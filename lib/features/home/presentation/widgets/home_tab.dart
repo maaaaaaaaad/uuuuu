@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
+import 'package:jellomark/features/home/presentation/pages/recommended_shops_page.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
 import 'package:jellomark/shared/utils/category_icon_mapper.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/sections/shop_section.dart';
+import 'package:jellomark/shared/widgets/units/shop_card.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
   const HomeTab({super.key});
@@ -51,6 +53,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ShopDetailScreen(shop: shop),
+      ),
+    );
+  }
+
+  void _navigateToRecommendedShops() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const RecommendedShopsPage(),
       ),
     );
   }
@@ -111,43 +121,23 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       const SizedBox(height: 24),
                     VerticalShopSection(
                       title: '추천 샵',
-                      shops: homeState.recommendedShops,
-                      showMore: true,
+                      shops: homeState.displayedRecommendedShops,
+                      showMore: homeState.hasMoreRecommended,
+                      onMoreTap: () => _navigateToRecommendedShops(),
                       onShopTap: (id) => _navigateToShopDetail(
                         id,
                         homeState.recommendedShops,
                       ),
                     ),
-                    if (homeState.isLoadingMoreRecommended)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            key: Key('recommended_loading_indicator'),
-                            color: Color(0xFFFFB5BA),
-                          ),
-                        ),
-                      ),
                     const SizedBox(height: 24),
-                    VerticalShopSection(
-                      title: '새로 입점한 샵',
+                    _NewShopsSection(
                       shops: homeState.newShops,
-                      showMore: true,
+                      isLoadingMore: homeState.isLoadingMoreNewShops,
                       onShopTap: (id) => _navigateToShopDetail(
                         id,
                         homeState.newShops,
                       ),
                     ),
-                    if (homeState.isLoadingMoreNewShops)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            key: Key('new_shops_loading_indicator'),
-                            color: Color(0xFFFFB5BA),
-                          ),
-                        ),
-                      ),
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -180,16 +170,70 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       final metrics = notification.metrics;
       if (metrics.extentAfter < 300) {
         final homeState = ref.read(homeNotifierProvider);
-        if (homeState.hasMoreRecommended &&
-            !homeState.isLoadingMoreRecommended) {
-          ref.read(homeNotifierProvider.notifier).loadMoreRecommended();
-        } else if (!homeState.hasMoreRecommended &&
-            homeState.hasMoreNewShops &&
-            !homeState.isLoadingMoreNewShops) {
+        if (homeState.hasMoreNewShops && !homeState.isLoadingMoreNewShops) {
           ref.read(homeNotifierProvider.notifier).loadMoreNewShops();
         }
       }
     }
+  }
+}
+
+class _NewShopsSection extends StatelessWidget {
+  final List<BeautyShop> shops;
+  final bool isLoadingMore;
+  final void Function(String id)? onShopTap;
+
+  const _NewShopsSection({
+    required this.shops,
+    required this.isLoadingMore,
+    this.onShopTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            '새로 입점한 샵',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: shops.length,
+          itemBuilder: (context, index) {
+            final shop = shops[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ShopCard(
+                shop: shop,
+                width: double.infinity,
+                onTap: () => onShopTap?.call(shop.id),
+              ),
+            );
+          },
+        ),
+        if (isLoadingMore)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: CircularProgressIndicator(
+                key: Key('new_shops_loading_indicator'),
+                color: Color(0xFFFFB5BA),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }
 
