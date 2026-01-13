@@ -4,10 +4,8 @@ import 'package:jellomark/core/network/auth_interceptor.dart';
 class ApiClient {
   final Dio dio;
 
-  ApiClient({
-    required String baseUrl,
-    AuthInterceptor? authInterceptor,
-  }) : dio = Dio() {
+  ApiClient({required String baseUrl, AuthInterceptor? authInterceptor})
+    : dio = Dio() {
     dio.options.baseUrl = baseUrl;
     dio.options.connectTimeout = const Duration(seconds: 30);
     dio.options.receiveTimeout = const Duration(seconds: 30);
@@ -35,5 +33,9 @@ class ApiClient {
 
   Future<Response<T>> delete<T>(String path) {
     return dio.delete<T>(path);
+  }
+
+  Future<Response<T>> patch<T>(String path, {Object? data}) {
+    return dio.patch<T>(path, data: data);
   }
 }

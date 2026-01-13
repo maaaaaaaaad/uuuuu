@@ -1,31 +1,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/core/di/injection_container.dart';
-import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
-import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jellomark/features/auth/domain/usecases/check_auth_status.dart';
 import 'package:jellomark/features/auth/domain/usecases/login_with_kakao.dart';
 import 'package:jellomark/features/auth/domain/usecases/logout.dart';
 
 final loginWithKakaoUseCaseProvider = Provider<LoginWithKakaoUseCase>((ref) {
-  return LoginWithKakaoUseCase(
-    kakaoAuthService: sl<KakaoAuthService>(),
-    authRepository: sl<AuthRepository>(),
-  );
+  return LoginWithKakaoUseCase(authRepository: sl<AuthRepository>());
 });
 
 final logoutUseCaseProvider = Provider<LogoutUseCase>((ref) {
-  return LogoutUseCase(
-    kakaoAuthService: sl<KakaoAuthService>(),
-    authRepository: sl<AuthRepository>(),
-  );
+  return LogoutUseCase(authRepository: sl<AuthRepository>());
 });
 
 final checkAuthStatusUseCaseProvider = Provider<CheckAuthStatusUseCase>((ref) {
-  return CheckAuthStatusUseCase(
-    localDataSource: sl<AuthLocalDataSource>(),
-    authRepository: sl<AuthRepository>(),
-  );
+  return CheckAuthStatusUseCase(authRepository: sl<AuthRepository>());
 });
 
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }

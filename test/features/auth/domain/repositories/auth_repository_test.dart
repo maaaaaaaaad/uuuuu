@@ -7,6 +7,16 @@ import 'package:jellomark/features/member/domain/entities/member.dart';
 
 class MockAuthRepository implements AuthRepository {
   @override
+  Future<Either<Failure, TokenPair>> loginWithKakaoSdk() async {
+    return Right(
+      TokenPair(
+        accessToken: 'server_access_token',
+        refreshToken: 'server_refresh_token',
+      ),
+    );
+  }
+
+  @override
   Future<Either<Failure, TokenPair>> loginWithKakao(
     String kakaoAccessToken,
   ) async {
@@ -31,7 +41,12 @@ class MockAuthRepository implements AuthRepository {
   @override
   Future<Either<Failure, Member>> getCurrentMember() async {
     return Right(
-      Member(id: 'member-123', nickname: '젤리', socialProvider: 'KAKAO', socialId: 'kakao-123456'),
+      Member(
+        id: 'member-123',
+        nickname: '젤리',
+        socialProvider: 'KAKAO',
+        socialId: 'kakao-123456',
+      ),
     );
   }
 
@@ -39,6 +54,17 @@ class MockAuthRepository implements AuthRepository {
   Future<Either<Failure, void>> logout() async {
     return const Right(null);
   }
+
+  @override
+  Future<TokenPair?> getStoredTokens() async {
+    return TokenPair(
+      accessToken: 'stored_access',
+      refreshToken: 'stored_refresh',
+    );
+  }
+
+  @override
+  Future<void> clearStoredTokens() async {}
 }
 
 void main() {
@@ -47,6 +73,16 @@ void main() {
 
     setUp(() {
       repository = MockAuthRepository();
+    });
+
+    test('should define loginWithKakaoSdk method', () async {
+      final result = await repository.loginWithKakaoSdk();
+
+      expect(result.isRight(), isTrue);
+      result.fold((failure) => fail('Should not be failure'), (tokenPair) {
+        expect(tokenPair.accessToken, isNotEmpty);
+        expect(tokenPair.refreshToken, isNotEmpty);
+      });
     });
 
     test('should define loginWithKakao method', () async {
@@ -79,6 +115,17 @@ void main() {
       final result = await repository.logout();
 
       expect(result.isRight(), isTrue);
+    });
+
+    test('should define getStoredTokens method', () async {
+      final result = await repository.getStoredTokens();
+
+      expect(result, isNotNull);
+      expect(result!.accessToken, isNotEmpty);
+    });
+
+    test('should define clearStoredTokens method', () async {
+      await repository.clearStoredTokens();
     });
   });
 }

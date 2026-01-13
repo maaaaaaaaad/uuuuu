@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
 import 'package:jellomark/features/auth/domain/entities/token_pair.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
@@ -10,12 +11,15 @@ import 'package:jellomark/features/member/domain/entities/member.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
   final AuthLocalDataSource _localDataSource;
+  final KakaoAuthService _kakaoAuthService;
 
   AuthRepositoryImpl({
     required AuthRemoteDataSource remoteDataSource,
     required AuthLocalDataSource localDataSource,
+    required KakaoAuthService kakaoAuthService,
   }) : _remoteDataSource = remoteDataSource,
-       _localDataSource = localDataSource;
+       _localDataSource = localDataSource,
+       _kakaoAuthService = kakaoAuthService;
 
   @override
   Future<Either<Failure, TokenPair>> loginWithKakao(
@@ -59,10 +63,33 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
+      await _kakaoAuthService.logout();
+    } catch (_) {}
+    try {
       await _remoteDataSource.logout();
     } catch (_) {}
     await _localDataSource.clearTokens();
     return const Right(null);
+  }
+
+  @override
+  Future<Either<Failure, TokenPair>> loginWithKakaoSdk() async {
+    try {
+      final kakaoAccessToken = await _kakaoAuthService.loginWithKakao();
+      return await loginWithKakao(kakaoAccessToken);
+    } catch (e) {
+      return Left(KakaoLoginFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<TokenPair?> getStoredTokens() async {
+    return await _localDataSource.getTokens();
+  }
+
+  @override
+  Future<void> clearStoredTokens() async {
+    await _localDataSource.clearTokens();
   }
 
   String _getErrorMessage(DioException e) {

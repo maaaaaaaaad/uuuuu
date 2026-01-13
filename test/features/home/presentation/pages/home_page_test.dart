@@ -17,8 +17,18 @@ class MockAuthRepository implements AuthRepository {
   @override
   Future<Either<Failure, Member>> getCurrentMember() async {
     return const Right(
-      Member(id: '1', nickname: '테스트', socialProvider: 'KAKAO', socialId: 'test-kakao-id'),
+      Member(
+        id: '1',
+        nickname: '테스트',
+        socialProvider: 'KAKAO',
+        socialId: 'test-kakao-id',
+      ),
     );
+  }
+
+  @override
+  Future<Either<Failure, TokenPair>> loginWithKakaoSdk() {
+    throw UnimplementedError();
   }
 
   @override
@@ -35,6 +45,12 @@ class MockAuthRepository implements AuthRepository {
   Future<Either<Failure, void>> logout() async {
     return const Right(null);
   }
+
+  @override
+  Future<TokenPair?> getStoredTokens() async => null;
+
+  @override
+  Future<void> clearStoredTokens() async {}
 }
 
 class MockMemberRepository implements MemberRepository {
@@ -43,7 +59,12 @@ class MockMemberRepository implements MemberRepository {
     required String nickname,
   }) async {
     return const Right(
-      Member(id: '1', nickname: '테스트', socialProvider: 'KAKAO', socialId: 'test-kakao-id'),
+      Member(
+        id: '1',
+        nickname: '테스트',
+        socialProvider: 'KAKAO',
+        socialId: 'test-kakao-id',
+      ),
     );
   }
 }

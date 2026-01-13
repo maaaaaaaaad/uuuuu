@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
-import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:jellomark/features/auth/data/models/member_model.dart';
 import 'package:jellomark/features/auth/data/models/token_pair_model.dart';
 import 'package:jellomark/features/auth/domain/entities/token_pair.dart';
@@ -13,32 +12,17 @@ import 'package:jellomark/features/auth/presentation/pages/splash_page.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
 
-class MockAuthLocalDataSource implements AuthLocalDataSource {
-  TokenPairModel? storedTokens;
-
-  @override
-  Future<void> saveTokens(TokenPairModel tokenPair) async {
-    storedTokens = tokenPair;
-  }
-
-  @override
-  Future<TokenPairModel?> getTokens() async => storedTokens;
-
-  @override
-  Future<void> clearTokens() async {
-    storedTokens = null;
-  }
-
-  @override
-  Future<String?> getAccessToken() async => storedTokens?.accessToken;
-
-  @override
-  Future<String?> getRefreshToken() async => storedTokens?.refreshToken;
-}
-
 class MockAuthRepository implements AuthRepository {
+  TokenPair? storedTokens;
   Member? memberResult;
   Failure? memberFailure;
+  TokenPair? refreshResult;
+  Failure? refreshFailure;
+
+  @override
+  Future<Either<Failure, TokenPair>> loginWithKakaoSdk() async {
+    throw UnimplementedError();
+  }
 
   @override
   Future<Either<Failure, TokenPair>> loginWithKakao(
@@ -49,7 +33,11 @@ class MockAuthRepository implements AuthRepository {
 
   @override
   Future<Either<Failure, TokenPair>> refreshToken(String refreshToken) async {
-    return const Right(TokenPairModel(accessToken: 'new', refreshToken: 'new'));
+    if (refreshFailure != null) return Left(refreshFailure!);
+    return Right(
+      refreshResult ??
+          const TokenPairModel(accessToken: 'new', refreshToken: 'new'),
+    );
   }
 
   @override
@@ -62,15 +50,21 @@ class MockAuthRepository implements AuthRepository {
   Future<Either<Failure, void>> logout() async {
     return const Right(null);
   }
+
+  @override
+  Future<TokenPair?> getStoredTokens() async => storedTokens;
+
+  @override
+  Future<void> clearStoredTokens() async {
+    storedTokens = null;
+  }
 }
 
 void main() {
   group('SplashPage', () {
-    late MockAuthLocalDataSource mockLocalDataSource;
     late MockAuthRepository mockRepository;
 
     setUp(() {
-      mockLocalDataSource = MockAuthLocalDataSource();
       mockRepository = MockAuthRepository();
     });
 
@@ -78,10 +72,7 @@ void main() {
       return ProviderScope(
         overrides: [
           checkAuthStatusUseCaseProvider.overrideWithValue(
-            CheckAuthStatusUseCase(
-              localDataSource: mockLocalDataSource,
-              authRepository: mockRepository,
-            ),
+            CheckAuthStatusUseCase(authRepository: mockRepository),
           ),
         ],
         child: MaterialApp(
@@ -97,7 +88,7 @@ void main() {
     testWidgets('should navigate to login when no token stored', (
       tester,
     ) async {
-      mockLocalDataSource.storedTokens = null;
+      mockRepository.storedTokens = null;
 
       await tester.pumpWidget(createSplashPage());
       await tester.pumpAndSettle();
@@ -106,7 +97,7 @@ void main() {
     });
 
     testWidgets('should navigate to home when token is valid', (tester) async {
-      mockLocalDataSource.storedTokens = const TokenPairModel(
+      mockRepository.storedTokens = const TokenPairModel(
         accessToken: 'valid_access',
         refreshToken: 'valid_refresh',
       );
@@ -126,11 +117,12 @@ void main() {
     testWidgets('should navigate to login when token is invalid', (
       tester,
     ) async {
-      mockLocalDataSource.storedTokens = const TokenPairModel(
+      mockRepository.storedTokens = const TokenPairModel(
         accessToken: 'invalid_access',
         refreshToken: 'invalid_refresh',
       );
       mockRepository.memberFailure = const AuthFailure('Token expired');
+      mockRepository.refreshFailure = const AuthFailure('Refresh failed');
 
       await tester.pumpWidget(createSplashPage());
       await tester.pumpAndSettle();

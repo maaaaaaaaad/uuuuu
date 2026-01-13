@@ -17,6 +17,11 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, TokenPair>> loginWithKakaoSdk() {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Either<Failure, TokenPair>> loginWithKakao(String kakaoAccessToken) {
     throw UnimplementedError();
   }
@@ -30,6 +35,12 @@ class MockAuthRepository implements AuthRepository {
   Future<Either<Failure, void>> logout() {
     throw UnimplementedError();
   }
+
+  @override
+  Future<TokenPair?> getStoredTokens() async => null;
+
+  @override
+  Future<void> clearStoredTokens() async {}
 }
 
 void main() {
@@ -43,7 +54,12 @@ void main() {
     });
 
     test('should return Member when repository call is successful', () async {
-      const member = Member(id: '1', nickname: '테스트유저', socialProvider: 'KAKAO', socialId: 'test-kakao-id');
+      const member = Member(
+        id: '1',
+        nickname: '테스트유저',
+        socialProvider: 'KAKAO',
+        socialId: 'test-kakao-id',
+      );
       mockRepository.memberResult = member;
 
       final result = await useCase();

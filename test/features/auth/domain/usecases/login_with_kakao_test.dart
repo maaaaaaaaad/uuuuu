@@ -1,37 +1,27 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
-import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
 import 'package:jellomark/features/auth/data/models/token_pair_model.dart';
 import 'package:jellomark/features/auth/domain/entities/token_pair.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jellomark/features/auth/domain/usecases/login_with_kakao.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
 
-class MockKakaoAuthService implements KakaoAuthService {
-  String? kakaoToken;
-  Exception? exception;
-
-  @override
-  Future<String> loginWithKakao() async {
-    if (exception != null) throw exception!;
-    return kakaoToken!;
-  }
-
-  @override
-  Future<void> logout() async {}
-}
-
 class MockAuthRepository implements AuthRepository {
-  TokenPair? loginResult;
-  Failure? failure;
+  TokenPair? loginSdkResult;
+  Failure? loginSdkFailure;
+
+  @override
+  Future<Either<Failure, TokenPair>> loginWithKakaoSdk() async {
+    if (loginSdkFailure != null) return Left(loginSdkFailure!);
+    return Right(loginSdkResult!);
+  }
 
   @override
   Future<Either<Failure, TokenPair>> loginWithKakao(
     String kakaoAccessToken,
   ) async {
-    if (failure != null) return Left(failure!);
-    return Right(loginResult!);
+    throw UnimplementedError();
   }
 
   @override
@@ -48,26 +38,26 @@ class MockAuthRepository implements AuthRepository {
   Future<Either<Failure, void>> logout() async {
     return const Right(null);
   }
+
+  @override
+  Future<TokenPair?> getStoredTokens() async => null;
+
+  @override
+  Future<void> clearStoredTokens() async {}
 }
 
 void main() {
   group('LoginWithKakaoUseCase', () {
     late LoginWithKakaoUseCase useCase;
-    late MockKakaoAuthService mockKakaoService;
     late MockAuthRepository mockRepository;
 
     setUp(() {
-      mockKakaoService = MockKakaoAuthService();
       mockRepository = MockAuthRepository();
-      useCase = LoginWithKakaoUseCase(
-        kakaoAuthService: mockKakaoService,
-        authRepository: mockRepository,
-      );
+      useCase = LoginWithKakaoUseCase(authRepository: mockRepository);
     });
 
     test('should login with Kakao and return TokenPair on success', () async {
-      mockKakaoService.kakaoToken = 'kakao_access_token_123';
-      mockRepository.loginResult = const TokenPairModel(
+      mockRepository.loginSdkResult = const TokenPairModel(
         accessToken: 'server_access',
         refreshToken: 'server_refresh',
       );
@@ -82,7 +72,7 @@ void main() {
     });
 
     test('should return KakaoLoginFailure when Kakao login fails', () async {
-      mockKakaoService.exception = Exception('Kakao login failed');
+      mockRepository.loginSdkFailure = KakaoLoginFailure('Kakao login failed');
 
       final result = await useCase();
 
@@ -94,8 +84,7 @@ void main() {
     });
 
     test('should return AuthFailure when server auth fails', () async {
-      mockKakaoService.kakaoToken = 'kakao_token';
-      mockRepository.failure = AuthFailure('Server error');
+      mockRepository.loginSdkFailure = AuthFailure('Server error');
 
       final result = await useCase();
 

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
-import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
 import 'package:jellomark/features/auth/domain/entities/token_pair.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jellomark/features/auth/domain/usecases/login_with_kakao.dart';
@@ -13,37 +12,28 @@ import 'package:jellomark/features/auth/presentation/pages/login_page.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
 
-class MockKakaoAuthService implements KakaoAuthService {
-  String? accessToken;
-  Exception? exception;
-  Completer<String>? completer;
-
-  @override
-  Future<String> loginWithKakao() async {
-    if (completer != null) {
-      return completer!.future;
-    }
-    if (exception != null) throw exception!;
-    return accessToken ?? 'mock_kakao_token';
-  }
-
-  @override
-  Future<void> logout() async {}
-}
-
 class MockAuthRepository implements AuthRepository {
   TokenPair? tokenPairResult;
   Failure? loginFailure;
+  Completer<Either<Failure, TokenPair>>? completer;
 
   @override
-  Future<Either<Failure, TokenPair>> loginWithKakao(
-    String kakaoAccessToken,
-  ) async {
+  Future<Either<Failure, TokenPair>> loginWithKakaoSdk() async {
+    if (completer != null) {
+      return completer!.future;
+    }
     if (loginFailure != null) return Left(loginFailure!);
     return Right(
       tokenPairResult ??
           const TokenPair(accessToken: 'access', refreshToken: 'refresh'),
     );
+  }
+
+  @override
+  Future<Either<Failure, TokenPair>> loginWithKakao(
+    String kakaoAccessToken,
+  ) async {
+    throw UnimplementedError();
   }
 
   @override
@@ -60,15 +50,19 @@ class MockAuthRepository implements AuthRepository {
   Future<Either<Failure, void>> logout() async {
     return const Right(null);
   }
+
+  @override
+  Future<TokenPair?> getStoredTokens() async => null;
+
+  @override
+  Future<void> clearStoredTokens() async {}
 }
 
 void main() {
   group('LoginPage', () {
-    late MockKakaoAuthService mockKakaoService;
     late MockAuthRepository mockAuthRepository;
 
     setUp(() {
-      mockKakaoService = MockKakaoAuthService();
       mockAuthRepository = MockAuthRepository();
     });
 
@@ -76,10 +70,7 @@ void main() {
       return ProviderScope(
         overrides: [
           loginWithKakaoUseCaseProvider.overrideWithValue(
-            LoginWithKakaoUseCase(
-              kakaoAuthService: mockKakaoService,
-              authRepository: mockAuthRepository,
-            ),
+            LoginWithKakaoUseCase(authRepository: mockAuthRepository),
           ),
         ],
         child: MaterialApp(
@@ -105,7 +96,7 @@ void main() {
     testWidgets('should show loading indicator when login is in progress', (
       tester,
     ) async {
-      mockKakaoService.completer = Completer<String>();
+      mockAuthRepository.completer = Completer<Either<Failure, TokenPair>>();
 
       await tester.pumpWidget(createLoginPage());
 
@@ -114,12 +105,13 @@ void main() {
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      mockKakaoService.completer!.complete('test_token');
+      mockAuthRepository.completer!.complete(
+        const Right(TokenPair(accessToken: 'access', refreshToken: 'refresh')),
+      );
       await tester.pumpAndSettle();
     });
 
     testWidgets('should navigate to home when login succeeds', (tester) async {
-      mockKakaoService.accessToken = 'test_kakao_token';
       mockAuthRepository.tokenPairResult = const TokenPair(
         accessToken: 'server_access',
         refreshToken: 'server_refresh',
@@ -134,7 +126,7 @@ void main() {
     });
 
     testWidgets('should show error snackbar when login fails', (tester) async {
-      mockKakaoService.exception = Exception('로그인에 실패했습니다');
+      mockAuthRepository.loginFailure = KakaoLoginFailure('로그인에 실패했습니다');
 
       await tester.pumpWidget(createLoginPage());
 
@@ -145,7 +137,7 @@ void main() {
     });
 
     testWidgets('should disable button when loading', (tester) async {
-      mockKakaoService.completer = Completer<String>();
+      mockAuthRepository.completer = Completer<Either<Failure, TokenPair>>();
 
       await tester.pumpWidget(createLoginPage());
 
@@ -155,7 +147,9 @@ void main() {
       final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
       expect(button.onPressed, isNull);
 
-      mockKakaoService.completer!.complete('test_token');
+      mockAuthRepository.completer!.complete(
+        const Right(TokenPair(accessToken: 'access', refreshToken: 'refresh')),
+      );
       await tester.pumpAndSettle();
     });
   });

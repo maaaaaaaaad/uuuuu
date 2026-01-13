@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
 import 'package:jellomark/features/auth/data/models/member_model.dart';
 import 'package:jellomark/features/auth/data/models/token_pair_model.dart';
 import 'package:jellomark/features/auth/data/repositories/auth_repository_impl.dart';
@@ -64,18 +65,39 @@ class MockAuthLocalDataSource implements AuthLocalDataSource {
   Future<String?> getRefreshToken() async => storedTokens?.refreshToken;
 }
 
+class MockKakaoAuthService implements KakaoAuthService {
+  String? kakaoToken;
+  bool logoutCalled = false;
+  Exception? exception;
+
+  @override
+  Future<String> loginWithKakao() async {
+    if (exception != null) throw exception!;
+    return kakaoToken!;
+  }
+
+  @override
+  Future<void> logout() async {
+    if (exception != null) throw exception!;
+    logoutCalled = true;
+  }
+}
+
 void main() {
   group('AuthRepositoryImpl', () {
     late AuthRepository repository;
     late MockAuthRemoteDataSource mockRemoteDataSource;
     late MockAuthLocalDataSource mockLocalDataSource;
+    late MockKakaoAuthService mockKakaoAuthService;
 
     setUp(() {
       mockRemoteDataSource = MockAuthRemoteDataSource();
       mockLocalDataSource = MockAuthLocalDataSource();
+      mockKakaoAuthService = MockKakaoAuthService();
       repository = AuthRepositoryImpl(
         remoteDataSource: mockRemoteDataSource,
         localDataSource: mockLocalDataSource,
+        kakaoAuthService: mockKakaoAuthService,
       );
     });
 
@@ -113,6 +135,37 @@ void main() {
       });
     });
 
+    group('loginWithKakaoSdk', () {
+      test('should login with Kakao SDK and return TokenPair', () async {
+        mockKakaoAuthService.kakaoToken = 'kakao_access_token';
+        const tokenPair = TokenPairModel(
+          accessToken: 'server_access',
+          refreshToken: 'server_refresh',
+        );
+        mockRemoteDataSource.loginResult = tokenPair;
+
+        final result = await repository.loginWithKakaoSdk();
+
+        expect(result.isRight(), isTrue);
+        result.fold((_) => fail('Should be success'), (token) {
+          expect(token.accessToken, 'server_access');
+          expect(token.refreshToken, 'server_refresh');
+        });
+      });
+
+      test('should return KakaoLoginFailure when Kakao SDK fails', () async {
+        mockKakaoAuthService.exception = Exception('Kakao login failed');
+
+        final result = await repository.loginWithKakaoSdk();
+
+        expect(result.isLeft(), isTrue);
+        result.fold(
+          (failure) => expect(failure, isA<KakaoLoginFailure>()),
+          (_) => fail('Should be failure'),
+        );
+      });
+    });
+
     group('getCurrentMember', () {
       test('should return Member on success', () async {
         const member = MemberModel(
@@ -130,7 +183,7 @@ void main() {
     });
 
     group('logout', () {
-      test('should clear tokens on logout', () async {
+      test('should logout from Kakao and clear tokens', () async {
         mockLocalDataSource.storedTokens = const TokenPairModel(
           accessToken: 'access',
           refreshToken: 'refresh',
@@ -139,6 +192,55 @@ void main() {
         final result = await repository.logout();
 
         expect(result.isRight(), isTrue);
+        expect(mockKakaoAuthService.logoutCalled, isTrue);
+        expect(mockLocalDataSource.storedTokens, isNull);
+      });
+
+      test('should clear tokens even if Kakao logout fails', () async {
+        mockKakaoAuthService.exception = Exception('Kakao logout failed');
+        mockLocalDataSource.storedTokens = const TokenPairModel(
+          accessToken: 'access',
+          refreshToken: 'refresh',
+        );
+
+        final result = await repository.logout();
+
+        expect(result.isRight(), isTrue);
+        expect(mockLocalDataSource.storedTokens, isNull);
+      });
+    });
+
+    group('getStoredTokens', () {
+      test('should return stored tokens', () async {
+        const tokenPair = TokenPairModel(
+          accessToken: 'access',
+          refreshToken: 'refresh',
+        );
+        mockLocalDataSource.storedTokens = tokenPair;
+
+        final result = await repository.getStoredTokens();
+
+        expect(result, tokenPair);
+      });
+
+      test('should return null when no tokens stored', () async {
+        mockLocalDataSource.storedTokens = null;
+
+        final result = await repository.getStoredTokens();
+
+        expect(result, isNull);
+      });
+    });
+
+    group('clearStoredTokens', () {
+      test('should clear stored tokens', () async {
+        mockLocalDataSource.storedTokens = const TokenPairModel(
+          accessToken: 'access',
+          refreshToken: 'refresh',
+        );
+
+        await repository.clearStoredTokens();
+
         expect(mockLocalDataSource.storedTokens, isNull);
       });
     });

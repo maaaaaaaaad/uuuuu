@@ -8,6 +8,7 @@ import 'package:jellomark/features/auth/data/datasources/auth_remote_datasource.
 import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
 import 'package:jellomark/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
+import 'package:jellomark/features/member/data/datasources/member_remote_datasource.dart';
 import 'package:jellomark/features/member/data/repositories/member_repository_impl.dart';
 import 'package:jellomark/features/member/domain/repositories/member_repository.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
@@ -55,10 +56,17 @@ Future<void> initDependencies() async {
     () => AuthRepositoryImpl(
       remoteDataSource: sl<AuthRemoteDataSource>(),
       localDataSource: sl<AuthLocalDataSource>(),
+      kakaoAuthService: sl<KakaoAuthService>(),
     ),
   );
 
-  sl.registerLazySingleton<MemberRepository>(() => MemberRepositoryImpl());
+  sl.registerLazySingleton<MemberRemoteDataSource>(
+    () => MemberRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  sl.registerLazySingleton<MemberRepository>(
+    () => MemberRepositoryImpl(remoteDataSource: sl<MemberRemoteDataSource>()),
+  );
 
   sl.registerLazySingleton<GetCurrentMember>(
     () => GetCurrentMember(repository: sl<AuthRepository>()),

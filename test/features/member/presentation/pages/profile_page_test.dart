@@ -24,6 +24,11 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, TokenPair>> loginWithKakaoSdk() {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Either<Failure, TokenPair>> loginWithKakao(String kakaoAccessToken) {
     throw UnimplementedError();
   }
@@ -38,6 +43,12 @@ class MockAuthRepository implements AuthRepository {
     logoutCalled = true;
     return const Right(null);
   }
+
+  @override
+  Future<TokenPair?> getStoredTokens() async => null;
+
+  @override
+  Future<void> clearStoredTokens() async {}
 }
 
 class MockMemberRepository implements MemberRepository {
