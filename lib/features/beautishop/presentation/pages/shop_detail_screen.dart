@@ -10,7 +10,6 @@ import 'package:jellomark/features/beautishop/presentation/widgets/service_menu_
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_description.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_image_gallery.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
-import 'package:jellomark/features/review/presentation/widgets/review_section.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
 
 class ShopDetailScreen extends ConsumerWidget {
@@ -102,8 +101,6 @@ class ShopDetailScreen extends ConsumerWidget {
                   ],
                   const SizedBox(height: 24),
                   _buildServiceMenuSection(treatmentsAsync),
-                  const SizedBox(height: 24),
-                  ReviewSection(shopId: shop.id),
                   const SizedBox(height: 80),
                 ],
               ),
@@ -206,9 +203,8 @@ class ShopDetailScreen extends ConsumerWidget {
 
   Widget _buildBottomReservationButton(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFFFB5BA),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -218,16 +214,16 @@ class ShopDetailScreen extends ConsumerWidget {
         ],
       ),
       child: SafeArea(
+        top: false,
         child: SizedBox(
           width: double.infinity,
-          height: 52,
-          child: ElevatedButton(
+          height: 56,
+          child: TextButton(
             onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFFB5BA),
+            style: TextButton.styleFrom(
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
               ),
             ),
             child: const Text(
