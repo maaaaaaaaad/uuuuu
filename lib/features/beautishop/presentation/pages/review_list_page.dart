@@ -97,15 +97,12 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _showWriteReviewBottomSheet(context),
         backgroundColor: const Color(0xFFFFB5BA),
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.edit_rounded),
-        label: const Text(
-          '리뷰 작성',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
+        shape: const CircleBorder(),
+        child: const Icon(Icons.edit_rounded),
       ),
     );
   }

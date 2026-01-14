@@ -41,9 +41,22 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
     super.dispose();
   }
 
+  static const int _minContentLength = 10;
+  static const int _maxContentLength = 500;
+
   bool get _canSubmit {
-    return !_isSubmitting &&
-        (_selectedRating != null || _contentController.text.trim().isNotEmpty);
+    if (_isSubmitting) return false;
+    final content = _contentController.text.trim();
+    if (content.isNotEmpty) {
+      return content.length >= _minContentLength;
+    }
+    return _selectedRating != null;
+  }
+
+  int get _remainingCharacters {
+    final content = _contentController.text.trim();
+    if (content.isEmpty) return 0;
+    return _minContentLength - content.length;
   }
 
   Future<void> _handleSubmit() async {
@@ -274,9 +287,9 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
         TextField(
           controller: _contentController,
           maxLines: 4,
-          maxLength: 500,
+          maxLength: _maxContentLength,
           decoration: InputDecoration(
-            hintText: '이용 경험을 자유롭게 작성해주세요',
+            hintText: '이용 경험을 자유롭게 작성해주세요 (최소 $_minContentLength자)',
             hintStyle: TextStyle(color: Colors.grey[400]),
             filled: true,
             fillColor: Colors.grey[50],
@@ -296,6 +309,17 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
           ),
           onChanged: (_) => setState(() {}),
         ),
+        if (_remainingCharacters > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              '$_remainingCharacters자 더 입력해주세요',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[500],
+              ),
+            ),
+          ),
       ],
     );
   }
