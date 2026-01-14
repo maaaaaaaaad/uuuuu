@@ -136,5 +136,35 @@ void main() {
         expect(review.formattedDate, '2024.01.15');
       });
     });
+
+    test('should create Review with null rating', () {
+      final review = Review(
+        id: '1',
+        shopId: 'shop-1',
+        memberId: 'member-1',
+        rating: null,
+        content: 'Great service!',
+        createdAt: DateTime(2024, 1, 15),
+        updatedAt: DateTime(2024, 1, 15),
+      );
+
+      expect(review.rating, isNull);
+      expect(review.content, 'Great service!');
+    });
+
+    test('should create Review with null content', () {
+      final review = Review(
+        id: '1',
+        shopId: 'shop-1',
+        memberId: 'member-1',
+        rating: 5,
+        content: null,
+        createdAt: DateTime(2024, 1, 15),
+        updatedAt: DateTime(2024, 1, 15),
+      );
+
+      expect(review.rating, 5);
+      expect(review.content, isNull);
+    });
   });
 }
