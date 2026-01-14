@@ -5,8 +5,8 @@ class ReviewModel extends Equatable {
   final String id;
   final String shopId;
   final String memberId;
-  final int rating;
-  final String content;
+  final int? rating;
+  final String? content;
   final List<String> images;
   final String createdAt;
   final String updatedAt;
@@ -15,8 +15,8 @@ class ReviewModel extends Equatable {
     required this.id,
     required this.shopId,
     required this.memberId,
-    required this.rating,
-    required this.content,
+    this.rating,
+    this.content,
     required this.images,
     required this.createdAt,
     required this.updatedAt,
@@ -27,8 +27,8 @@ class ReviewModel extends Equatable {
       id: json['id'] as String,
       shopId: json['shopId'] as String,
       memberId: json['memberId'] as String,
-      rating: json['rating'] as int,
-      content: json['content'] as String,
+      rating: json['rating'] as int?,
+      content: json['content'] as String?,
       images: (json['images'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
