@@ -76,5 +76,73 @@ void main() {
       expect(result['content'], 'Great service!');
       expect(result['images'], ['image1.jpg', 'image2.jpg']);
     });
+
+    test('should handle null rating in JSON', () {
+      final json = {
+        'id': '1',
+        'shopId': 'shop-1',
+        'memberId': 'member-1',
+        'rating': null,
+        'content': 'Great service!',
+        'images': null,
+        'createdAt': '2024-01-15T10:30:00Z',
+        'updatedAt': '2024-01-15T10:30:00Z',
+      };
+
+      final result = ReviewModel.fromJson(json);
+
+      expect(result.rating, isNull);
+      expect(result.content, 'Great service!');
+    });
+
+    test('should handle null content in JSON', () {
+      final json = {
+        'id': '1',
+        'shopId': 'shop-1',
+        'memberId': 'member-1',
+        'rating': 5,
+        'content': null,
+        'images': null,
+        'createdAt': '2024-01-15T10:30:00Z',
+        'updatedAt': '2024-01-15T10:30:00Z',
+      };
+
+      final result = ReviewModel.fromJson(json);
+
+      expect(result.rating, 5);
+      expect(result.content, isNull);
+    });
+
+    test('should create ReviewModel with null rating', () {
+      const model = ReviewModel(
+        id: '1',
+        shopId: 'shop-1',
+        memberId: 'member-1',
+        rating: null,
+        content: 'Great service!',
+        images: [],
+        createdAt: '2024-01-15T10:30:00Z',
+        updatedAt: '2024-01-15T10:30:00Z',
+      );
+
+      expect(model.rating, isNull);
+      expect(model.content, 'Great service!');
+    });
+
+    test('should create ReviewModel with null content', () {
+      const model = ReviewModel(
+        id: '1',
+        shopId: 'shop-1',
+        memberId: 'member-1',
+        rating: 5,
+        content: null,
+        images: [],
+        createdAt: '2024-01-15T10:30:00Z',
+        updatedAt: '2024-01-15T10:30:00Z',
+      );
+
+      expect(model.rating, 5);
+      expect(model.content, isNull);
+    });
   });
 }
