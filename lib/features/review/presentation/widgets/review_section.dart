@@ -65,9 +65,9 @@ class _ReviewSectionState extends ConsumerState<ReviewSection> {
         else
           Column(
             children: [
-              ...state.reviews.take(3).map(
-                    (review) => _ReviewItem(review: review),
-                  ),
+              ...state.reviews
+                  .take(3)
+                  .map((review) => _ReviewItem(review: review)),
               if (state.reviews.length > 3)
                 TextButton(
                   onPressed: () {
@@ -119,8 +119,10 @@ class _ReviewItem extends StatelessWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        _buildRatingStars(review.rating.toDouble()),
-                        const SizedBox(width: 8),
+                        if (review.rating != null) ...[
+                          _buildRatingStars(review.rating!.toDouble()),
+                          const SizedBox(width: 8),
+                        ],
                         Text(
                           review.formattedDate,
                           style: TextStyle(
@@ -135,14 +137,13 @@ class _ReviewItem extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            review.content,
-            style: const TextStyle(
-              fontSize: 14,
-              height: 1.5,
+          if (review.content != null) ...[
+            const SizedBox(height: 10),
+            Text(
+              review.content!,
+              style: const TextStyle(fontSize: 14, height: 1.5),
             ),
-          ),
+          ],
           if (review.hasImages) ...[
             const SizedBox(height: 10),
             SizedBox(
@@ -162,10 +163,7 @@ class _ReviewItem extends StatelessWidget {
                         review.images[index],
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            Icons.image,
-                            color: Colors.grey[500],
-                          );
+                          return Icon(Icons.image, color: Colors.grey[500]);
                         },
                       ),
                     ),
