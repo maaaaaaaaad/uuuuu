@@ -7,6 +7,7 @@ class ShopInfoHeader extends StatelessWidget {
   final String? distance;
   final List<String>? tags;
   final String? address;
+  final VoidCallback? onReviewTap;
 
   const ShopInfoHeader({
     super.key,
@@ -16,6 +17,7 @@ class ShopInfoHeader extends StatelessWidget {
     this.distance,
     this.tags,
     this.address,
+    this.onReviewTap,
   });
 
   @override
@@ -35,23 +37,7 @@ class ShopInfoHeader extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.star, color: Colors.amber, size: 20),
-              const SizedBox(width: 4),
-              Text(
-                rating.toStringAsFixed(1),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '($reviewCount)',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
+              _buildReviewButton(),
               if (distance != null) ...[
                 const SizedBox(width: 12),
                 Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
@@ -93,6 +79,57 @@ class ShopInfoHeader extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildReviewButton() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onReviewTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFB5BA).withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFFFFB5BA).withValues(alpha: 0.5),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
+              const SizedBox(width: 4),
+              Text(
+                rating.toStringAsFixed(1),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF2D2D2D),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '리뷰 $reviewCount개',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFFD4848A),
+                ),
+              ),
+              const SizedBox(width: 2),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: Color(0xFFD4848A),
+                size: 16,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

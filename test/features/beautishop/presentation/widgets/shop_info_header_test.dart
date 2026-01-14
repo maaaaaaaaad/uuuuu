@@ -33,7 +33,7 @@ void main() {
         ),
       );
 
-      expect(find.byIcon(Icons.star), findsOneWidget);
+      expect(find.byIcon(Icons.star_rounded), findsOneWidget);
       expect(find.text('4.8'), findsOneWidget);
     });
 
@@ -50,7 +50,7 @@ void main() {
         ),
       );
 
-      expect(find.text('(234)'), findsOneWidget);
+      expect(find.text('리뷰 234개'), findsOneWidget);
     });
 
     testWidgets('should display distance when provided', (tester) async {
@@ -103,6 +103,27 @@ void main() {
       );
 
       expect(find.text('서울시 강남구 역삼동 123-45'), findsOneWidget);
+    });
+
+    testWidgets('should trigger onReviewTap when review button is tapped', (tester) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ShopInfoHeader(
+              name: '블루밍 네일',
+              rating: 4.8,
+              reviewCount: 234,
+              onReviewTap: () => tapped = true,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('리뷰 234개'));
+      await tester.pump();
+
+      expect(tapped, isTrue);
     });
   });
 }

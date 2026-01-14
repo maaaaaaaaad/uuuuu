@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/core/di/injection_container.dart';
-import 'package:jellomark/features/review/domain/entities/paged_reviews.dart';
 import 'package:jellomark/features/review/domain/entities/review.dart';
 import 'package:jellomark/features/review/domain/usecases/create_review_usecase.dart';
 import 'package:jellomark/features/review/domain/usecases/delete_review_usecase.dart';
@@ -123,15 +122,10 @@ class ShopReviewsNotifier extends StateNotifier<ShopReviewsState> {
       images: images,
     );
 
-    return result.fold(
-      (failure) => false,
-      (review) {
-        state = state.copyWith(
-          reviews: [review, ...state.reviews],
-        );
-        return true;
-      },
-    );
+    return result.fold((failure) => false, (review) {
+      state = state.copyWith(reviews: [review, ...state.reviews]);
+      return true;
+    });
   }
 
   Future<bool> updateReview({
@@ -149,35 +143,30 @@ class ShopReviewsNotifier extends StateNotifier<ShopReviewsState> {
       images: images,
     );
 
-    return result.fold(
-      (failure) => false,
-      (updatedReview) {
-        final updatedReviews = state.reviews.map((r) {
-          return r.id == reviewId ? updatedReview : r;
-        }).toList();
-        state = state.copyWith(reviews: updatedReviews);
-        return true;
-      },
-    );
+    return result.fold((failure) => false, (updatedReview) {
+      final updatedReviews = state.reviews.map((r) {
+        return r.id == reviewId ? updatedReview : r;
+      }).toList();
+      state = state.copyWith(reviews: updatedReviews);
+      return true;
+    });
   }
 
   Future<bool> deleteReview(String reviewId) async {
     final useCase = _ref.read(deleteReviewUseCaseProvider);
     final result = await useCase(shopId: shopId, reviewId: reviewId);
 
-    return result.fold(
-      (failure) => false,
-      (_) {
-        final updatedReviews =
-            state.reviews.where((r) => r.id != reviewId).toList();
-        state = state.copyWith(reviews: updatedReviews);
-        return true;
-      },
-    );
+    return result.fold((failure) => false, (_) {
+      final updatedReviews = state.reviews
+          .where((r) => r.id != reviewId)
+          .toList();
+      state = state.copyWith(reviews: updatedReviews);
+      return true;
+    });
   }
 }
 
 final shopReviewsNotifierProvider = StateNotifierProvider.autoDispose
     .family<ShopReviewsNotifier, ShopReviewsState, String>(
-  (ref, shopId) => ShopReviewsNotifier(shopId, ref),
-);
+      (ref, shopId) => ShopReviewsNotifier(shopId, ref),
+    );

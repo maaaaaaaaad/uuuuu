@@ -3,7 +3,7 @@ import 'package:jellomark/features/beautishop/domain/entities/shop_review.dart';
 
 void main() {
   group('ShopReview', () {
-    test('should create ShopReview with required fields', () {
+    test('should create ShopReview with all fields', () {
       final review = ShopReview(
         id: '1',
         authorName: '김민지',
@@ -17,6 +17,34 @@ void main() {
       expect(review.rating, 4.5);
       expect(review.content, '네일 너무 예쁘게 해주셨어요!');
       expect(review.createdAt, DateTime(2024, 1, 15));
+    });
+
+    test('should create ShopReview with rating only (no content)', () {
+      final review = ShopReview(
+        id: '1',
+        authorName: '김민지',
+        rating: 4.5,
+        content: null,
+        createdAt: DateTime(2024, 1, 15),
+      );
+
+      expect(review.hasRating, isTrue);
+      expect(review.hasContent, isFalse);
+      expect(review.isRatingOnly, isTrue);
+    });
+
+    test('should create ShopReview with content only (no rating)', () {
+      final review = ShopReview(
+        id: '1',
+        authorName: '김민지',
+        rating: null,
+        content: '네일 너무 예쁘게 해주셨어요!',
+        createdAt: DateTime(2024, 1, 15),
+      );
+
+      expect(review.hasRating, isFalse);
+      expect(review.hasContent, isTrue);
+      expect(review.isRatingOnly, isFalse);
     });
 
     test('should have optional images list', () {
@@ -137,6 +165,18 @@ void main() {
       );
 
       expect(review1, equals(review2));
+    });
+
+    test('hasContent should return false for empty string', () {
+      final review = ShopReview(
+        id: '1',
+        authorName: '김민지',
+        rating: 4.5,
+        content: '',
+        createdAt: DateTime(2024, 1, 15),
+      );
+
+      expect(review.hasContent, isFalse);
     });
   });
 }

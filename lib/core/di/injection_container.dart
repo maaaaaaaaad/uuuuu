@@ -12,6 +12,7 @@ import 'package:jellomark/features/beautishop/data/datasources/beauty_shop_remot
 import 'package:jellomark/features/beautishop/data/repositories/beauty_shop_repository_impl.dart';
 import 'package:jellomark/features/beautishop/domain/repositories/beauty_shop_repository.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops_usecase.dart';
+import 'package:jellomark/features/beautishop/domain/usecases/get_shop_reviews.dart';
 import 'package:jellomark/features/category/data/datasources/category_remote_datasource.dart';
 import 'package:jellomark/features/category/data/repositories/category_repository_impl.dart';
 import 'package:jellomark/features/category/domain/repositories/category_repository.dart';
@@ -91,6 +92,10 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<GetFilteredShopsUseCase>(
     () => GetFilteredShopsUseCase(repository: sl<BeautyShopRepository>()),
+  );
+
+  sl.registerLazySingleton<GetShopReviews>(
+    () => GetShopReviews(repository: sl<BeautyShopRepository>()),
   );
 
   sl.registerLazySingleton<CategoryRemoteDataSource>(

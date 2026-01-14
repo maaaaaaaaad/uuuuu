@@ -47,8 +47,10 @@ class ReviewCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          _buildRatingStars(review.rating),
-                          const SizedBox(width: 8),
+                          if (review.hasRating) ...[
+                            _buildRatingStars(review.rating!),
+                            const SizedBox(width: 8),
+                          ],
                           Text(
                             review.formattedDate,
                             style: TextStyle(
@@ -81,13 +83,24 @@ class ReviewCard extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 10),
-            Text(
-              review.content,
-              style: const TextStyle(
-                fontSize: 14,
-                height: 1.5,
+            if (review.hasContent)
+              Text(
+                review.content!,
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              )
+            else if (review.isRatingOnly)
+              Text(
+                '평점만 등록됨',
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: Colors.grey[500],
+                  fontStyle: FontStyle.italic,
+                ),
               ),
-            ),
             if (review.hasImages) ...[
               const SizedBox(height: 10),
               SizedBox(

@@ -3,8 +3,8 @@ import 'package:equatable/equatable.dart';
 class ShopReview extends Equatable {
   final String id;
   final String authorName;
-  final double rating;
-  final String content;
+  final double? rating;
+  final String? content;
   final DateTime createdAt;
   final List<String> images;
   final String? authorProfileImage;
@@ -13,13 +13,17 @@ class ShopReview extends Equatable {
   const ShopReview({
     required this.id,
     required this.authorName,
-    required this.rating,
-    required this.content,
+    this.rating,
+    this.content,
     required this.createdAt,
     this.images = const [],
     this.authorProfileImage,
     this.serviceName,
   });
+
+  bool get hasRating => rating != null;
+  bool get hasContent => content != null && content!.isNotEmpty;
+  bool get isRatingOnly => hasRating && !hasContent;
 
   bool get hasImages => images.isNotEmpty;
 

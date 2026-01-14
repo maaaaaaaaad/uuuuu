@@ -4,9 +4,9 @@ import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/beautishop/data/datasources/beauty_shop_remote_datasource.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/paged_beauty_shops.dart';
+import 'package:jellomark/features/beautishop/domain/entities/paged_shop_reviews.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
-import 'package:jellomark/features/beautishop/domain/entities/shop_review.dart';
 import 'package:jellomark/features/beautishop/domain/repositories/beauty_shop_repository.dart';
 
 class BeautyShopRepositoryImpl implements BeautyShopRepository {
@@ -136,10 +136,23 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
   }
 
   @override
-  Future<Either<Failure, List<ShopReview>>> getShopReviews(
-    String shopId,
-  ) async {
-    return const Left(ServerFailure('Not implemented yet'));
+  Future<Either<Failure, PagedShopReviews>> getShopReviews(
+    String shopId, {
+    int page = 0,
+    int size = 20,
+    String sort = 'createdAt,desc',
+  }) async {
+    try {
+      final pagedModel = await _remoteDataSource.getShopReviews(
+        shopId,
+        page: page,
+        size: size,
+        sort: sort,
+      );
+      return Right(pagedModel);
+    } on DioException catch (e) {
+      return Left(ServerFailure(_getErrorMessage(e)));
+    }
   }
 
   String _getErrorMessage(DioException e) {

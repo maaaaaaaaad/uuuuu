@@ -4,6 +4,7 @@ import 'package:jellomark/features/beautishop/data/models/beauty_shop_model.dart
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
+import 'package:jellomark/features/beautishop/presentation/pages/review_list_page.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/operating_hours_card.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/service_menu_item.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_description.dart';
@@ -59,6 +60,15 @@ class ShopDetailScreen extends ConsumerWidget {
     final shopDetail = _buildShopDetail();
     final treatmentsAsync = ref.watch(shopTreatmentsProvider(shop.id));
 
+    void navigateToReviewList() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) =>
+              ReviewListPage(shopId: shop.id, shopName: shop.name),
+        ),
+      );
+    }
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -77,6 +87,7 @@ class ShopDetailScreen extends ConsumerWidget {
                         ? '${shopDetail.distance!.toStringAsFixed(1)}km'
                         : null,
                     address: shopDetail.address,
+                    onReviewTap: navigateToReviewList,
                   ),
                   if (shopDetail.description.isNotEmpty) ...[
                     const SizedBox(height: 24),
@@ -114,14 +125,16 @@ class ShopDetailScreen extends ConsumerWidget {
       ),
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
-          final isCollapsed = constraints.maxHeight <=
+          final isCollapsed =
+              constraints.maxHeight <=
               kToolbarHeight + MediaQuery.of(context).padding.top;
           return FlexibleSpaceBar(
             title: isCollapsed ? Text(shopDetail.name) : null,
             background: shopDetail.images.isNotEmpty
                 ? ShopImageGallery(images: shopDetail.images)
                 : Container(
-                    color: const Color(0xFFFFB5BA).withValues(alpha: 0.3)),
+                    color: const Color(0xFFFFB5BA).withValues(alpha: 0.3),
+                  ),
           );
         },
       ),
