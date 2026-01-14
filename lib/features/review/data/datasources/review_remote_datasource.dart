@@ -11,16 +11,16 @@ abstract class ReviewRemoteDataSource {
 
   Future<ReviewModel> createReview({
     required String shopId,
-    required int rating,
-    required String content,
+    int? rating,
+    String? content,
     List<String>? images,
   });
 
   Future<ReviewModel> updateReview({
     required String shopId,
     required String reviewId,
-    required int rating,
-    required String content,
+    int? rating,
+    String? content,
     List<String>? images,
   });
 
@@ -53,17 +53,18 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   @override
   Future<ReviewModel> createReview({
     required String shopId,
-    required int rating,
-    required String content,
+    int? rating,
+    String? content,
     List<String>? images,
   }) async {
+    final data = <String, dynamic>{};
+    if (rating != null) data['rating'] = rating;
+    if (content != null) data['content'] = content;
+    if (images != null) data['images'] = images;
+
     final response = await _apiClient.post(
       '/api/beautishops/$shopId/reviews',
-      data: {
-        'rating': rating,
-        'content': content,
-        'images': images,
-      },
+      data: data,
     );
 
     return ReviewModel.fromJson(response.data as Map<String, dynamic>);
@@ -73,17 +74,18 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   Future<ReviewModel> updateReview({
     required String shopId,
     required String reviewId,
-    required int rating,
-    required String content,
+    int? rating,
+    String? content,
     List<String>? images,
   }) async {
+    final data = <String, dynamic>{};
+    if (rating != null) data['rating'] = rating;
+    if (content != null) data['content'] = content;
+    if (images != null) data['images'] = images;
+
     final response = await _apiClient.put(
       '/api/beautishops/$shopId/reviews/$reviewId',
-      data: {
-        'rating': rating,
-        'content': content,
-        'images': images,
-      },
+      data: data,
     );
 
     return ReviewModel.fromJson(response.data as Map<String, dynamic>);

@@ -144,7 +144,6 @@ void main() {
             data: {
               'rating': tRating,
               'content': tContent,
-              'images': null,
             },
           )).thenAnswer(
         (_) async => Response(
@@ -169,7 +168,6 @@ void main() {
             data: {
               'rating': tRating,
               'content': tContent,
-              'images': null,
             },
           )).called(1);
     });

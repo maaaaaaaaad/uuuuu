@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/core/di/injection_container.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_review.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_shop_reviews.dart';
+import 'package:jellomark/features/review/domain/usecases/create_review_usecase.dart';
 
 class ReviewListState extends Equatable {
   final List<ShopReview> reviews;
@@ -64,14 +65,21 @@ final getShopReviewsUseCaseProvider = Provider<GetShopReviews>((ref) {
   return sl<GetShopReviews>();
 });
 
+final createReviewUseCaseProvider = Provider<CreateReviewUseCase>((ref) {
+  return sl<CreateReviewUseCase>();
+});
+
 class ReviewListNotifier extends StateNotifier<ReviewListState> {
   final GetShopReviews _getShopReviews;
+  final CreateReviewUseCase _createReviewUseCase;
   final String shopId;
 
   ReviewListNotifier({
     required GetShopReviews getShopReviews,
+    required CreateReviewUseCase createReviewUseCase,
     required this.shopId,
   }) : _getShopReviews = getShopReviews,
+       _createReviewUseCase = createReviewUseCase,
        super(const ReviewListState());
 
   Future<void> loadReviews() async {
@@ -149,12 +157,32 @@ class ReviewListNotifier extends StateNotifier<ReviewListState> {
     );
     await loadReviews();
   }
+
+  Future<bool> createReview({
+    int? rating,
+    String? content,
+  }) async {
+    final result = await _createReviewUseCase(
+      shopId: shopId,
+      rating: rating,
+      content: content,
+    );
+
+    return result.fold(
+      (failure) => false,
+      (review) {
+        refresh();
+        return true;
+      },
+    );
+  }
 }
 
 final reviewListNotifierProvider = StateNotifierProvider.autoDispose
     .family<ReviewListNotifier, ReviewListState, String>((ref, shopId) {
       return ReviewListNotifier(
         getShopReviews: ref.watch(getShopReviewsUseCaseProvider),
+        createReviewUseCase: ref.watch(createReviewUseCaseProvider),
         shopId: shopId,
       );
     });

@@ -9,11 +9,14 @@ import 'package:jellomark/features/beautishop/domain/repositories/beauty_shop_re
 import 'package:jellomark/features/beautishop/domain/usecases/get_shop_reviews.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/review_list_page.dart';
 import 'package:jellomark/features/beautishop/presentation/providers/review_list_provider.dart';
+import 'package:jellomark/features/review/domain/entities/review.dart';
+import 'package:jellomark/features/review/domain/repositories/review_repository.dart';
+import 'package:jellomark/features/review/domain/usecases/create_review_usecase.dart';
 
 class MockGetShopReviews extends GetShopReviews {
   PagedShopReviews? mockResult;
 
-  MockGetShopReviews() : super(repository: _MockRepository());
+  MockGetShopReviews() : super(repository: _MockBeautyShopRepository());
 
   @override
   Future<Either<Failure, PagedShopReviews>> call({
@@ -26,7 +29,34 @@ class MockGetShopReviews extends GetShopReviews {
   }
 }
 
-class _MockRepository implements BeautyShopRepository {
+class MockCreateReviewUseCase extends CreateReviewUseCase {
+  MockCreateReviewUseCase() : super(repository: _MockReviewRepository());
+
+  @override
+  Future<Either<Failure, Review>> call({
+    required String shopId,
+    int? rating,
+    String? content,
+    List<String>? images,
+  }) async {
+    return Right(Review(
+      id: 'new-review',
+      shopId: shopId,
+      memberId: 'member-1',
+      rating: rating ?? 5,
+      content: content ?? '',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ));
+  }
+}
+
+class _MockBeautyShopRepository implements BeautyShopRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+class _MockReviewRepository implements ReviewRepository {
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
 }
@@ -34,15 +64,18 @@ class _MockRepository implements BeautyShopRepository {
 void main() {
   group('ReviewListPage', () {
     late MockGetShopReviews mockGetShopReviews;
+    late MockCreateReviewUseCase mockCreateReviewUseCase;
 
     setUp(() {
       mockGetShopReviews = MockGetShopReviews();
+      mockCreateReviewUseCase = MockCreateReviewUseCase();
     });
 
     Widget createTestWidget() {
       return ProviderScope(
         overrides: [
           getShopReviewsUseCaseProvider.overrideWithValue(mockGetShopReviews),
+          createReviewUseCaseProvider.overrideWithValue(mockCreateReviewUseCase),
         ],
         child: const MaterialApp(
           home: ReviewListPage(shopId: 'test-shop-id', shopName: '테스트 샵'),

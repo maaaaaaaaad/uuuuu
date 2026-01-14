@@ -12,16 +12,16 @@ abstract class ReviewRepository {
 
   Future<Either<Failure, Review>> createReview({
     required String shopId,
-    required int rating,
-    required String content,
+    int? rating,
+    String? content,
     List<String>? images,
   });
 
   Future<Either<Failure, Review>> updateReview({
     required String shopId,
     required String reviewId,
-    required int rating,
-    required String content,
+    int? rating,
+    String? content,
     List<String>? images,
   });
 

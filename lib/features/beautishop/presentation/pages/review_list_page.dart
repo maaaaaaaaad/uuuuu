@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_shop_reviews.dart';
 import 'package:jellomark/features/beautishop/presentation/providers/review_list_provider.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/review_card.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/write_review_bottom_sheet.dart';
 
 class ReviewListPage extends ConsumerStatefulWidget {
   final String shopId;
@@ -44,6 +45,18 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
     }
   }
 
+  void _showWriteReviewBottomSheet(BuildContext context) {
+    WriteReviewBottomSheet.show(
+      context: context,
+      shopName: widget.shopName,
+      onSubmit: ({int? rating, String? content}) {
+        return ref
+            .read(reviewListNotifierProvider(widget.shopId).notifier)
+            .createReview(rating: rating, content: content);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(reviewListNotifierProvider(widget.shopId));
@@ -83,6 +96,16 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
             child: _buildReviewList(state),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showWriteReviewBottomSheet(context),
+        backgroundColor: const Color(0xFFFFB5BA),
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.edit_rounded),
+        label: const Text(
+          '리뷰 작성',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }

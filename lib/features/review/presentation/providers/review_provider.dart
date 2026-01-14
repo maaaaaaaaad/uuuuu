@@ -110,8 +110,8 @@ class ShopReviewsNotifier extends StateNotifier<ShopReviewsState> {
   }
 
   Future<bool> createReview({
-    required int rating,
-    required String content,
+    int? rating,
+    String? content,
     List<String>? images,
   }) async {
     final useCase = _ref.read(createReviewUseCaseProvider);
@@ -130,8 +130,8 @@ class ShopReviewsNotifier extends StateNotifier<ShopReviewsState> {
 
   Future<bool> updateReview({
     required String reviewId,
-    required int rating,
-    required String content,
+    int? rating,
+    String? content,
     List<String>? images,
   }) async {
     final useCase = _ref.read(updateReviewUseCaseProvider);
