@@ -19,10 +19,8 @@ class WriteReviewBottomSheet extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => WriteReviewBottomSheet(
-        shopName: shopName,
-        onSubmit: onSubmit,
-      ),
+      builder: (context) =>
+          WriteReviewBottomSheet(shopName: shopName, onSubmit: onSubmit),
     );
   }
 
@@ -148,18 +146,12 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
               children: [
                 const Text(
                   '리뷰 작성',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   widget.shopName,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -183,18 +175,12 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
           children: [
             const Text(
               '평점',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 8),
             Text(
               '(선택)',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
             ),
           ],
         ),
@@ -203,7 +189,8 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: List.generate(5, (index) {
             final rating = index + 1;
-            final isSelected = _selectedRating != null && rating <= _selectedRating!;
+            final isSelected =
+                _selectedRating != null && rating <= _selectedRating!;
             return GestureDetector(
               onTap: () {
                 setState(() {
@@ -268,18 +255,12 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
           children: [
             const Text(
               '리뷰 내용',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 8),
             Text(
               '(선택)',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
             ),
           ],
         ),
@@ -314,10 +295,7 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
             padding: const EdgeInsets.only(top: 8),
             child: Text(
               '$_remainingCharacters자 더 입력해주세요',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[500],
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
             ),
           ),
       ],
@@ -351,10 +329,7 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
               )
             : const Text(
                 '작성 완료',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
       ),
     );
