@@ -4,8 +4,8 @@ class Review extends Equatable {
   final String id;
   final String shopId;
   final String memberId;
-  final int rating;
-  final String content;
+  final int? rating;
+  final String? content;
   final List<String> images;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -14,8 +14,8 @@ class Review extends Equatable {
     required this.id,
     required this.shopId,
     required this.memberId,
-    required this.rating,
-    required this.content,
+    this.rating,
+    this.content,
     this.images = const [],
     required this.createdAt,
     required this.updatedAt,
