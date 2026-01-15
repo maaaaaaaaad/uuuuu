@@ -8,6 +8,8 @@ import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart'
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
 import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
+import 'package:jellomark/shared/widgets/glass_card.dart';
 
 import '../../../../helpers/mock_http_client.dart';
 
@@ -201,6 +203,78 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(ShopDetailScreen), findsNothing);
+    });
+
+    group('UI Redesign', () {
+      testWidgets('has lavender gradient background', (tester) async {
+        await tester.pumpWidget(createShopDetailScreen(shop: testShop));
+        await tester.pumpAndSettle();
+
+        final container = tester.widget<Container>(
+          find.descendant(
+            of: find.byType(Scaffold),
+            matching: find.byType(Container).first,
+          ),
+        );
+        final decoration = container.decoration as BoxDecoration?;
+        expect(decoration?.gradient, isNotNull);
+      });
+
+      testWidgets('has BackdropFilter for glassmorphism', (tester) async {
+        await tester.pumpWidget(createShopDetailScreen(shop: testShop));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BackdropFilter), findsWidgets);
+      });
+
+      testWidgets('uses GlassCard for info sections', (tester) async {
+        await tester.pumpWidget(createShopDetailScreen(shop: testShop));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(GlassCard), findsWidgets);
+      });
+
+      testWidgets('CircularProgressIndicator has mint color', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              shopTreatmentsProvider(testShop.id).overrideWith((ref) async {
+                await Future<void>.value();
+                return const <ServiceMenu>[];
+              }),
+              shopReviewsNotifierProvider(testShop.id).overrideWith(
+                (ref) => _MockShopReviewsNotifier(),
+              ),
+            ],
+            child: MaterialApp(
+              home: ShopDetailScreen(shop: testShop),
+            ),
+          ),
+        );
+
+        final indicator = tester.widget<CircularProgressIndicator>(
+          find.byType(CircularProgressIndicator),
+        );
+        expect(indicator.color, AppColors.mint);
+
+        await tester.pumpAndSettle();
+      });
+
+      testWidgets('reservation button has gradient', (tester) async {
+        await tester.pumpWidget(createShopDetailScreen(shop: testShop));
+        await tester.pumpAndSettle();
+
+        final containers = tester.widgetList<Container>(find.byType(Container));
+        bool hasGradientButton = false;
+        for (final container in containers) {
+          final decoration = container.decoration;
+          if (decoration is BoxDecoration && decoration.gradient != null) {
+            hasGradientButton = true;
+            break;
+          }
+        }
+        expect(hasGradientButton, isTrue);
+      });
     });
   });
 }

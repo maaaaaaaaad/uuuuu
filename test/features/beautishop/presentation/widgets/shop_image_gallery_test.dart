@@ -62,15 +62,12 @@ void main() {
         ),
       );
 
-      // Initially first dot is active
       expect(find.byKey(const Key('indicator_dot_0_active')), findsOneWidget);
       expect(find.byKey(const Key('indicator_dot_1_inactive')), findsOneWidget);
 
-      // Swipe to next page
       await tester.fling(find.byType(PageView), const Offset(-300, 0), 1000);
       await tester.pumpAndSettle();
 
-      // Second dot should be active after swipe
       expect(find.byKey(const Key('indicator_dot_0_inactive')), findsOneWidget);
       expect(find.byKey(const Key('indicator_dot_1_active')), findsOneWidget);
     });

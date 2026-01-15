@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class MemberProfileWidget extends StatelessWidget {
   final Member member;
@@ -27,7 +28,7 @@ class MemberProfileWidget extends StatelessWidget {
             ),
             Text(
               '${member.socialProvider}로 로그인',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 14, color: SemanticColors.text.secondary),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/validation_message.dart';
 
 void main() {
@@ -74,21 +75,18 @@ void main() {
 
     testWidgets('should use error color for error type', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          ),
-          home: const Scaffold(
+        const MaterialApp(
+          home: Scaffold(
             body: ValidationMessage(message: '에러', type: ValidationType.error),
           ),
         ),
       );
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.error_outline));
-      expect(icon.color, equals(ThemeData().colorScheme.error));
+      expect(icon.color, equals(SemanticColors.state.error));
     });
 
-    testWidgets('should use green color for success type', (tester) async {
+    testWidgets('should use success color for success type', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -101,10 +99,10 @@ void main() {
       );
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.check_circle_outline));
-      expect(icon.color, equals(Colors.green));
+      expect(icon.color, equals(SemanticColors.state.success));
     });
 
-    testWidgets('should use orange color for warning type', (tester) async {
+    testWidgets('should use warning color for warning type', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -119,7 +117,7 @@ void main() {
       final icon = tester.widget<Icon>(
         find.byIcon(Icons.warning_amber_outlined),
       );
-      expect(icon.color, equals(Colors.orange));
+      expect(icon.color, equals(SemanticColors.state.warning));
     });
 
     testWidgets('should render nothing when message is null', (tester) async {

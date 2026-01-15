@@ -1,8 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
 import 'package:jellomark/features/search/presentation/providers/search_provider.dart';
+import 'package:jellomark/shared/theme/app_gradients.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/pill_chip.dart';
+import 'package:jellomark/shared/widgets/units/glass_search_bar.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
@@ -14,25 +20,18 @@ class SearchPage extends ConsumerStatefulWidget {
 
 class _SearchPageState extends ConsumerState<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocusNode = FocusNode();
-
-  static const Color _primaryColor = Color(0xFFFFB5BA);
-  static const Color _textSecondary = Color(0xFF666666);
-  static const Color _backgroundLight = Color(0xFFF5F5F5);
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(searchNotifierProvider.notifier).loadSearchHistory();
-      _searchFocusNode.requestFocus();
     });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
-    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -42,9 +41,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
   }
 
-  void _onCancel() {
+  void _onClear() {
     _searchController.clear();
-    _searchFocusNode.unfocus();
     ref.read(searchNotifierProvider.notifier).clearSearch();
   }
 
@@ -67,62 +65,82 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
+  void _dismissKeyboard() {
+    FocusScope.of(context).unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(searchNotifierProvider);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
-      body: state.query.isEmpty
-          ? _buildHistoryView(state)
-          : _buildResultsView(state),
+    return GestureDetector(
+      onTap: _dismissKeyboard,
+      child: Scaffold(
+        backgroundColor: SemanticColors.special.transparent,
+        extendBodyBehindAppBar: true,
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: AppGradients.softWhiteGradient,
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                _buildSearchHeader(),
+                Expanded(
+                  child: state.query.isEmpty
+                      ? _buildHistoryView(state)
+                      : _buildResultsView(state),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      title: Row(
+  Widget _buildSearchHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 40,
-              decoration: BoxDecoration(
-                color: _backgroundLight,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                controller: _searchController,
-                focusNode: _searchFocusNode,
-                decoration: InputDecoration(
-                  hintText: '이름 또는 위치로 샵을 검색 하세요',
-                  hintStyle: TextStyle(fontSize: 14, color: _textSecondary),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: _textSecondary,
-                    size: 20,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                ),
-                style: const TextStyle(fontSize: 14),
-                textInputAction: TextInputAction.search,
-                onSubmitted: _onSearch,
-              ),
+            child: GlassSearchBar(
+              controller: _searchController,
+              hintText: '이름 또는 위치로 샵을 검색 하세요',
+              onChanged: (_) {},
+              onSubmitted: _onSearch,
+              onClear: _onClear,
+              autofocus: false,
             ),
           ),
           const SizedBox(width: 12),
           GestureDetector(
-            onTap: _onCancel,
-            child: const Text(
-              '취소',
-              style: TextStyle(fontSize: 14, color: _primaryColor),
+            onTap: _onClear,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: SemanticColors.background.card,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: SemanticColors.border.glass),
+                  ),
+                  child: Text(
+                    '취소',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: SemanticColors.button.textButton,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -136,22 +154,29 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 '최근 검색어',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: SemanticColors.text.primary,
+                ),
               ),
               GestureDetector(
                 onTap: _onClearHistory,
                 child: Text(
                   '전체 삭제',
-                  style: TextStyle(fontSize: 12, color: _textSecondary),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: SemanticColors.text.secondary,
+                  ),
                 ),
               ),
             ],
@@ -161,32 +186,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             spacing: 8,
             runSpacing: 8,
             children: state.searchHistory.map((history) {
-              return _buildHistoryChip(history.keyword);
+              return _HistoryPillChip(
+                keyword: history.keyword,
+                onTap: () => _onHistoryTap(history.keyword),
+                onDelete: () => _onHistoryDelete(history.keyword),
+              );
             }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHistoryChip(String keyword) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: _backgroundLight,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          GestureDetector(
-            onTap: () => _onHistoryTap(keyword),
-            child: Text(keyword, style: const TextStyle(fontSize: 14)),
-          ),
-          const SizedBox(width: 4),
-          GestureDetector(
-            onTap: () => _onHistoryDelete(keyword),
-            child: Icon(Icons.close, size: 16, color: _textSecondary),
           ),
         ],
       ),
@@ -204,15 +209,25 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.search,
-                    size: 64,
-                    color: _textSecondary.withValues(alpha: 0.5),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: SemanticColors.background.card,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.search,
+                      size: 48,
+                      color: SemanticColors.icon.accent,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     '검색어를 입력해주세요',
-                    style: TextStyle(fontSize: 16, color: _textSecondary),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: SemanticColors.text.secondary,
+                    ),
                   ),
                 ],
               ),
@@ -225,18 +240,15 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Widget _buildResultsView(SearchState state) {
     if (state.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: _primaryColor),
+      return Center(
+        child: CircularProgressIndicator(
+          color: SemanticColors.indicator.loading,
+        ),
       );
     }
 
     if (state.error != null) {
-      return Center(
-        child: Text(
-          state.error!,
-          style: const TextStyle(fontSize: 16, color: Colors.red),
-        ),
-      );
+      return _buildErrorState(state.error!);
     }
 
     if (state.results.isEmpty) {
@@ -258,10 +270,12 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         itemCount: state.results.length + (state.isLoadingMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == state.results.length) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(color: _primaryColor),
+                padding: const EdgeInsets.all(16),
+                child: CircularProgressIndicator(
+                  color: SemanticColors.indicator.loading,
+                ),
               ),
             );
           }
@@ -291,15 +305,25 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.search_off,
-                    size: 64,
-                    color: _textSecondary.withValues(alpha: 0.5),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: SemanticColors.background.card,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.search_off,
+                      size: 48,
+                      color: SemanticColors.icon.accent,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     '검색 결과가 없습니다',
-                    style: TextStyle(fontSize: 16, color: _textSecondary),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: SemanticColors.text.secondary,
+                    ),
                   ),
                 ],
               ),
@@ -308,5 +332,76 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         );
       },
     );
+  }
+
+  Widget _buildErrorState(String error) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: SemanticColors.background.card,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: SemanticColors.icon.accent,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    error,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: SemanticColors.text.secondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      final query = _searchController.text.trim();
+                      if (query.isNotEmpty) {
+                        ref.read(searchNotifierProvider.notifier).search(query);
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: SemanticColors.button.textButton,
+                    ),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HistoryPillChip extends StatelessWidget {
+  final String keyword;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+
+  const _HistoryPillChip({
+    required this.keyword,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PillChip(label: keyword, icon: Icons.history, onTap: onTap);
   }
 }

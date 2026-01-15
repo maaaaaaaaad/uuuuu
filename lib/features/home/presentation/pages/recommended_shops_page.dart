@@ -4,6 +4,7 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop_filter.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
 
 class RecommendedShopsState {
@@ -160,8 +161,8 @@ class _RecommendedShopsPageState extends ConsumerState<RecommendedShopsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('추천 샵'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: SemanticColors.background.input,
+        foregroundColor: SemanticColors.text.primary,
         elevation: 0,
       ),
       body: _buildBody(state),
@@ -170,8 +171,8 @@ class _RecommendedShopsPageState extends ConsumerState<RecommendedShopsPage> {
 
   Widget _buildBody(RecommendedShopsState state) {
     if (state.isLoading && state.shops.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFFFFB5BA)),
+      return Center(
+        child: CircularProgressIndicator(color: SemanticColors.indicator.loadingPink),
       );
     }
 
@@ -199,10 +200,10 @@ class _RecommendedShopsPageState extends ConsumerState<RecommendedShopsPage> {
       itemCount: state.shops.length + (state.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == state.shops.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(
-              child: CircularProgressIndicator(color: Color(0xFFFFB5BA)),
+              child: CircularProgressIndicator(color: SemanticColors.indicator.loadingPink),
             ),
           );
         }

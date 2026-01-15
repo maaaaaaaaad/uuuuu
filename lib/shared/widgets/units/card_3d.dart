@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/app_shadows.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class Card3D extends StatefulWidget {
   final Widget child;
   final double borderRadius;
   final EdgeInsetsGeometry padding;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final VoidCallback? onTap;
 
   const Card3D({
@@ -12,7 +14,7 @@ class Card3D extends StatefulWidget {
     required this.child,
     this.borderRadius = 16,
     this.padding = const EdgeInsets.all(16),
-    this.backgroundColor = Colors.white,
+    this.backgroundColor,
     this.onTap,
   });
 
@@ -93,20 +95,13 @@ class _Card3DState extends State<Card3D> with SingleTickerProviderStateMixin {
           ..rotateY(_rotationY),
         child: Container(
           decoration: BoxDecoration(
-            color: widget.backgroundColor,
+            color: widget.backgroundColor ?? SemanticColors.background.input,
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            boxShadow: [
-              BoxShadow(
-                offset: const Offset(4, 4),
-                blurRadius: 10,
-                color: Colors.grey.withValues(alpha: 0.15),
-              ),
-              BoxShadow(
-                offset: const Offset(-2, -2),
-                blurRadius: 8,
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
-            ],
+            boxShadow: AppShadows.card3D,
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.6),
+              width: 1,
+            ),
           ),
           child: Padding(padding: widget.padding, child: widget.child),
         ),

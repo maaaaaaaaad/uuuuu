@@ -10,6 +10,7 @@ import 'package:jellomark/features/beautishop/presentation/widgets/service_menu_
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_description.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_image_gallery.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class ShopDetailPage extends StatelessWidget {
   final ShopDetail shopDetail;
@@ -137,7 +138,7 @@ class ShopDetailPage extends StatelessWidget {
             title: isCollapsed ? Text(shopDetail.name) : null,
             background: shopDetail.images.isNotEmpty
                 ? ShopImageGallery(images: shopDetail.images)
-                : Container(color: const Color(0xFFFFB5BA).withValues(alpha: 0.3)),
+                : Container(color: SemanticColors.background.cardPink),
           );
         },
       ),
@@ -177,7 +178,7 @@ class ShopDetailPage extends StatelessWidget {
             if (shopDetail.reviewCount > 0)
               Text(
                 '${shopDetail.reviewCount}개',
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 14, color: SemanticColors.text.secondary),
               ),
           ],
         ),
@@ -196,10 +197,10 @@ class ShopDetailPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: SemanticColors.background.input,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: SemanticColors.overlay.shadowLight,
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -212,8 +213,8 @@ class ShopDetailPage extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFFB5BA),
-              foregroundColor: Colors.white,
+              backgroundColor: SemanticColors.button.primary,
+              foregroundColor: SemanticColors.button.primaryText,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

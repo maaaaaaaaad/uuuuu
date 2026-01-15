@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class CategoryChip extends StatelessWidget {
   final String label;
@@ -19,10 +20,10 @@ class CategoryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final backgroundColor = isSelected
-        ? const Color(0xFFFFB5BA)
-        : Colors.grey[100];
+        ? SemanticColors.background.chipSelected
+        : SemanticColors.background.chip;
 
-    final iconColor = isSelected ? Colors.white : const Color(0xFF2D2D2D);
+    final iconColor = isSelected ? SemanticColors.icon.onDark : SemanticColors.text.primary;
 
     return GestureDetector(
       onTap: onTap,
@@ -39,12 +40,12 @@ class CategoryChip extends StatelessWidget {
                 BoxShadow(
                   offset: const Offset(3, 3),
                   blurRadius: 6,
-                  color: Colors.grey.withValues(alpha: 0.2),
+                  color: SemanticColors.overlay.neumorphicDark,
                 ),
                 BoxShadow(
                   offset: const Offset(-2, -2),
                   blurRadius: 6,
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: SemanticColors.overlay.neumorphicLight,
                 ),
               ],
             ),
@@ -61,8 +62,8 @@ class CategoryChip extends StatelessWidget {
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               color: isSelected
-                  ? const Color(0xFFFF8A94)
-                  : const Color(0xFF2D2D2D),
+                  ? SemanticColors.text.accent
+                  : SemanticColors.text.primary,
             ),
           ),
         ],

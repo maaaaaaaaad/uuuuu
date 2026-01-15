@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/config/theme.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 
 void main() {
   group('AppTheme', () {
@@ -8,7 +9,7 @@ void main() {
       test('should have pastel pink as primary color', () {
         final theme = AppTheme.lightTheme;
 
-        expect(theme.colorScheme.primary, AppTheme.pastelPink);
+        expect(theme.colorScheme.primary, AppColors.pastelPink);
       });
 
       test('should use Esamanru font family', () {

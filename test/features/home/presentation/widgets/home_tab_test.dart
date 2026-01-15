@@ -15,6 +15,8 @@ import 'package:jellomark/features/home/presentation/providers/home_provider.dar
 import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
 import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
+import 'package:jellomark/shared/widgets/gradient_card.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
@@ -282,6 +284,53 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(ShopDetailScreen), findsOneWidget);
+    });
+
+    group('UI Redesign', () {
+      testWidgets('renders hero section with GradientCard', (tester) async {
+        setupMocks();
+
+        await tester.pumpWidget(
+          buildTestWidget(
+            filteredShopsUseCase: mockGetFilteredShopsUseCase,
+            categoriesUseCase: mockGetCategoriesUseCase,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(GradientCard), findsOneWidget);
+      });
+
+      testWidgets('hero section contains welcome message', (tester) async {
+        setupMocks();
+
+        await tester.pumpWidget(
+          buildTestWidget(
+            filteredShopsUseCase: mockGetFilteredShopsUseCase,
+            categoriesUseCase: mockGetCategoriesUseCase,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('환영'), findsOneWidget);
+      });
+
+      testWidgets('RefreshIndicator has mint color', (tester) async {
+        setupMocks();
+
+        await tester.pumpWidget(
+          buildTestWidget(
+            filteredShopsUseCase: mockGetFilteredShopsUseCase,
+            categoriesUseCase: mockGetCategoriesUseCase,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final refreshIndicator = tester.widget<RefreshIndicator>(
+          find.byType(RefreshIndicator),
+        );
+        expect(refreshIndicator.color, AppColors.mint);
+      });
     });
   });
 }

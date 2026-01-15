@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_review.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class ReviewCard extends StatelessWidget {
   final ShopReview review;
@@ -24,12 +25,12 @@ class ReviewCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: Colors.grey[300],
+                  backgroundColor: SemanticColors.background.avatar,
                   backgroundImage: review.authorProfileImage != null
                       ? NetworkImage(review.authorProfileImage!)
                       : null,
                   child: review.authorProfileImage == null
-                      ? Icon(Icons.person, color: Colors.grey[600], size: 20)
+                      ? Icon(Icons.person, color: SemanticColors.icon.secondary, size: 20)
                       : null,
                 ),
                 const SizedBox(width: 10),
@@ -55,7 +56,7 @@ class ReviewCard extends StatelessWidget {
                             review.formattedDate,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[500],
+                              color: SemanticColors.text.disabled,
                             ),
                           ),
                         ],
@@ -70,14 +71,14 @@ class ReviewCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: SemanticColors.background.chip,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   review.serviceName!,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[700],
+                    color: SemanticColors.icon.primary,
                   ),
                 ),
               ),
@@ -97,7 +98,7 @@ class ReviewCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.5,
-                  color: Colors.grey[500],
+                  color: SemanticColors.text.disabled,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -116,14 +117,14 @@ class ReviewCard extends StatelessWidget {
                       child: Container(
                         width: 80,
                         height: 80,
-                        color: Colors.grey[300],
+                        color: SemanticColors.background.avatar,
                         child: Image.network(
                           review.images[index],
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(
                               Icons.image,
-                              color: Colors.grey[500],
+                              color: SemanticColors.icon.disabled,
                             );
                           },
                         ),
@@ -144,11 +145,11 @@ class ReviewCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         if (index < rating.floor()) {
-          return const Icon(Icons.star, size: 14, color: Colors.amber);
+          return Icon(Icons.star, size: 14, color: SemanticColors.icon.starFilled);
         } else if (index < rating) {
-          return const Icon(Icons.star_half, size: 14, color: Colors.amber);
+          return Icon(Icons.star_half, size: 14, color: SemanticColors.icon.starFilled);
         } else {
-          return Icon(Icons.star_border, size: 14, color: Colors.grey[400]);
+          return Icon(Icons.star_border, size: 14, color: SemanticColors.icon.starEmpty);
         }
       }),
     );

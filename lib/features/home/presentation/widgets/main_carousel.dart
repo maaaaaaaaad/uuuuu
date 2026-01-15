@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class CarouselItem {
   final String id;
@@ -46,7 +47,7 @@ class _MainCarouselState extends State<MainCarousel> {
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: Colors.grey[200],
+                  color: SemanticColors.background.imagePlaceholder,
                 ),
                 child: Center(child: Text(item.title)),
               );
@@ -85,7 +86,7 @@ class PageIndicator extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: index == currentIndex ? Colors.pink[200] : Colors.grey[300],
+            color: index == currentIndex ? SemanticColors.indicator.carouselActive : SemanticColors.indicator.carouselInactive,
           ),
         ),
       ),

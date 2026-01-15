@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jellomark/features/beautishop/presentation/pages/review_list_page.dart';
 import 'package:jellomark/features/review/domain/entities/review.dart';
 import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class ReviewSection extends ConsumerStatefulWidget {
   final String shopId;
+  final String shopName;
 
-  const ReviewSection({super.key, required this.shopId});
+  const ReviewSection({super.key, required this.shopId, required this.shopName});
 
   @override
   ConsumerState<ReviewSection> createState() => _ReviewSectionState();
@@ -36,10 +39,10 @@ class _ReviewSectionState extends ConsumerState<ReviewSection> {
         ),
         const SizedBox(height: 12),
         if (state.isLoading && state.reviews.isEmpty)
-          const Center(
+          Center(
             child: Padding(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(color: Color(0xFFFFB5BA)),
+              padding: const EdgeInsets.all(16),
+              child: CircularProgressIndicator(color: SemanticColors.indicator.loadingPink),
             ),
           )
         else if (state.error != null && state.reviews.isEmpty)
@@ -48,7 +51,7 @@ class _ReviewSectionState extends ConsumerState<ReviewSection> {
               padding: const EdgeInsets.all(16),
               child: Text(
                 '리뷰를 불러올 수 없습니다',
-                style: TextStyle(color: Colors.grey[600]),
+                style: TextStyle(color: SemanticColors.text.secondary),
               ),
             ),
           )
@@ -58,7 +61,7 @@ class _ReviewSectionState extends ConsumerState<ReviewSection> {
               padding: const EdgeInsets.all(16),
               child: Text(
                 '아직 리뷰가 없습니다',
-                style: TextStyle(color: Colors.grey[600]),
+                style: TextStyle(color: SemanticColors.text.secondary),
               ),
             ),
           )
@@ -71,11 +74,18 @@ class _ReviewSectionState extends ConsumerState<ReviewSection> {
               if (state.reviews.length > 3)
                 TextButton(
                   onPressed: () {
-                    // TODO: Navigate to all reviews page
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ReviewListPage(
+                          shopId: widget.shopId,
+                          shopName: widget.shopName,
+                        ),
+                      ),
+                    );
                   },
-                  child: const Text(
+                  child: Text(
                     '리뷰 더보기',
-                    style: TextStyle(color: Color(0xFFFFB5BA)),
+                    style: TextStyle(color: SemanticColors.text.linkPink),
                   ),
                 ),
             ],
@@ -101,8 +111,8 @@ class _ReviewItem extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: Colors.grey[300],
-                child: Icon(Icons.person, color: Colors.grey[600], size: 20),
+                backgroundColor: SemanticColors.background.avatar,
+                child: Icon(Icons.person, color: SemanticColors.icon.secondary, size: 20),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -127,7 +137,7 @@ class _ReviewItem extends StatelessWidget {
                           review.formattedDate,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[500],
+                            color: SemanticColors.text.disabled,
                           ),
                         ),
                       ],
@@ -158,12 +168,12 @@ class _ReviewItem extends StatelessWidget {
                     child: Container(
                       width: 80,
                       height: 80,
-                      color: Colors.grey[300],
+                      color: SemanticColors.background.avatar,
                       child: Image.network(
                         review.images[index],
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.image, color: Colors.grey[500]);
+                          return Icon(Icons.image, color: SemanticColors.icon.disabled);
                         },
                       ),
                     ),
@@ -190,11 +200,11 @@ class _ReviewItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         if (index < rating.floor()) {
-          return const Icon(Icons.star, size: 14, color: Colors.amber);
+          return Icon(Icons.star, size: 14, color: SemanticColors.icon.starFilled);
         } else if (index < rating) {
-          return const Icon(Icons.star_half, size: 14, color: Colors.amber);
+          return Icon(Icons.star_half, size: 14, color: SemanticColors.icon.starFilled);
         } else {
-          return Icon(Icons.star_border, size: 14, color: Colors.grey[400]);
+          return Icon(Icons.star_border, size: 14, color: SemanticColors.icon.starEmpty);
         }
       }),
     );

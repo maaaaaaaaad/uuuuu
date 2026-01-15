@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class LoadingOverlay extends StatelessWidget {
   final bool isLoading;
@@ -19,24 +22,33 @@ class LoadingOverlay extends StatelessWidget {
         child,
         if (isLoading)
           Positioned.fill(
-            child: Container(
-              color: Colors.black.withValues(alpha: 0.3),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(),
-                    if (loadingText != null) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        loadingText!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: SemanticColors.background.card,
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(
+                          color: SemanticColors.indicator.loading,
                         ),
-                      ),
-                    ],
-                  ],
+                        if (loadingText != null) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            loadingText!,
+                            style: TextStyle(
+                              color: SemanticColors.icon.primary,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

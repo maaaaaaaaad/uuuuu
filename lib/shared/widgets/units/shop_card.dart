@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
-import 'package:jellomark/shared/widgets/units/card_3d.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/glass_card.dart';
 
 class ShopCard extends StatelessWidget {
   final BeautyShop shop;
@@ -18,9 +19,11 @@ class ShopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card3D(
+    return GlassCard(
       onTap: onTap,
       padding: EdgeInsets.zero,
+      borderRadius: 16,
+      backgroundColor: SemanticColors.background.cardAccent,
       child: SizedBox(
         width: width ?? 200,
         child: Column(
@@ -35,10 +38,10 @@ class ShopCard extends StatelessWidget {
                 children: [
                   Text(
                     shop.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D2D2D),
+                      color: SemanticColors.text.primary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -48,7 +51,7 @@ class ShopCard extends StatelessWidget {
                     shop.address,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: SemanticColors.text.secondary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -75,7 +78,7 @@ class ShopCard extends StatelessWidget {
           height: 120,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            color: Colors.grey[200],
+            color: SemanticColors.background.imagePlaceholder,
             image: shop.imageUrl != null
                 ? DecorationImage(
                     image: NetworkImage(shop.imageUrl!),
@@ -88,7 +91,7 @@ class ShopCard extends StatelessWidget {
                   child: Icon(
                     Icons.storefront,
                     size: 40,
-                    color: Colors.grey[400],
+                    color: SemanticColors.icon.disabled,
                   ),
                 )
               : null,
@@ -100,13 +103,13 @@ class ShopCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF8A94),
+                color: SemanticColors.special.tagDiscount,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 '${shop.discountRate}%',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: SemanticColors.special.tagDiscountText,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -120,13 +123,13 @@ class ShopCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFB5BA),
+                color: SemanticColors.special.tagNew,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text(
+              child: Text(
                 'NEW',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: SemanticColors.special.tagNewText,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -140,10 +143,10 @@ class ShopCard extends StatelessWidget {
   Widget _buildRatingAndDistance() {
     return Row(
       children: [
-        const Icon(
+        Icon(
           Icons.star,
           size: 14,
-          color: Color(0xFFFFB5BA),
+          color: SemanticColors.icon.starSelectable,
         ),
         const SizedBox(width: 2),
         Flexible(
@@ -161,13 +164,13 @@ class ShopCard extends StatelessWidget {
           Icon(
             Icons.location_on,
             size: 14,
-            color: Colors.grey[500],
+            color: SemanticColors.icon.disabled,
           ),
           Text(
             shop.formattedDistance!,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey[500],
+              color: SemanticColors.text.hint,
             ),
           ),
         ],
@@ -183,14 +186,14 @@ class ShopCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFE4E6),
+            color: SemanticColors.special.badge,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
             tag,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
-              color: Color(0xFFFF8A94),
+              color: SemanticColors.special.badgeText,
             ),
           ),
         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class AppSnackbar {
   static void showSuccess({
@@ -12,7 +13,7 @@ class AppSnackbar {
       context: context,
       message: message,
       icon: Icons.check_circle,
-      backgroundColor: Colors.green,
+      backgroundColor: SemanticColors.state.success,
       actionLabel: actionLabel,
       onAction: onAction,
       duration: duration,
@@ -30,7 +31,7 @@ class AppSnackbar {
       context: context,
       message: message,
       icon: Icons.error,
-      backgroundColor: Colors.red,
+      backgroundColor: SemanticColors.state.error,
       actionLabel: actionLabel,
       onAction: onAction,
       duration: duration,
@@ -48,7 +49,7 @@ class AppSnackbar {
       context: context,
       message: message,
       icon: Icons.info,
-      backgroundColor: Colors.blue,
+      backgroundColor: SemanticColors.state.info,
       actionLabel: actionLabel,
       onAction: onAction,
       duration: duration,
@@ -66,7 +67,7 @@ class AppSnackbar {
       context: context,
       message: message,
       icon: Icons.warning,
-      backgroundColor: Colors.orange,
+      backgroundColor: SemanticColors.state.warning,
       actionLabel: actionLabel,
       onAction: onAction,
       duration: duration,
@@ -86,7 +87,7 @@ class AppSnackbar {
       SnackBar(
         content: Row(
           children: [
-            Icon(icon, color: Colors.white),
+            Icon(icon, color: SemanticColors.icon.onDark),
             const SizedBox(width: 8),
             Expanded(child: Text(message)),
           ],
@@ -96,12 +97,12 @@ class AppSnackbar {
         action: actionLabel != null
             ? SnackBarAction(
                 label: actionLabel,
-                textColor: Colors.white,
+                textColor: SemanticColors.text.onDark,
                 onPressed: () => onAction?.call(),
               )
             : null,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
   }

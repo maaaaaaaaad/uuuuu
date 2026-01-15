@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/core/di/injection_container.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 class AppConfig {
@@ -12,8 +12,8 @@ class AppConfig {
     ]);
 
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+      SystemUiOverlayStyle(
+        statusBarColor: SemanticColors.special.transparent,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
       ),

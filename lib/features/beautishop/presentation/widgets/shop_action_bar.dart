@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class ShopActionBar extends StatelessWidget {
   final VoidCallback? onCall;
@@ -20,8 +21,8 @@ class ShopActionBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(color: Colors.grey[200]!),
-          bottom: BorderSide(color: Colors.grey[200]!),
+          top: BorderSide(color: SemanticColors.border.primary),
+          bottom: BorderSide(color: SemanticColors.border.primary),
         ),
       ),
       child: Row(
@@ -60,13 +61,13 @@ class ShopActionBar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 24, color: Colors.grey[700]),
+            Icon(icon, size: 24, color: SemanticColors.icon.primary),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[700],
+                color: SemanticColors.icon.primary,
               ),
             ),
           ],

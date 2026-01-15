@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/data/models/beauty_shop_model.dart';
@@ -11,6 +13,9 @@ import 'package:jellomark/features/beautishop/presentation/widgets/shop_descript
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_image_gallery.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/theme/app_gradients.dart';
+import 'package:jellomark/shared/widgets/glass_card.dart';
 
 class ShopDetailScreen extends ConsumerWidget {
   final BeautyShop shop;
@@ -69,44 +74,55 @@ class ShopDetailScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _buildSliverAppBar(context, shopDetail),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ShopInfoHeader(
-                    name: shopDetail.name,
-                    rating: shopDetail.rating,
-                    reviewCount: shopDetail.reviewCount,
-                    distance: shopDetail.distance != null
-                        ? '${shopDetail.distance!.toStringAsFixed(1)}km'
-                        : null,
-                    address: shopDetail.address,
-                    onReviewTap: navigateToReviewList,
-                  ),
-                  if (shopDetail.description.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    ShopDescription(description: shopDetail.description),
-                  ],
-                  if (shopDetail.operatingHoursMap != null &&
-                      shopDetail.operatingHoursMap!.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    OperatingHoursCard(
-                      operatingHours: shopDetail.operatingHoursMap!,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppGradients.softWhiteGradient,
+        ),
+        child: CustomScrollView(
+          slivers: [
+            _buildSliverAppBar(context, shopDetail),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GlassCard(
+                      child: ShopInfoHeader(
+                        name: shopDetail.name,
+                        rating: shopDetail.rating,
+                        reviewCount: shopDetail.reviewCount,
+                        distance: shopDetail.distance != null
+                            ? '${shopDetail.distance!.toStringAsFixed(1)}km'
+                            : null,
+                        address: shopDetail.address,
+                        onReviewTap: navigateToReviewList,
+                      ),
                     ),
+                    if (shopDetail.description.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      GlassCard(
+                        child: ShopDescription(description: shopDetail.description),
+                      ),
+                    ],
+                    if (shopDetail.operatingHoursMap != null &&
+                        shopDetail.operatingHoursMap!.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      GlassCard(
+                        child: OperatingHoursCard(
+                          operatingHours: shopDetail.operatingHoursMap!,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    _buildServiceMenuSection(treatmentsAsync),
+                    const SizedBox(height: 80),
                   ],
-                  const SizedBox(height: 24),
-                  _buildServiceMenuSection(treatmentsAsync),
-                  const SizedBox(height: 80),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomSheet: _buildBottomReservationButton(context),
     );
@@ -116,9 +132,27 @@ class ShopDetailScreen extends ConsumerWidget {
     return SliverAppBar(
       expandedHeight: shopDetail.images.isNotEmpty ? 250 : kToolbarHeight,
       pinned: true,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
+      backgroundColor: SemanticColors.special.transparent,
+      leading: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: SemanticColors.background.appBar,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: SemanticColors.border.glass),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+                padding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+        ),
       ),
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
@@ -130,7 +164,7 @@ class ShopDetailScreen extends ConsumerWidget {
             background: shopDetail.images.isNotEmpty
                 ? ShopImageGallery(images: shopDetail.images)
                 : Container(
-                    color: const Color(0xFFFFB5BA).withValues(alpha: 0.3),
+                    color: SemanticColors.background.cardAccent,
                   ),
           );
         },
@@ -142,18 +176,18 @@ class ShopDetailScreen extends ConsumerWidget {
     AsyncValue<List<ServiceMenu>> treatmentsAsync,
   ) {
     return treatmentsAsync.when(
-      loading: () => const Column(
+      loading: () => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             '시술 메뉴',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Center(
             child: Padding(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(color: Color(0xFFFFB5BA)),
+              padding: const EdgeInsets.all(16),
+              child: CircularProgressIndicator(color: SemanticColors.indicator.loading),
             ),
           ),
         ],
@@ -171,7 +205,7 @@ class ShopDetailScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16),
               child: Text(
                 '시술 정보를 불러올 수 없습니다',
-                style: TextStyle(color: Colors.grey[600]),
+                style: TextStyle(color: SemanticColors.text.secondary),
               ),
             ),
           ),
@@ -204,12 +238,12 @@ class ShopDetailScreen extends ConsumerWidget {
   Widget _buildBottomReservationButton(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFFFB5BA),
+        gradient: AppGradients.mintGradient,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
+            color: SemanticColors.overlay.shadowMedium,
+            blurRadius: 12,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
@@ -221,7 +255,7 @@ class ShopDetailScreen extends ConsumerWidget {
           child: TextButton(
             onPressed: () {},
             style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
+              foregroundColor: SemanticColors.button.secondaryText,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
@@ -57,34 +58,34 @@ class CustomTextField extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: hasError
-                    ? Theme.of(context).colorScheme.error
-                    : Colors.grey.shade300,
+                    ? SemanticColors.state.error
+                    : SemanticColors.border.inputDisabled,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: hasError
-                    ? Theme.of(context).colorScheme.error
-                    : Theme.of(context).colorScheme.primary,
+                    ? SemanticColors.state.error
+                    : SemanticColors.border.focus,
                 width: 2,
               ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.error,
+                color: SemanticColors.state.error,
               ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.error,
+                color: SemanticColors.state.error,
                 width: 2,
               ),
             ),
             filled: true,
-            fillColor: enabled ? Colors.white : Colors.grey.shade100,
+            fillColor: enabled ? SemanticColors.background.input : SemanticColors.background.inputDisabled,
           ),
         ),
       ],

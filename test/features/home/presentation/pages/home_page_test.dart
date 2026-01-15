@@ -19,6 +19,7 @@ import 'package:jellomark/features/member/domain/usecases/get_current_member.dar
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/features/search/domain/usecases/manage_search_history_usecase.dart';
 import 'package:jellomark/features/search/presentation/providers/search_provider.dart';
+import 'package:jellomark/shared/widgets/glass_bottom_nav_bar.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/mock_http_client.dart';
@@ -131,18 +132,18 @@ void main() {
       expect(find.byType(HomePage), findsOneWidget);
     });
 
-    testWidgets('should display bottom navigation bar', (tester) async {
+    testWidgets('should display GlassBottomNavBar', (tester) async {
       await tester.pumpWidget(createHomePage());
 
-      expect(find.byType(BottomNavigationBar), findsOneWidget);
+      expect(find.byType(GlassBottomNavBar), findsOneWidget);
     });
 
-    testWidgets('should have correct navigation items', (tester) async {
+    testWidgets('should have correct navigation icons', (tester) async {
       await tester.pumpWidget(createHomePage());
 
-      expect(find.text('홈'), findsOneWidget);
-      expect(find.text('검색'), findsOneWidget);
-      expect(find.text('마이'), findsOneWidget);
+      expect(find.byIcon(Icons.home), findsOneWidget);
+      expect(find.byIcon(Icons.search_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.person_outline), findsOneWidget);
     });
 
     testWidgets('should switch tabs when navigation item tapped', (
@@ -150,11 +151,11 @@ void main() {
     ) async {
       await tester.pumpWidget(createHomePage());
 
-      await tester.tap(find.text('검색'));
+      await tester.tap(find.byIcon(Icons.search_outlined));
       await tester.pumpAndSettle();
 
-      final bottomNav = tester.widget<BottomNavigationBar>(
-        find.byType(BottomNavigationBar),
+      final bottomNav = tester.widget<GlassBottomNavBar>(
+        find.byType(GlassBottomNavBar),
       );
       expect(bottomNav.currentIndex, 1);
     });
@@ -164,13 +165,53 @@ void main() {
 
       expect(find.byType(HomeTab), findsOneWidget);
 
-      await tester.tap(find.text('검색'));
+      await tester.tap(find.byIcon(Icons.search_outlined));
       await tester.pumpAndSettle();
       expect(find.text('취소'), findsOneWidget);
 
-      await tester.tap(find.text('마이'));
+      await tester.tap(find.byIcon(Icons.person_outline));
       await tester.pumpAndSettle();
       expect(find.text('프로필'), findsOneWidget);
+    });
+
+    testWidgets('should have lavender gradient background', (tester) async {
+      await tester.pumpWidget(createHomePage());
+
+      final container = tester.widget<Container>(
+        find.descendant(
+          of: find.byType(HomePage),
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is Container &&
+                widget.decoration is BoxDecoration &&
+                (widget.decoration as BoxDecoration).gradient != null,
+          ),
+        ).first,
+      );
+
+      final decoration = container.decoration as BoxDecoration;
+      expect(decoration.gradient, isA<LinearGradient>());
+    });
+
+    group('Tab Transition Animation', () {
+      testWidgets('should have AnimatedSwitcher for tab transitions', (
+        tester,
+      ) async {
+        await tester.pumpWidget(createHomePage());
+
+        expect(find.byType(AnimatedSwitcher), findsOneWidget);
+      });
+
+      testWidgets('should animate when switching tabs', (tester) async {
+        await tester.pumpWidget(createHomePage());
+
+        expect(find.byType(HomeTab), findsOneWidget);
+
+        await tester.tap(find.byIcon(Icons.search_outlined));
+        await tester.pump();
+
+        expect(find.byType(FadeTransition), findsWidgets);
+      });
     });
   });
 }

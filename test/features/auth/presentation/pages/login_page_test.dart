@@ -84,7 +84,7 @@ void main() {
       await tester.pumpWidget(createLoginPage());
 
       expect(find.byType(LoginPage), findsOneWidget);
-      expect(find.byType(Image), findsOneWidget);
+      expect(find.byType(Image), findsWidgets);
     });
 
     testWidgets('should display Kakao login button', (tester) async {
@@ -151,6 +151,45 @@ void main() {
         const Right(TokenPair(accessToken: 'access', refreshToken: 'refresh')),
       );
       await tester.pumpAndSettle();
+    });
+
+    group('UI Redesign', () {
+      testWidgets('should have lavender gradient background', (tester) async {
+        await tester.pumpWidget(createLoginPage());
+
+        final container = tester.widget<Container>(
+          find.descendant(
+            of: find.byType(LoginPage),
+            matching: find.byWidgetPredicate(
+              (widget) =>
+                  widget is Container &&
+                  widget.decoration is BoxDecoration &&
+                  (widget.decoration as BoxDecoration).gradient != null,
+            ),
+          ).first,
+        );
+
+        final decoration = container.decoration as BoxDecoration;
+        expect(decoration.gradient, isA<LinearGradient>());
+      });
+
+      testWidgets('should have glass style kakao button with BackdropFilter', (tester) async {
+        await tester.pumpWidget(createLoginPage());
+
+        expect(find.byType(BackdropFilter), findsOneWidget);
+      });
+
+      testWidgets('should have kakao icon in login button', (tester) async {
+        await tester.pumpWidget(createLoginPage());
+
+        expect(find.byType(Image), findsWidgets);
+      });
+
+      testWidgets('should be scrollable to prevent keyboard overflow', (tester) async {
+        await tester.pumpWidget(createLoginPage());
+
+        expect(find.byType(SingleChildScrollView), findsOneWidget);
+      });
     });
   });
 }

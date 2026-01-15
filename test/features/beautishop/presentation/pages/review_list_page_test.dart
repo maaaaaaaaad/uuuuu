@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +14,8 @@ import 'package:jellomark/features/beautishop/presentation/providers/review_list
 import 'package:jellomark/features/review/domain/entities/review.dart';
 import 'package:jellomark/features/review/domain/repositories/review_repository.dart';
 import 'package:jellomark/features/review/domain/usecases/create_review_usecase.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
+import 'package:jellomark/shared/widgets/pill_chip.dart';
 
 class MockGetShopReviews extends GetShopReviews {
   PagedShopReviews? mockResult;
@@ -168,5 +172,175 @@ void main() {
 
       expect(find.text('평점만 등록됨'), findsOneWidget);
     });
+
+    group('UI Redesign', () {
+      testWidgets('has lavender gradient background', (tester) async {
+        mockGetShopReviews.mockResult = const PagedShopReviews(
+          items: [],
+          hasNext: false,
+          totalElements: 0,
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        final container = tester.widget<Container>(
+          find.descendant(
+            of: find.byType(Scaffold),
+            matching: find.byType(Container).first,
+          ),
+        );
+        final decoration = container.decoration as BoxDecoration?;
+        expect(decoration?.gradient, isNotNull);
+      });
+
+      testWidgets('has BackdropFilter for glassmorphism', (tester) async {
+        mockGetShopReviews.mockResult = const PagedShopReviews(
+          items: [],
+          hasNext: false,
+          totalElements: 0,
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BackdropFilter), findsWidgets);
+      });
+
+      testWidgets('uses PillChip for sort tabs', (tester) async {
+        mockGetShopReviews.mockResult = const PagedShopReviews(
+          items: [],
+          hasNext: false,
+          totalElements: 0,
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        expect(find.byType(PillChip), findsWidgets);
+      });
+
+      testWidgets('CircularProgressIndicator has mint color', (tester) async {
+        mockGetShopReviews.mockResult = null;
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              getShopReviewsUseCaseProvider.overrideWithValue(
+                _CompleterMockGetShopReviews(),
+              ),
+              createReviewUseCaseProvider.overrideWithValue(
+                mockCreateReviewUseCase,
+              ),
+            ],
+            child: const MaterialApp(
+              home: ReviewListPage(shopId: 'test-shop-id', shopName: '테스트 샵'),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        final indicator = tester.widget<CircularProgressIndicator>(
+          find.byType(CircularProgressIndicator),
+        );
+        expect(indicator.color, AppColors.mint);
+      });
+
+      testWidgets('FAB has gradient decoration', (tester) async {
+        mockGetShopReviews.mockResult = const PagedShopReviews(
+          items: [],
+          hasNext: false,
+          totalElements: 0,
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        final containers = tester.widgetList<Container>(find.byType(Container));
+        bool hasGradientFab = false;
+        for (final container in containers) {
+          final decoration = container.decoration;
+          if (decoration is BoxDecoration &&
+              decoration.gradient != null &&
+              decoration.shape == BoxShape.circle) {
+            hasGradientFab = true;
+            break;
+          }
+        }
+        expect(hasGradientFab, isTrue);
+      });
+
+      testWidgets('empty state has mint colored icon', (tester) async {
+        mockGetShopReviews.mockResult = const PagedShopReviews(
+          items: [],
+          hasNext: false,
+          totalElements: 0,
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        final icon = tester.widget<Icon>(
+          find.byIcon(Icons.rate_review_outlined),
+        );
+        expect(icon.color, AppColors.mint);
+      });
+
+      testWidgets('empty state has write review inducement button', (
+        tester,
+      ) async {
+        mockGetShopReviews.mockResult = const PagedShopReviews(
+          items: [],
+          hasNext: false,
+          totalElements: 0,
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        expect(find.text('첫 리뷰 작성하기'), findsOneWidget);
+      });
+
+      testWidgets('empty state button has gradient decoration', (
+        tester,
+      ) async {
+        mockGetShopReviews.mockResult = const PagedShopReviews(
+          items: [],
+          hasNext: false,
+          totalElements: 0,
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        final containers = tester.widgetList<Container>(find.byType(Container));
+        bool hasGradientButton = false;
+        for (final container in containers) {
+          final decoration = container.decoration;
+          if (decoration is BoxDecoration && decoration.gradient != null) {
+            final child = container.child;
+            if (child != null) {
+              hasGradientButton = true;
+              break;
+            }
+          }
+        }
+        expect(hasGradientButton, isTrue);
+      });
+    });
   });
+}
+
+class _CompleterMockGetShopReviews extends GetShopReviews {
+  _CompleterMockGetShopReviews() : super(repository: _MockBeautyShopRepository());
+
+  @override
+  Future<Either<Failure, PagedShopReviews>> call({
+    required String shopId,
+    int page = 0,
+    int size = 20,
+    ReviewSortType sort = ReviewSortType.createdAtDesc,
+  }) {
+    return Completer<Either<Failure, PagedShopReviews>>().future;
+  }
 }

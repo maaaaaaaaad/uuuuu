@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 enum ValidationType { error, success, warning, info }
 
@@ -51,13 +52,13 @@ class ValidationMessage extends StatelessWidget {
   Color _getColor(BuildContext context) {
     switch (type) {
       case ValidationType.error:
-        return ThemeData().colorScheme.error;
+        return SemanticColors.state.error;
       case ValidationType.success:
-        return Colors.green;
+        return SemanticColors.state.success;
       case ValidationType.warning:
-        return Colors.orange;
+        return SemanticColors.state.warning;
       case ValidationType.info:
-        return Colors.blue;
+        return SemanticColors.state.info;
     }
   }
 }

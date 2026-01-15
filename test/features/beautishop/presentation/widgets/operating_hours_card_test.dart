@@ -84,7 +84,6 @@ void main() {
     });
 
     testWidgets('should highlight current day', (tester) async {
-      // 오늘 요일 가져오기
       final days = ['일', '월', '화', '수', '목', '금', '토'];
       final today = days[DateTime.now().weekday % 7];
 
@@ -100,7 +99,6 @@ void main() {
         ),
       );
 
-      // 현재 요일이 강조 표시되어야 함
       final dayText = tester.widget<Text>(find.text(today));
       expect(dayText.style?.fontWeight, FontWeight.bold);
     });

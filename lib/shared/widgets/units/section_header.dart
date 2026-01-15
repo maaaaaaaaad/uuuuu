@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -25,10 +26,10 @@ class SectionHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF2D2D2D),
+              color: SemanticColors.text.primary,
             ),
           ),
           if (showMore)
@@ -36,7 +37,7 @@ class SectionHeader extends StatelessWidget {
               onTap: onMoreTap,
               child: Text(
                 moreText,
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 14, color: SemanticColors.text.secondary),
               ),
             ),
         ],

@@ -198,5 +198,57 @@ void main() {
 
       expect(actionCalled, isTrue);
     });
+
+    group('UI Redesign', () {
+      testWidgets('has floating behavior', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: ElevatedButton(
+                  onPressed: () => AppSnackbar.showSuccess(
+                    context: context,
+                    message: '성공',
+                  ),
+                  child: const Text('스낵바 열기'),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('스낵바 열기'));
+        await tester.pump();
+
+        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+        expect(snackBar.behavior, SnackBarBehavior.floating);
+      });
+
+      testWidgets('has borderRadius 20', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: ElevatedButton(
+                  onPressed: () => AppSnackbar.showSuccess(
+                    context: context,
+                    message: '성공',
+                  ),
+                  child: const Text('스낵바 열기'),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('스낵바 열기'));
+        await tester.pump();
+
+        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+        final shape = snackBar.shape as RoundedRectangleBorder;
+        final borderRadius = shape.borderRadius as BorderRadius;
+        expect(borderRadius.topLeft.x, 20);
+      });
+    });
   });
 }

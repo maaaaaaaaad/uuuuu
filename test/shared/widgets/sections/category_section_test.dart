@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jellomark/shared/widgets/pill_chip.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
-import 'package:jellomark/shared/widgets/units/category_chip.dart';
 
 void main() {
   final testCategories = [
@@ -24,7 +24,7 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsOneWidget);
     });
 
-    testWidgets('renders all category chips', (tester) async {
+    testWidgets('renders all category chips as PillChips', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -33,7 +33,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(CategoryChip), findsNWidgets(4));
+      expect(find.byType(PillChip), findsNWidgets(4));
     });
 
     testWidgets('displays category labels', (tester) async {
@@ -83,7 +83,7 @@ void main() {
         ),
       );
 
-      final chips = tester.widgetList<CategoryChip>(find.byType(CategoryChip));
+      final chips = tester.widgetList<PillChip>(find.byType(PillChip));
       final selectedChip = chips.firstWhere((chip) => chip.isSelected);
       expect(selectedChip.label, '속눈썹');
     });

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class ShopImageGallery extends StatefulWidget {
   final List<String> images;
@@ -38,12 +39,12 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
       return SizedBox(
         height: widget.height,
         child: Container(
-          color: Colors.grey[200],
-          child: const Center(
+          color: SemanticColors.background.placeholder,
+          child: Center(
             child: Icon(
               Icons.store,
               size: 64,
-              color: Colors.grey,
+              color: SemanticColors.icon.disabled,
             ),
           ),
         ),
@@ -67,7 +68,7 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
                 onTap: () => widget.onImageTap?.call(index),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: SemanticColors.background.avatar,
                     image: DecorationImage(
                       image: NetworkImage(widget.images[index]),
                       fit: BoxFit.cover,
@@ -75,8 +76,8 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
                     ),
                   ),
                   child: widget.images[index].isEmpty
-                      ? const Center(
-                          child: Icon(Icons.image, size: 48, color: Colors.grey),
+                      ? Center(
+                          child: Icon(Icons.image, size: 48, color: SemanticColors.icon.disabled),
                         )
                       : null,
                 ),
@@ -111,7 +112,7 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
       width: isActive ? 24 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.5),
+        color: isActive ? SemanticColors.indicator.loadingOnDark : SemanticColors.text.onDarkSecondary,
         borderRadius: BorderRadius.circular(4),
       ),
     );

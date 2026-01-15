@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class ShopDescription extends StatefulWidget {
   final String description;
@@ -37,10 +38,10 @@ class _ShopDescriptionState extends State<ShopDescription> {
             builder: (context, constraints) {
               final textSpan = TextSpan(
                 text: widget.description,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   height: 1.6,
-                  color: Colors.black87,
+                  color: SemanticColors.state.open,
                 ),
               );
 
@@ -57,10 +58,10 @@ class _ShopDescriptionState extends State<ShopDescription> {
                 children: [
                   Text(
                     widget.description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       height: 1.6,
-                      color: Colors.black87,
+                      color: SemanticColors.state.open,
                     ),
                     maxLines: _isExpanded ? null : widget.maxLines,
                     overflow: _isExpanded ? null : TextOverflow.ellipsis,
@@ -77,7 +78,7 @@ class _ShopDescriptionState extends State<ShopDescription> {
                         _isExpanded ? '접기' : '더보기',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.pink[600],
+                          color: SemanticColors.text.highlight,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class OperatingHoursCard extends StatelessWidget {
   final Map<String, String> operatingHours;
@@ -37,14 +38,14 @@ class OperatingHoursCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.info_outline, size: 16, color: Colors.grey[600]),
+                Icon(Icons.info_outline, size: 16, color: SemanticColors.icon.secondary),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     notice!,
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey[600],
+                      color: SemanticColors.text.secondary,
                     ),
                   ),
                 ),
@@ -71,7 +72,7 @@ class OperatingHoursCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                color: isToday ? Colors.pink[600] : Colors.black87,
+                color: isToday ? SemanticColors.special.todayHighlight : SemanticColors.state.open,
               ),
             ),
           ),
@@ -81,7 +82,7 @@ class OperatingHoursCard extends StatelessWidget {
               hours,
               style: TextStyle(
                 fontSize: 14,
-                color: isClosed ? Colors.red : Colors.black87,
+                color: isClosed ? SemanticColors.state.closed : SemanticColors.state.open,
               ),
             ),
           ),

@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class WriteReviewBottomSheet extends StatefulWidget {
   final String shopName;
@@ -18,7 +21,7 @@ class WriteReviewBottomSheet extends StatefulWidget {
     return showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: SemanticColors.special.transparent,
       builder: (context) =>
           WriteReviewBottomSheet(shopName: shopName, onSubmit: onSubmit),
     );
@@ -74,49 +77,68 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
       } else {
         setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('리뷰 작성에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: Colors.red,
+          SnackBar(
+            content: const Text('리뷰 작성에 실패했습니다. 다시 시도해주세요.'),
+            backgroundColor: SemanticColors.state.error,
           ),
         );
       }
     }
   }
 
+  void _dismissKeyboard() {
+    FocusScope.of(context).unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: EdgeInsets.only(bottom: bottomPadding),
-      child: SafeArea(
-        top: false,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHandle(),
-              _buildHeader(),
-              const Divider(height: 1),
-              Padding(
-                padding: const EdgeInsets.all(20),
+    return GestureDetector(
+      onTap: _dismissKeyboard,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: SemanticColors.background.bottomSheet,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(30),
+              ),
+              border: Border.all(
+                color: SemanticColors.border.glass,
+                width: 1.5,
+              ),
+            ),
+            padding: EdgeInsets.only(bottom: bottomPadding),
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildRatingSection(),
-                    const SizedBox(height: 24),
-                    _buildContentSection(),
-                    const SizedBox(height: 24),
-                    _buildSubmitButton(),
+                    _buildHandle(),
+                    _buildHeader(),
+                    Divider(height: 1, color: SemanticColors.border.divider),
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildRatingSection(),
+                          const SizedBox(height: 24),
+                          _buildContentSection(),
+                          const SizedBox(height: 24),
+                          _buildSubmitButton(),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -130,7 +152,7 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: Colors.grey[300],
+          color: SemanticColors.icon.disabled,
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -153,7 +175,10 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
                 const SizedBox(height: 4),
                 Text(
                   widget.shopName,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: SemanticColors.text.secondary,
+                  ),
                 ),
               ],
             ),
@@ -182,7 +207,10 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
             const SizedBox(width: 8),
             Text(
               '(선택)',
-              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+              style: TextStyle(
+                fontSize: 14,
+                color: SemanticColors.text.disabled,
+              ),
             ),
           ],
         ),
@@ -209,8 +237,8 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
                   isSelected ? Icons.star_rounded : Icons.star_outline_rounded,
                   size: 40,
                   color: isSelected
-                      ? const Color(0xFFFFB5BA)
-                      : Colors.grey[300],
+                      ? SemanticColors.icon.starSelectable
+                      : SemanticColors.icon.starSelectableEmpty,
                 ),
               ),
             );
@@ -221,9 +249,9 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
             padding: const EdgeInsets.only(top: 8),
             child: Text(
               _getRatingText(_selectedRating!),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: Color(0xFFFFB5BA),
+                color: SemanticColors.text.linkPink,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -262,7 +290,10 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
             const SizedBox(width: 8),
             Text(
               '(선택)',
-              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+              style: TextStyle(
+                fontSize: 14,
+                color: SemanticColors.text.disabled,
+              ),
             ),
           ],
         ),
@@ -273,20 +304,20 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
           maxLength: _maxContentLength,
           decoration: InputDecoration(
             hintText: '이용 경험을 자유롭게 작성해주세요 (최소 $_minContentLength자)',
-            hintStyle: TextStyle(color: Colors.grey[400]),
+            hintStyle: TextStyle(color: SemanticColors.text.hint),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: SemanticColors.background.inputTranslucent,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderSide: BorderSide(color: SemanticColors.border.input),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderSide: BorderSide(color: SemanticColors.border.input),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFFFB5BA)),
+              borderSide: BorderSide(color: SemanticColors.border.focus),
             ),
             contentPadding: const EdgeInsets.all(16),
           ),
@@ -297,7 +328,10 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
             padding: const EdgeInsets.only(top: 8),
             child: Text(
               '$_remainingCharacters자 더 입력해주세요',
-              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+              style: TextStyle(
+                fontSize: 12,
+                color: SemanticColors.text.disabled,
+              ),
             ),
           ),
       ],
@@ -311,21 +345,21 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
       child: ElevatedButton(
         onPressed: _canSubmit ? _handleSubmit : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFFB5BA),
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: Colors.grey[200],
-          disabledForegroundColor: Colors.grey[400],
+          backgroundColor: SemanticColors.button.primary,
+          foregroundColor: SemanticColors.button.primaryText,
+          disabledBackgroundColor: SemanticColors.button.disabled,
+          disabledForegroundColor: SemanticColors.button.disabledText,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 0,
         ),
         child: _isSubmitting
-            ? const SizedBox(
+            ? SizedBox(
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: SemanticColors.indicator.loadingOnDark,
                   strokeWidth: 2,
                 ),
               )

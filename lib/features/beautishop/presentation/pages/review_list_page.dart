@@ -1,9 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_shop_reviews.dart';
 import 'package:jellomark/features/beautishop/presentation/providers/review_list_provider.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/review_card.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/write_review_bottom_sheet.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/theme/app_gradients.dart';
+import 'package:jellomark/shared/widgets/pill_chip.dart';
 
 class ReviewListPage extends ConsumerStatefulWidget {
   final String shopId;
@@ -62,6 +67,7 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
     final state = ref.watch(reviewListNotifierProvider(widget.shopId));
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Column(
           children: [
@@ -77,32 +83,63 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
-                color: Colors.grey[600],
+                color: SemanticColors.text.secondary,
               ),
             ),
           ],
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-      ),
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _buildSortTabs(state.sortType),
-          const Divider(height: 1),
-          Expanded(
-            child: _buildReviewList(state),
+        backgroundColor: SemanticColors.special.transparent,
+        foregroundColor: SemanticColors.text.primary,
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(color: SemanticColors.special.transparent),
           ),
-        ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showWriteReviewBottomSheet(context),
-        backgroundColor: const Color(0xFFFFB5BA),
-        foregroundColor: Colors.white,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.edit_rounded),
+      backgroundColor: SemanticColors.special.transparent,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppGradients.softWhiteGradient,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildSortTabs(state.sortType),
+              Expanded(
+                child: _buildReviewList(state),
+              ),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: _buildGradientFab(context),
+    );
+  }
+
+  Widget _buildGradientFab(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showWriteReviewBottomSheet(context),
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: AppGradients.mintGradient,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: SemanticColors.overlay.shadowMedium,
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.edit_rounded,
+          color: SemanticColors.icon.onDark,
+        ),
       ),
     );
   }
@@ -116,28 +153,14 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
           final isSelected = currentSort == sortType;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(
-                sortType.displayName,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isSelected ? Colors.white : Colors.grey[700],
-                ),
-              ),
-              selected: isSelected,
-              onSelected: (_) {
+            child: PillChip(
+              label: sortType.displayName,
+              isSelected: isSelected,
+              onTap: () {
                 ref
                     .read(reviewListNotifierProvider(widget.shopId).notifier)
                     .changeSortType(sortType);
               },
-              selectedColor: const Color(0xFFFFB5BA),
-              backgroundColor: Colors.grey[100],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              side: BorderSide.none,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             ),
           );
         }).toList(),
@@ -147,9 +170,9 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
 
   Widget _buildReviewList(ReviewListState state) {
     if (state.isLoading && state.reviews.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
-          color: Color(0xFFFFB5BA),
+          color: SemanticColors.indicator.loading,
         ),
       );
     }
@@ -159,11 +182,22 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: SemanticColors.background.card,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.error_outline,
+                size: 48,
+                color: SemanticColors.icon.accent,
+              ),
+            ),
             const SizedBox(height: 16),
             Text(
               state.error!,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: SemanticColors.text.secondary),
             ),
             const SizedBox(height: 16),
             TextButton(
@@ -172,6 +206,9 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
                     .read(reviewListNotifierProvider(widget.shopId).notifier)
                     .refresh();
               },
+              style: TextButton.styleFrom(
+                foregroundColor: SemanticColors.button.textButton,
+              ),
               child: const Text('다시 시도'),
             ),
           ],
@@ -184,13 +221,53 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.rate_review_outlined, size: 48, color: Colors.grey[400]),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: SemanticColors.background.card,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.rate_review_outlined,
+                size: 48,
+                color: SemanticColors.icon.accent,
+              ),
+            ),
             const SizedBox(height: 16),
             Text(
               '아직 리뷰가 없어요',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: SemanticColors.text.secondary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            GestureDetector(
+              onTap: () => _showWriteReviewBottomSheet(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  gradient: AppGradients.mintGradient,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: SemanticColors.overlay.shadowMedium,
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  '첫 리뷰 작성하기',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: SemanticColors.text.onDark,
+                  ),
+                ),
               ),
             ),
           ],
@@ -204,25 +281,28 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
             .read(reviewListNotifierProvider(widget.shopId).notifier)
             .refresh();
       },
-      color: const Color(0xFFFFB5BA),
+      color: SemanticColors.indicator.loading,
       child: ListView.separated(
         controller: _scrollController,
         padding: const EdgeInsets.only(bottom: 16),
         itemCount: state.reviews.length + (state.isLoadingMore ? 1 : 0),
-        separatorBuilder: (context, index) => const Divider(height: 1),
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
         itemBuilder: (context, index) {
           if (index == state.reviews.length) {
-            return const Padding(
-              padding: EdgeInsets.all(16),
+            return Padding(
+              padding: const EdgeInsets.all(16),
               child: Center(
                 child: CircularProgressIndicator(
-                  color: Color(0xFFFFB5BA),
+                  color: SemanticColors.indicator.loading,
                 ),
               ),
             );
           }
 
-          return ReviewCard(review: state.reviews[index]);
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ReviewCard(review: state.reviews[index]),
+          );
         },
       ),
     );

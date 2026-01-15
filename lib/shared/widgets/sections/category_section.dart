@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:jellomark/shared/widgets/units/category_chip.dart';
+import 'package:jellomark/shared/widgets/pill_chip.dart';
 
 class CategoryData {
   final String id;
@@ -35,11 +35,10 @@ class CategorySection extends StatelessWidget {
       child: Row(
         children: categories.map((category) {
           return Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: CategoryChip(
+            padding: const EdgeInsets.only(right: 8),
+            child: PillChip(
               label: category.label,
               icon: category.icon,
-              iconImagePath: category.iconImagePath,
               isSelected: category.id == selectedCategoryId,
               onTap: () => onCategoryTap?.call(category.id),
             ),

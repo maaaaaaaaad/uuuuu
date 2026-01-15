@@ -1,10 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
 import 'package:jellomark/features/home/presentation/pages/recommended_shops_page.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/utils/category_icon_mapper.dart';
+import 'package:jellomark/shared/widgets/gradient_card.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/sections/shop_section.dart';
@@ -68,8 +72,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     final homeState = ref.watch(homeNotifierProvider);
 
     if (homeState.isLoading && homeState.recommendedShops.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFFFFB5BA)),
+      return Center(
+        child: CircularProgressIndicator(
+          color: SemanticColors.indicator.loading,
+        ),
       );
     }
 
@@ -87,7 +93,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
       child: Stack(
         children: [
           RefreshIndicator(
-            color: const Color(0xFFFFB5BA),
+            color: SemanticColors.indicator.loading,
             onRefresh: () => ref.read(homeNotifierProvider.notifier).refresh(),
             child: NotificationListener<ScrollNotification>(
               onNotification: (notification) {
@@ -106,6 +112,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       locationText: '현재 위치',
                       onSearchTap: widget.onSearchTap,
                     ),
+                    const SizedBox(height: 20),
+                    _buildHeroSection(),
                     const SizedBox(height: 20),
                     if (categories.isNotEmpty)
                       CategorySection(categories: categories),
@@ -135,7 +143,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       onShopTap: (id) =>
                           _navigateToShopDetail(id, homeState.newShops),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -157,6 +165,44 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHeroSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GradientCard(
+        gradientType: GradientType.mint,
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '환영합니다! 👋',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: SemanticColors.text.onDark,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '오늘도 예뻐지는 하루 되세요',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: SemanticColors.text.onDarkSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.spa, size: 48, color: SemanticColors.icon.onDark),
+          ],
+        ),
       ),
     );
   }
@@ -217,12 +263,12 @@ class _NewShopsSection extends StatelessWidget {
           },
         ),
         if (isLoadingMore)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(
               child: CircularProgressIndicator(
-                key: Key('new_shops_loading_indicator'),
-                color: Color(0xFFFFB5BA),
+                key: const Key('new_shops_loading_indicator'),
+                color: SemanticColors.indicator.loading,
               ),
             ),
           ),
@@ -240,21 +286,31 @@ class _FloatingSearchButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(22),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFFFFB5BA).withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+      child: ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: SemanticColors.background.card,
+              shape: BoxShape.circle,
+              border: Border.all(color: SemanticColors.border.glass, width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: SemanticColors.icon.accent.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-          ],
+            child: Icon(
+              Icons.search,
+              color: SemanticColors.icon.accent,
+              size: 24,
+            ),
+          ),
         ),
-        child: const Icon(Icons.search, color: Color(0xFFFFB5BA), size: 24),
       ),
     );
   }

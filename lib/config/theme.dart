@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 
 class AppTheme {
-  static const Color pastelPink = Color(0xFFFFB6C1);
   static const double _buttonRadius = 16.0;
 
   static ThemeData get lightTheme {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: pastelPink,
+      seedColor: AppColors.pastelPink,
       brightness: Brightness.light,
-    ).copyWith(
-      primary: pastelPink,
-    );
+    ).copyWith(primary: AppColors.pastelPink);
 
     final buttonShape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(_buttonRadius),
@@ -21,6 +20,13 @@ class AppTheme {
       fontFamily: 'Esamanru',
       colorScheme: colorScheme,
       textTheme: const TextTheme().apply(fontFamily: 'Esamanru'),
+      appBarTheme: const AppBarTheme(
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
+      ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(shape: buttonShape),
       ),

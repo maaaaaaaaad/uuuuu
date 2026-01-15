@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
+import 'package:jellomark/shared/widgets/glass_card.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
 
 void main() {
@@ -120,12 +121,13 @@ void main() {
       expect(find.text('NEW'), findsOneWidget);
     });
 
-    testWidgets('uses Card3D for 3D effect', (tester) async {
+    testWidgets('uses GlassCard for glassmorphism effect', (tester) async {
       await tester.pumpWidget(
         buildTestWidget(const ShopCard(shop: testShop, width: 250)),
       );
 
-      expect(find.byType(Transform), findsWidgets);
+      expect(find.byType(GlassCard), findsOneWidget);
+      expect(find.byType(BackdropFilter), findsOneWidget);
     });
   });
 }

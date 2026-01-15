@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class BannerItem {
   final String id;
@@ -109,7 +110,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFE4E6),
+                  color: SemanticColors.special.badge,
                   image: DecorationImage(
                     image: NetworkImage(banner.imageUrl),
                     fit: BoxFit.cover,
@@ -123,8 +124,8 @@ class _BannerCarouselState extends State<BannerCarousel> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.5),
+                      SemanticColors.special.transparent,
+                      SemanticColors.overlay.imageGradient,
                     ],
                   ),
                 ),
@@ -139,8 +140,8 @@ class _BannerCarouselState extends State<BannerCarousel> {
                   children: [
                     Text(
                       banner.title,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: SemanticColors.text.onDark,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -150,7 +151,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
                       Text(
                         banner.subtitle!,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: SemanticColors.text.onDarkSecondary,
                           fontSize: 14,
                         ),
                       ),
@@ -178,8 +179,8 @@ class _BannerCarouselState extends State<BannerCarousel> {
             shape: _currentPage == index ? BoxShape.rectangle : BoxShape.circle,
             borderRadius: _currentPage == index ? BorderRadius.circular(4) : null,
             color: _currentPage == index
-                ? const Color(0xFFFFB5BA)
-                : const Color(0xFFFFE4E6),
+                ? SemanticColors.indicator.pageActive
+                : SemanticColors.indicator.pageInactive,
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class ServiceMenuItem extends StatelessWidget {
   final ServiceMenu menu;
@@ -49,7 +50,7 @@ class ServiceMenuItem extends StatelessWidget {
                       menu.description!,
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey[600],
+                        color: SemanticColors.text.secondary,
                       ),
                     ),
                   ],
@@ -57,13 +58,13 @@ class ServiceMenuItem extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.access_time, size: 14, color: Colors.grey[500]),
+                        Icon(Icons.access_time, size: 14, color: SemanticColors.icon.disabled),
                         const SizedBox(width: 4),
                         Text(
                           menu.formattedDuration!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[500],
+                            color: SemanticColors.text.disabled,
                           ),
                         ),
                       ],
@@ -80,7 +81,7 @@ class ServiceMenuItem extends StatelessWidget {
                     '${_formatNumber(menu.price)}원',
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey[400],
+                      color: SemanticColors.icon.disabled,
                       decoration: TextDecoration.lineThrough,
                     ),
                   ),
@@ -90,7 +91,7 @@ class ServiceMenuItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.pink[600],
+                      color: SemanticColors.text.price,
                     ),
                   ),
                 ] else
