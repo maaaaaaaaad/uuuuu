@@ -25,6 +25,10 @@ import 'package:jellomark/features/review/domain/usecases/create_review_usecase.
 import 'package:jellomark/features/review/domain/usecases/delete_review_usecase.dart';
 import 'package:jellomark/features/review/domain/usecases/get_shop_reviews_usecase.dart';
 import 'package:jellomark/features/review/domain/usecases/update_review_usecase.dart';
+import 'package:jellomark/features/search/data/datasources/search_local_datasource.dart';
+import 'package:jellomark/features/search/data/repositories/search_repository_impl.dart';
+import 'package:jellomark/features/search/domain/repositories/search_repository.dart';
+import 'package:jellomark/features/search/domain/usecases/manage_search_history_usecase.dart';
 import 'package:jellomark/features/treatment/data/datasources/treatment_remote_datasource.dart';
 import 'package:jellomark/features/treatment/data/repositories/treatment_repository_impl.dart';
 import 'package:jellomark/features/treatment/domain/repositories/treatment_repository.dart';
@@ -131,9 +135,7 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<ReviewRepository>(
-    () => ReviewRepositoryImpl(
-      remoteDataSource: sl<ReviewRemoteDataSource>(),
-    ),
+    () => ReviewRepositoryImpl(remoteDataSource: sl<ReviewRemoteDataSource>()),
   );
 
   sl.registerLazySingleton<GetShopReviewsUseCase>(
@@ -150,6 +152,18 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<DeleteReviewUseCase>(
     () => DeleteReviewUseCase(repository: sl<ReviewRepository>()),
+  );
+
+  sl.registerLazySingleton<SearchLocalDataSource>(
+    () => SearchLocalDataSourceImpl(),
+  );
+
+  sl.registerLazySingleton<SearchRepository>(
+    () => SearchRepositoryImpl(localDataSource: sl<SearchLocalDataSource>()),
+  );
+
+  sl.registerLazySingleton<ManageSearchHistoryUseCase>(
+    () => ManageSearchHistoryUseCase(repository: sl<SearchRepository>()),
   );
 
   _initialized = true;

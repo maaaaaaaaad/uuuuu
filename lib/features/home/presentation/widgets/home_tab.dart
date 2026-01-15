@@ -11,7 +11,9 @@ import 'package:jellomark/shared/widgets/sections/shop_section.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
-  const HomeTab({super.key});
+  final VoidCallback? onSearchTap;
+
+  const HomeTab({super.key, this.onSearchTap});
 
   @override
   ConsumerState<HomeTab> createState() => _HomeTabState();
@@ -50,19 +52,15 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   void _navigateToShopDetail(String shopId, List<BeautyShop> shops) {
     final shop = shops.firstWhere((s) => s.id == shopId);
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ShopDetailScreen(shop: shop),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => ShopDetailScreen(shop: shop)));
   }
 
   void _navigateToRecommendedShops() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const RecommendedShopsPage(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const RecommendedShopsPage()));
   }
 
   @override
@@ -76,11 +74,13 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     }
 
     final categories = homeState.categories
-        .map((c) => CategoryData(
-              id: c.id,
-              label: c.name,
-              icon: CategoryIconMapper.getIcon(c.name),
-            ))
+        .map(
+          (c) => CategoryData(
+            id: c.id,
+            label: c.name,
+            icon: CategoryIconMapper.getIcon(c.name),
+          ),
+        )
         .toList();
 
     return SafeArea(
@@ -102,7 +102,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    const SearchSection(locationText: '현재 위치'),
+                    SearchSection(
+                      locationText: '현재 위치',
+                      onSearchTap: widget.onSearchTap,
+                    ),
                     const SizedBox(height: 20),
                     if (categories.isNotEmpty)
                       CategorySection(categories: categories),
@@ -112,10 +115,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                         title: '내 주변 인기 샵',
                         shops: homeState.nearbyShops,
                         showMore: true,
-                        onShopTap: (id) => _navigateToShopDetail(
-                          id,
-                          homeState.nearbyShops,
-                        ),
+                        onShopTap: (id) =>
+                            _navigateToShopDetail(id, homeState.nearbyShops),
                       ),
                     if (homeState.nearbyShops.isNotEmpty)
                       const SizedBox(height: 24),
@@ -124,19 +125,15 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       shops: homeState.displayedRecommendedShops,
                       showMore: homeState.hasMoreRecommended,
                       onMoreTap: () => _navigateToRecommendedShops(),
-                      onShopTap: (id) => _navigateToShopDetail(
-                        id,
-                        homeState.recommendedShops,
-                      ),
+                      onShopTap: (id) =>
+                          _navigateToShopDetail(id, homeState.recommendedShops),
                     ),
                     const SizedBox(height: 24),
                     _NewShopsSection(
                       shops: homeState.newShops,
                       isLoadingMore: homeState.isLoadingMoreNewShops,
-                      onShopTap: (id) => _navigateToShopDetail(
-                        id,
-                        homeState.newShops,
-                      ),
+                      onShopTap: (id) =>
+                          _navigateToShopDetail(id, homeState.newShops),
                     ),
                     const SizedBox(height: 32),
                   ],
@@ -198,10 +195,7 @@ class _NewShopsSection extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             '새로 입점한 샵',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
         const SizedBox(height: 12),

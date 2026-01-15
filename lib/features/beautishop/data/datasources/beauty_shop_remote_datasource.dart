@@ -7,6 +7,7 @@ abstract class BeautyShopRemoteDataSource {
   Future<PagedBeautyShopsModel> getBeautyShops({
     required int page,
     required int size,
+    String? keyword,
     String? sortBy,
     String? sortOrder,
     String? categoryId,
@@ -35,6 +36,7 @@ class BeautyShopRemoteDataSourceImpl implements BeautyShopRemoteDataSource {
   Future<PagedBeautyShopsModel> getBeautyShops({
     required int page,
     required int size,
+    String? keyword,
     String? sortBy,
     String? sortOrder,
     String? categoryId,
@@ -42,11 +44,9 @@ class BeautyShopRemoteDataSourceImpl implements BeautyShopRemoteDataSource {
     double? longitude,
     double? minRating,
   }) async {
-    final queryParameters = <String, dynamic>{
-      'page': page,
-      'size': size,
-    };
+    final queryParameters = <String, dynamic>{'page': page, 'size': size};
 
+    if (keyword != null) queryParameters['keyword'] = keyword;
     if (sortBy != null) queryParameters['sortBy'] = sortBy;
     if (sortOrder != null) queryParameters['sortOrder'] = sortOrder;
     if (categoryId != null) queryParameters['categoryId'] = categoryId;
@@ -79,11 +79,7 @@ class BeautyShopRemoteDataSourceImpl implements BeautyShopRemoteDataSource {
   }) async {
     final response = await _apiClient.get(
       '/api/beautishops/$shopId/reviews',
-      queryParameters: {
-        'page': page,
-        'size': size,
-        'sort': sort,
-      },
+      queryParameters: {'page': page, 'size': size, 'sort': sort},
     );
 
     return PagedShopReviewsModel.fromJson(

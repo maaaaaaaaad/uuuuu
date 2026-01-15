@@ -9,7 +9,16 @@ void main() {
     const mainSrc = 'lib/features';
     const testSrc = 'test/features';
 
-    final domains = ['auth', 'member', 'beautishop', 'home', 'category', 'review', 'treatment'];
+    final domains = [
+      'auth',
+      'member',
+      'beautishop',
+      'home',
+      'category',
+      'review',
+      'treatment',
+      'search',
+    ];
 
     group('UseCase Test Coverage', () {
       test('every UseCase should have a corresponding unit test', () {

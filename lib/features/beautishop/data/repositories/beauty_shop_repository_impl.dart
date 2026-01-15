@@ -20,6 +20,7 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
   Future<Either<Failure, PagedBeautyShops>> getBeautyShops({
     required int page,
     required int size,
+    String? keyword,
     String? sortBy,
     String? sortOrder,
     String? categoryId,
@@ -31,6 +32,7 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
       final pagedModel = await _remoteDataSource.getBeautyShops(
         page: page,
         size: size,
+        keyword: keyword,
         sortBy: sortBy,
         sortOrder: sortOrder,
         categoryId: categoryId,
@@ -152,6 +154,8 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
       return Right(pagedModel);
     } on DioException catch (e) {
       return Left(ServerFailure(_getErrorMessage(e)));
+    } catch (e) {
+      return Left(ServerFailure('데이터 파싱 오류: ${e.toString()}'));
     }
   }
 

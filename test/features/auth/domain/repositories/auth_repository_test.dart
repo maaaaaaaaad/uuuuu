@@ -44,6 +44,7 @@ class MockAuthRepository implements AuthRepository {
       Member(
         id: 'member-123',
         nickname: '젤리',
+        displayName: '젤리',
         socialProvider: 'KAKAO',
         socialId: 'kakao-123456',
       ),

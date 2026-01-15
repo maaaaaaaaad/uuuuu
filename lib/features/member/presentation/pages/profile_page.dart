@@ -51,7 +51,7 @@ class ProfilePage extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                member.nickname,
+                member.displayName,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),

@@ -4,6 +4,7 @@ class MemberModel extends Member {
   const MemberModel({
     required super.id,
     required super.nickname,
+    required super.displayName,
     required super.socialProvider,
     required super.socialId,
   });
@@ -12,6 +13,7 @@ class MemberModel extends Member {
     return MemberModel(
       id: json['id'] as String,
       nickname: json['nickname'] as String,
+      displayName: json['displayName'] as String,
       socialProvider: json['socialProvider'] as String,
       socialId: json['socialId'] as String,
     );
@@ -21,6 +23,7 @@ class MemberModel extends Member {
     return {
       'id': id,
       'nickname': nickname,
+      'displayName': displayName,
       'socialProvider': socialProvider,
       'socialId': socialId,
     };

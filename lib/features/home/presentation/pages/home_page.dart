@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
 import 'package:jellomark/features/member/presentation/pages/profile_page.dart';
+import 'package:jellomark/features/search/presentation/pages/search_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,16 +13,20 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
-  final List<Widget> _tabs = const [
-    HomeTab(),
-    Center(child: Text('검색 탭')),
-    ProfilePage(),
-  ];
+  void _switchToSearchTab() {
+    setState(() => _currentIndex = 1);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final tabs = [
+      HomeTab(onSearchTap: _switchToSearchTab),
+      const SearchPage(),
+      const ProfilePage(),
+    ];
+
     return Scaffold(
-      body: _tabs[_currentIndex],
+      body: tabs[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),

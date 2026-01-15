@@ -7,12 +7,13 @@ void main() {
   group('MemberProfileWidget', () {
     const testMember = Member(
       id: 'member-123',
-      nickname: '젤리',
+      nickname: '젤리123456',
+      displayName: '젤리',
       socialProvider: 'KAKAO',
       socialId: '1234567890',
     );
 
-    testWidgets('should display member nickname', (tester) async {
+    testWidgets('should display member displayName', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(body: MemberProfileWidget(member: testMember)),

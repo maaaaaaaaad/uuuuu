@@ -77,7 +77,8 @@ void main() {
           '/api/members/me',
           (server) => server.reply(200, {
             'id': 'member-123',
-            'nickname': '젤리',
+            'nickname': '젤리123456',
+            'displayName': '젤리',
             'socialProvider': 'KAKAO',
             'socialId': 'kakao-123456',
           }),
@@ -87,7 +88,8 @@ void main() {
 
         expect(result, isA<MemberModel>());
         expect(result.id, 'member-123');
-        expect(result.nickname, '젤리');
+        expect(result.nickname, '젤리123456');
+        expect(result.displayName, '젤리');
         expect(result.socialProvider, 'KAKAO');
         expect(result.socialId, 'kakao-123456');
       });

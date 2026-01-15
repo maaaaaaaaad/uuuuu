@@ -8,6 +8,7 @@ void main() {
 
       expect(filter.page, equals(0));
       expect(filter.size, equals(20));
+      expect(filter.keyword, isNull);
       expect(filter.sortBy, isNull);
       expect(filter.sortOrder, isNull);
       expect(filter.categoryId, isNull);
@@ -20,6 +21,7 @@ void main() {
       const filter = BeautyShopFilter(
         page: 1,
         size: 10,
+        keyword: '강남',
         sortBy: 'RATING',
         sortOrder: 'DESC',
         categoryId: 'cat-1',
@@ -30,6 +32,7 @@ void main() {
 
       expect(filter.page, equals(1));
       expect(filter.size, equals(10));
+      expect(filter.keyword, equals('강남'));
       expect(filter.sortBy, equals('RATING'));
       expect(filter.sortOrder, equals('DESC'));
       expect(filter.categoryId, equals('cat-1'));
@@ -38,21 +41,25 @@ void main() {
       expect(filter.minRating, equals(4.0));
     });
 
+    test('creates instance with keyword search only', () {
+      const filter = BeautyShopFilter(keyword: '네일');
+
+      expect(filter.keyword, equals('네일'));
+      expect(filter.categoryId, isNull);
+    });
+
     test('copyWith creates new instance with updated values', () {
       const filter = BeautyShopFilter(page: 0, size: 20);
-      final updated = filter.copyWith(page: 1, sortBy: 'RATING');
+      final updated = filter.copyWith(page: 1, sortBy: 'RATING', keyword: '강남');
 
       expect(updated.page, equals(1));
       expect(updated.size, equals(20));
       expect(updated.sortBy, equals('RATING'));
+      expect(updated.keyword, equals('강남'));
     });
 
     test('copyWith preserves unchanged values', () {
-      const filter = BeautyShopFilter(
-        page: 0,
-        size: 20,
-        categoryId: 'cat-1',
-      );
+      const filter = BeautyShopFilter(page: 0, size: 20, categoryId: 'cat-1');
       final updated = filter.copyWith(page: 1);
 
       expect(updated.categoryId, equals('cat-1'));

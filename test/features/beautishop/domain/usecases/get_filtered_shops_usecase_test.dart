@@ -20,11 +20,7 @@ void main() {
       useCase = GetFilteredShopsUseCase(repository: mockRepository);
     });
 
-    const testShop = BeautyShop(
-      id: 'shop-1',
-      name: '뷰티살롱',
-      address: '서울시 강남구',
-    );
+    const testShop = BeautyShop(id: 'shop-1', name: '뷰티살롱', address: '서울시 강남구');
 
     test('calls repository with filter parameters', () async {
       const filter = BeautyShopFilter(
@@ -44,6 +40,7 @@ void main() {
         () => mockRepository.getBeautyShops(
           page: filter.page,
           size: filter.size,
+          keyword: filter.keyword,
           sortBy: filter.sortBy,
           sortOrder: filter.sortOrder,
           categoryId: filter.categoryId,
@@ -56,19 +53,17 @@ void main() {
       final result = await useCase(filter);
 
       expect(result.isRight(), isTrue);
-      result.fold(
-        (failure) => fail('Should not return failure'),
-        (paged) {
-          expect(paged.items.length, equals(1));
-          expect(paged.hasNext, isTrue);
-          expect(paged.totalElements, equals(100));
-        },
-      );
+      result.fold((failure) => fail('Should not return failure'), (paged) {
+        expect(paged.items.length, equals(1));
+        expect(paged.hasNext, isTrue);
+        expect(paged.totalElements, equals(100));
+      });
 
       verify(
         () => mockRepository.getBeautyShops(
           page: 0,
           size: 20,
+          keyword: null,
           sortBy: 'RATING',
           sortOrder: 'DESC',
           categoryId: null,
@@ -86,6 +81,7 @@ void main() {
         () => mockRepository.getBeautyShops(
           page: any(named: 'page'),
           size: any(named: 'size'),
+          keyword: any(named: 'keyword'),
           sortBy: any(named: 'sortBy'),
           sortOrder: any(named: 'sortOrder'),
           categoryId: any(named: 'categoryId'),
@@ -126,6 +122,7 @@ void main() {
         () => mockRepository.getBeautyShops(
           page: 1,
           size: 10,
+          keyword: null,
           sortBy: 'CREATED_AT',
           sortOrder: 'ASC',
           categoryId: 'cat-1',
@@ -141,6 +138,7 @@ void main() {
         () => mockRepository.getBeautyShops(
           page: 1,
           size: 10,
+          keyword: null,
           sortBy: 'CREATED_AT',
           sortOrder: 'ASC',
           categoryId: 'cat-1',

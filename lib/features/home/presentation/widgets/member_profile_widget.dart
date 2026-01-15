@@ -12,7 +12,9 @@ class MemberProfileWidget extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 24,
-          child: Text(member.nickname.isNotEmpty ? member.nickname[0] : '?'),
+          child: Text(
+            member.displayName.isNotEmpty ? member.displayName[0] : '?',
+          ),
         ),
         const SizedBox(width: 12),
         Column(
@@ -20,7 +22,7 @@ class MemberProfileWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              member.nickname,
+              member.displayName,
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             Text(

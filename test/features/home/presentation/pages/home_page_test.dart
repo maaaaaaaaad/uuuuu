@@ -17,12 +17,17 @@ import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
+import 'package:jellomark/features/search/domain/usecases/manage_search_history_usecase.dart';
+import 'package:jellomark/features/search/presentation/providers/search_provider.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/mock_http_client.dart';
 
 class MockGetFilteredShopsUseCase extends Mock
     implements GetFilteredShopsUseCase {}
+
+class MockManageSearchHistoryUseCase extends Mock
+    implements ManageSearchHistoryUseCase {}
 
 class MockGetCategoriesUseCase extends Mock implements GetCategoriesUseCase {}
 
@@ -34,7 +39,8 @@ class MockAuthRepository implements AuthRepository {
     return const Right(
       Member(
         id: '1',
-        nickname: '테스트',
+        nickname: '테스트123456',
+        displayName: '테스트',
         socialProvider: 'KAKAO',
         socialId: 'test-kakao-id',
       ),
@@ -73,6 +79,7 @@ void main() {
     late MockAuthRepository mockAuthRepository;
     late MockGetFilteredShopsUseCase mockGetFilteredShopsUseCase;
     late MockGetCategoriesUseCase mockGetCategoriesUseCase;
+    late MockManageSearchHistoryUseCase mockManageSearchHistoryUseCase;
 
     setUpAll(() {
       HttpOverrides.global = MockHttpOverrides();
@@ -83,16 +90,19 @@ void main() {
       mockAuthRepository = MockAuthRepository();
       mockGetFilteredShopsUseCase = MockGetFilteredShopsUseCase();
       mockGetCategoriesUseCase = MockGetCategoriesUseCase();
+      mockManageSearchHistoryUseCase = MockManageSearchHistoryUseCase();
 
-      when(() => mockGetCategoriesUseCase())
-          .thenAnswer((_) async => const Right([]));
+      when(
+        () => mockGetCategoriesUseCase(),
+      ).thenAnswer((_) async => const Right([]));
       when(() => mockGetFilteredShopsUseCase(any())).thenAnswer(
-        (_) async => const Right(PagedBeautyShops(
-          items: [],
-          hasNext: false,
-          totalElements: 0,
-        )),
+        (_) async => const Right(
+          PagedBeautyShops(items: [], hasNext: false, totalElements: 0),
+        ),
       );
+      when(
+        () => mockManageSearchHistoryUseCase.getSearchHistory(),
+      ).thenAnswer((_) async => const Right([]));
     });
 
     Widget createHomePage() {
@@ -101,10 +111,15 @@ void main() {
           getCurrentMemberUseCaseProvider.overrideWithValue(
             GetCurrentMember(repository: mockAuthRepository),
           ),
-          getFilteredShopsUseCaseProvider
-              .overrideWithValue(mockGetFilteredShopsUseCase),
-          getCategoriesUseCaseProvider
-              .overrideWithValue(mockGetCategoriesUseCase),
+          getFilteredShopsUseCaseProvider.overrideWithValue(
+            mockGetFilteredShopsUseCase,
+          ),
+          getCategoriesUseCaseProvider.overrideWithValue(
+            mockGetCategoriesUseCase,
+          ),
+          manageSearchHistoryUseCaseProvider.overrideWithValue(
+            mockManageSearchHistoryUseCase,
+          ),
         ],
         child: const MaterialApp(home: HomePage()),
       );
@@ -151,7 +166,7 @@ void main() {
 
       await tester.tap(find.text('검색'));
       await tester.pumpAndSettle();
-      expect(find.text('검색 탭'), findsOneWidget);
+      expect(find.text('취소'), findsOneWidget);
 
       await tester.tap(find.text('마이'));
       await tester.pumpAndSettle();

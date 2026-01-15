@@ -9,7 +9,16 @@ void main() {
     final libDir = Directory('lib');
     final featuresDir = Directory('lib/features');
 
-    final domains = ['auth', 'member', 'beautishop', 'home', 'category', 'review', 'treatment'];
+    final domains = [
+      'auth',
+      'member',
+      'beautishop',
+      'home',
+      'category',
+      'review',
+      'treatment',
+      'search',
+    ];
 
     group('Domain Layer Independence', () {
       test('domain layer should not import from data layer', () {

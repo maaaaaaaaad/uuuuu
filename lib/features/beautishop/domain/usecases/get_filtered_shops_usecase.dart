@@ -14,6 +14,7 @@ class GetFilteredShopsUseCase {
     return _repository.getBeautyShops(
       page: filter.page,
       size: filter.size,
+      keyword: filter.keyword,
       sortBy: filter.sortBy,
       sortOrder: filter.sortOrder,
       categoryId: filter.categoryId,

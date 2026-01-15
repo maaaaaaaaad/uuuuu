@@ -74,7 +74,8 @@ void main() {
     testWidgets('should render profile page', (tester) async {
       mockAuthRepository.memberResult = const Member(
         id: '1',
-        nickname: '테스트유저',
+        nickname: '테스트유저123',
+        displayName: '테스트유저',
         socialProvider: 'KAKAO',
         socialId: 'test-kakao-id',
       );
@@ -85,10 +86,11 @@ void main() {
       expect(find.byType(ProfilePage), findsOneWidget);
     });
 
-    testWidgets('should display member nickname', (tester) async {
+    testWidgets('should display member displayName', (tester) async {
       mockAuthRepository.memberResult = const Member(
         id: '1',
-        nickname: '테스트유저',
+        nickname: '테스트유저123',
+        displayName: '테스트유저',
         socialProvider: 'KAKAO',
         socialId: 'test-kakao-id',
       );
@@ -102,7 +104,8 @@ void main() {
     testWidgets('should display social provider info', (tester) async {
       mockAuthRepository.memberResult = const Member(
         id: '1',
-        nickname: '테스트유저',
+        nickname: '테스트유저123',
+        displayName: '테스트유저',
         socialProvider: 'KAKAO',
         socialId: 'test-kakao-id',
       );
@@ -116,7 +119,8 @@ void main() {
     testWidgets('should show loading indicator while loading', (tester) async {
       mockAuthRepository.memberResult = const Member(
         id: '1',
-        nickname: '테스트유저',
+        nickname: '테스트유저123',
+        displayName: '테스트유저',
         socialProvider: 'KAKAO',
         socialId: 'test-kakao-id',
       );
@@ -129,7 +133,8 @@ void main() {
     testWidgets('should display logout button', (tester) async {
       mockAuthRepository.memberResult = const Member(
         id: '1',
-        nickname: '테스트유저',
+        nickname: '테스트유저123',
+        displayName: '테스트유저',
         socialProvider: 'KAKAO',
         socialId: 'test-kakao-id',
       );

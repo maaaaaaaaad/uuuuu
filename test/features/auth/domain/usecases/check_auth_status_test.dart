@@ -84,7 +84,8 @@ void main() {
       );
       mockRepository.memberResult = const MemberModel(
         id: 'member-123',
-        nickname: '젤리',
+        nickname: '젤리123456',
+        displayName: '젤리',
         socialProvider: 'KAKAO',
         socialId: 'kakao-123456',
       );
@@ -94,7 +95,7 @@ void main() {
       expect(result.isRight(), isTrue);
       result.fold((_) => fail('Should be success'), (member) {
         expect(member.id, 'member-123');
-        expect(member.nickname, '젤리');
+        expect(member.displayName, '젤리');
       });
     });
 

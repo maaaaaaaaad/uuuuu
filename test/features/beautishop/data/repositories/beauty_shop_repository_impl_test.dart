@@ -57,6 +57,7 @@ void main() {
           () => mockRemoteDataSource.getBeautyShops(
             page: any(named: 'page'),
             size: any(named: 'size'),
+            keyword: any(named: 'keyword'),
             sortBy: any(named: 'sortBy'),
             sortOrder: any(named: 'sortOrder'),
             categoryId: any(named: 'categoryId'),
@@ -88,6 +89,7 @@ void main() {
           () => mockRemoteDataSource.getBeautyShops(
             page: 0,
             size: 20,
+            keyword: null,
             sortBy: 'RATING',
             sortOrder: 'DESC',
             categoryId: 'cat-1',
@@ -112,6 +114,7 @@ void main() {
           () => mockRemoteDataSource.getBeautyShops(
             page: 0,
             size: 20,
+            keyword: null,
             sortBy: 'RATING',
             sortOrder: 'DESC',
             categoryId: 'cat-1',
@@ -127,6 +130,7 @@ void main() {
           () => mockRemoteDataSource.getBeautyShops(
             page: any(named: 'page'),
             size: any(named: 'size'),
+            keyword: any(named: 'keyword'),
             sortBy: any(named: 'sortBy'),
             sortOrder: any(named: 'sortOrder'),
             categoryId: any(named: 'categoryId'),
@@ -196,6 +200,7 @@ void main() {
           () => mockRemoteDataSource.getBeautyShops(
             page: 0,
             size: 10,
+            keyword: null,
             sortBy: 'RATING',
             sortOrder: 'DESC',
             categoryId: null,
@@ -227,6 +232,7 @@ void main() {
           () => mockRemoteDataSource.getBeautyShops(
             page: 0,
             size: 10,
+            keyword: null,
             sortBy: 'CREATED_AT',
             sortOrder: 'DESC',
             categoryId: null,
@@ -258,6 +264,7 @@ void main() {
           () => mockRemoteDataSource.getBeautyShops(
             page: 0,
             size: 10,
+            keyword: null,
             sortBy: null,
             sortOrder: null,
             categoryId: null,

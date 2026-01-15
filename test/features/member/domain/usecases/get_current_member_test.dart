@@ -56,7 +56,8 @@ void main() {
     test('should return Member when repository call is successful', () async {
       const member = Member(
         id: '1',
-        nickname: '테스트유저',
+        nickname: '테스트유저123',
+        displayName: '테스트유저',
         socialProvider: 'KAKAO',
         socialId: 'test-kakao-id',
       );

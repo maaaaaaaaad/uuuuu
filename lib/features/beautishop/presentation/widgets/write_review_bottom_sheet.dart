@@ -95,27 +95,29 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
       padding: EdgeInsets.only(bottom: bottomPadding),
       child: SafeArea(
         top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHandle(),
-            _buildHeader(),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildRatingSection(),
-                  const SizedBox(height: 24),
-                  _buildContentSection(),
-                  const SizedBox(height: 24),
-                  _buildSubmitButton(),
-                ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildHandle(),
+              _buildHeader(),
+              const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildRatingSection(),
+                    const SizedBox(height: 24),
+                    _buildContentSection(),
+                    const SizedBox(height: 24),
+                    _buildSubmitButton(),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

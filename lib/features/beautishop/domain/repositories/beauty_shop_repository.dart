@@ -3,13 +3,14 @@ import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/paged_beauty_shops.dart';
 import 'package:jellomark/features/beautishop/domain/entities/paged_shop_reviews.dart';
-import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
+import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
 
 abstract class BeautyShopRepository {
   Future<Either<Failure, PagedBeautyShops>> getBeautyShops({
     required int page,
     required int size,
+    String? keyword,
     String? sortBy,
     String? sortOrder,
     String? categoryId,

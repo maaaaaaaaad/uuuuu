@@ -7,7 +7,8 @@ void main() {
     test('should be a subclass of Member entity', () {
       const model = MemberModel(
         id: 'member-123',
-        nickname: '젤리',
+        nickname: '젤리123456',
+        displayName: '젤리',
         socialProvider: 'KAKAO',
         socialId: '1234567890',
       );
@@ -19,7 +20,8 @@ void main() {
       test('should return a valid model from JSON', () {
         final json = {
           'id': 'member-456',
-          'nickname': '마크',
+          'nickname': '마크654321',
+          'displayName': '마크',
           'socialProvider': 'KAKAO',
           'socialId': '9876543210',
         };
@@ -27,7 +29,8 @@ void main() {
         final result = MemberModel.fromJson(json);
 
         expect(result.id, 'member-456');
-        expect(result.nickname, '마크');
+        expect(result.nickname, '마크654321');
+        expect(result.displayName, '마크');
         expect(result.socialProvider, 'KAKAO');
         expect(result.socialId, '9876543210');
       });
@@ -37,7 +40,8 @@ void main() {
       test('should return a valid JSON map', () {
         const model = MemberModel(
           id: 'member-789',
-          nickname: '테스트',
+          nickname: '테스트111111',
+          displayName: '테스트',
           socialProvider: 'KAKAO',
           socialId: '1111111111',
         );
@@ -45,7 +49,8 @@ void main() {
         final result = model.toJson();
 
         expect(result['id'], 'member-789');
-        expect(result['nickname'], '테스트');
+        expect(result['nickname'], '테스트111111');
+        expect(result['displayName'], '테스트');
         expect(result['socialProvider'], 'KAKAO');
         expect(result['socialId'], '1111111111');
       });

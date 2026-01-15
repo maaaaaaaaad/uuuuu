@@ -170,7 +170,8 @@ void main() {
       test('should return Member on success', () async {
         const member = MemberModel(
           id: 'member-123',
-          nickname: '젤리',
+          nickname: '젤리123456',
+          displayName: '젤리',
           socialProvider: 'KAKAO',
           socialId: 'kakao-123456',
         );
