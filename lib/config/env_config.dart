@@ -14,6 +14,11 @@ class EnvConfig {
     defaultValue: '',
   );
 
+  static const String naverMapClientId = String.fromEnvironment(
+    'NAVER_MAP_CLIENT_ID',
+    defaultValue: '5yi4ydr7p1',
+  );
+
   static bool get isDebug => env == 'dev';
   static bool get isProduction => env == 'prod';
 }

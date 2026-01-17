@@ -18,6 +18,7 @@ void main() {
       'review',
       'treatment',
       'search',
+      'location',
     ];
 
     group('Domain Layer Independence', () {

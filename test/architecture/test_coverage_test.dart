@@ -18,6 +18,7 @@ void main() {
       'review',
       'treatment',
       'search',
+      'location',
     ];
 
     group('UseCase Test Coverage', () {

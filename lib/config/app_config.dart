@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/core/di/injection_container.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -20,6 +21,8 @@ class AppConfig {
     );
 
     KakaoSdk.init(nativeAppKey: EnvConfig.kakaoNativeAppKey);
+
+    await FlutterNaverMap().init(clientId: EnvConfig.naverMapClientId);
 
     await initDependencies();
   }
