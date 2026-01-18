@@ -116,4 +116,47 @@ class BeautyShopModel extends BeautyShop {
     }
     return result;
   }
+
+  @override
+  BeautyShopModel copyWith({
+    String? id,
+    String? name,
+    String? address,
+    double? latitude,
+    double? longitude,
+    String? imageUrl,
+    double? rating,
+    int? reviewCount,
+    double? distance,
+    List<String>? tags,
+    int? discountRate,
+    bool? isNew,
+    String? operatingHours,
+    String? phoneNumber,
+    String? description,
+    Map<String, String>? operatingTimeMap,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return BeautyShopModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      address: address ?? this.address,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      imageUrl: imageUrl ?? this.imageUrl,
+      rating: rating ?? this.rating,
+      reviewCount: reviewCount ?? this.reviewCount,
+      distance: distance ?? this.distance,
+      tags: tags ?? this.tags,
+      discountRate: discountRate ?? this.discountRate,
+      isNew: isNew ?? this.isNew,
+      operatingHours: operatingHours ?? this.operatingHours,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      description: description ?? this.description,
+      operatingTimeMap: operatingTimeMap ?? this.operatingTimeMap,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

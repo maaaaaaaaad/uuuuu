@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
+import 'package:jellomark/features/location/presentation/widgets/location_setting_toggle.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
@@ -133,7 +134,17 @@ class ProfilePage extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: SemanticColors.background.card,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: SemanticColors.border.glass),
+                    ),
+                    child: const LocationSettingToggle(),
+                  ),
+                  const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(

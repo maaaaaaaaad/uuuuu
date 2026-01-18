@@ -166,11 +166,14 @@ class ShopCard extends StatelessWidget {
             size: 14,
             color: SemanticColors.icon.disabled,
           ),
-          Text(
-            shop.formattedDistance!,
-            style: TextStyle(
-              fontSize: 12,
-              color: SemanticColors.text.hint,
+          Flexible(
+            child: Text(
+              shop.formattedDistance!,
+              style: TextStyle(
+                fontSize: 12,
+                color: SemanticColors.text.hint,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

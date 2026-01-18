@@ -10,8 +10,12 @@ import 'package:jellomark/features/beautishop/presentation/pages/review_list_pag
 import 'package:jellomark/features/beautishop/presentation/widgets/operating_hours_card.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/service_menu_item.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_description.dart';
-import 'package:jellomark/features/beautishop/presentation/widgets/shop_image_gallery.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/full_screen_image_viewer.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbnail_grid.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/shop_map_widget.dart';
+import 'package:jellomark/features/location/domain/entities/route.dart' as domain;
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
@@ -63,6 +67,24 @@ class ShopDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final shopDetail = _buildShopDetail();
     final treatmentsAsync = ref.watch(shopTreatmentsProvider(shop.id));
+    final userLocationAsync = ref.watch(currentLocationProvider);
+
+    final userLocation = userLocationAsync.valueOrNull;
+    AsyncValue<domain.Route?>? routeAsync;
+    if (userLocation != null &&
+        shop.latitude != null &&
+        shop.longitude != null) {
+      routeAsync = ref.watch(
+        routeProvider(
+          RouteParams(
+            startLat: userLocation.latitude,
+            startLng: userLocation.longitude,
+            endLat: shop.latitude!,
+            endLng: shop.longitude!,
+          ),
+        ),
+      );
+    }
 
     void navigateToReviewList() {
       Navigator.of(context).push(
@@ -80,21 +102,37 @@ class ShopDetailScreen extends ConsumerWidget {
         ),
         child: CustomScrollView(
           slivers: [
-            _buildSliverAppBar(context, shopDetail),
+            _buildSliverAppBar(context, shopDetail, userLocationAsync, routeAsync),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (shopDetail.images.isNotEmpty) ...[
+                      ImageThumbnailGrid(
+                        imageUrls: shopDetail.images,
+                        imageSize: 60,
+                        onImageTap: (index) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => FullScreenImageViewer(
+                                images: shopDetail.images,
+                                initialIndex: index,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                     GlassCard(
+                      padding: EdgeInsets.zero,
                       child: ShopInfoHeader(
                         name: shopDetail.name,
                         rating: shopDetail.rating,
                         reviewCount: shopDetail.reviewCount,
-                        distance: shopDetail.distance != null
-                            ? '${shopDetail.distance!.toStringAsFixed(1)}km'
-                            : null,
+                        distance: _getDisplayDistance(routeAsync, shopDetail.distance),
                         address: shopDetail.address,
                         onReviewTap: navigateToReviewList,
                       ),
@@ -102,6 +140,7 @@ class ShopDetailScreen extends ConsumerWidget {
                     if (shopDetail.description.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       GlassCard(
+                        padding: EdgeInsets.zero,
                         child: ShopDescription(description: shopDetail.description),
                       ),
                     ],
@@ -109,6 +148,7 @@ class ShopDetailScreen extends ConsumerWidget {
                         shopDetail.operatingHoursMap!.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       GlassCard(
+                        padding: EdgeInsets.zero,
                         child: OperatingHoursCard(
                           operatingHours: shopDetail.operatingHoursMap!,
                         ),
@@ -128,9 +168,15 @@ class ShopDetailScreen extends ConsumerWidget {
     );
   }
 
-  SliverAppBar _buildSliverAppBar(BuildContext context, ShopDetail shopDetail) {
+  SliverAppBar _buildSliverAppBar(
+    BuildContext context,
+    ShopDetail shopDetail,
+    AsyncValue<dynamic> userLocationAsync,
+    AsyncValue<domain.Route?>? routeAsync,
+  ) {
+    final mapHeight = MediaQuery.of(context).size.height * 0.4;
     return SliverAppBar(
-      expandedHeight: shopDetail.images.isNotEmpty ? 250 : kToolbarHeight,
+      expandedHeight: mapHeight,
       pinned: true,
       backgroundColor: SemanticColors.special.transparent,
       leading: Padding(
@@ -161,14 +207,52 @@ class ShopDetailScreen extends ConsumerWidget {
               kToolbarHeight + MediaQuery.of(context).padding.top;
           return FlexibleSpaceBar(
             title: isCollapsed ? Text(shopDetail.name) : null,
-            background: shopDetail.images.isNotEmpty
-                ? ShopImageGallery(images: shopDetail.images)
-                : Container(
-                    color: SemanticColors.background.cardAccent,
-                  ),
+            background: _buildMapWidget(context, userLocationAsync, routeAsync),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildMapWidget(
+    BuildContext context,
+    AsyncValue<dynamic> userLocationAsync,
+    AsyncValue<domain.Route?>? routeAsync,
+  ) {
+    final mapHeight = MediaQuery.of(context).size.height * 0.4;
+
+    if (shop.latitude == null || shop.longitude == null) {
+      debugPrint('[ShopDetailScreen] Shop coordinates missing: lat=${shop.latitude}, lng=${shop.longitude}');
+      return Container(
+        color: SemanticColors.background.cardAccent,
+        child: Center(
+          child: Icon(
+            Icons.map_outlined,
+            size: 48,
+            color: SemanticColors.icon.disabled,
+          ),
+        ),
+      );
+    }
+
+    final userLocation = userLocationAsync.valueOrNull;
+    final route = routeAsync?.valueOrNull;
+
+    debugPrint('[ShopDetailScreen] Building map widget');
+    debugPrint('[ShopDetailScreen] Shop: lat=${shop.latitude}, lng=${shop.longitude}');
+    debugPrint('[ShopDetailScreen] User location: $userLocation');
+    debugPrint('[ShopDetailScreen] Route async state: ${routeAsync?.toString()}');
+    debugPrint('[ShopDetailScreen] Route: $route');
+    debugPrint('[ShopDetailScreen] Route coordinates count: ${route?.coordinates.length ?? 0}');
+
+    return ShopMapWidget(
+      shopLatitude: shop.latitude!,
+      shopLongitude: shop.longitude!,
+      shopName: shop.name,
+      userLatitude: userLocation?.latitude,
+      userLongitude: userLocation?.longitude,
+      routeCoordinates: route?.coordinates,
+      height: mapHeight,
     );
   }
 
@@ -233,6 +317,20 @@ class ShopDetailScreen extends ConsumerWidget {
         );
       },
     );
+  }
+
+  String? _getDisplayDistance(
+    AsyncValue<domain.Route?>? routeAsync,
+    double? fallbackDistance,
+  ) {
+    final route = routeAsync?.valueOrNull;
+    if (route != null) {
+      return route.formattedDistance;
+    }
+    if (fallbackDistance != null) {
+      return '${fallbackDistance.toStringAsFixed(1)}km';
+    }
+    return null;
   }
 
   Widget _buildBottomReservationButton(BuildContext context) {

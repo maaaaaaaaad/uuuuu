@@ -38,16 +38,19 @@ class ShopInfoHeader extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              _buildReviewButton(),
+              Flexible(child: _buildReviewButton()),
               if (distance != null) ...[
                 const SizedBox(width: 12),
                 Icon(Icons.location_on, size: 16, color: SemanticColors.icon.secondary),
                 const SizedBox(width: 2),
-                Text(
-                  distance!,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: SemanticColors.text.secondary,
+                Flexible(
+                  child: Text(
+                    distance!,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: SemanticColors.text.secondary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -114,12 +117,15 @@ class ShopInfoHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              Text(
-                '리뷰 $reviewCount개',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: SemanticColors.text.count,
+              Flexible(
+                child: Text(
+                  '리뷰 $reviewCount개',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: SemanticColors.text.count,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 2),

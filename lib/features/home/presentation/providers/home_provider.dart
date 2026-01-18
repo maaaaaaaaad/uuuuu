@@ -6,6 +6,9 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop_filter
 import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops_usecase.dart';
 import 'package:jellomark/features/category/domain/entities/category.dart';
 import 'package:jellomark/features/category/domain/usecases/get_categories_usecase.dart';
+import 'package:jellomark/features/location/domain/entities/user_location.dart';
+import 'package:jellomark/features/location/domain/utils/distance_calculator.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 
 class HomeState extends Equatable {
   final List<BeautyShop> recommendedShops;
@@ -18,6 +21,7 @@ class HomeState extends Equatable {
   final bool hasMoreNewShops;
   final bool isLoadingMoreNewShops;
   final bool hasMoreRecommended;
+  final UserLocation? userLocation;
 
   static const int recommendedDisplayLimit = 5;
 
@@ -32,6 +36,7 @@ class HomeState extends Equatable {
     this.hasMoreNewShops = true,
     this.isLoadingMoreNewShops = false,
     this.hasMoreRecommended = false,
+    this.userLocation,
   });
 
   List<BeautyShop> get displayedRecommendedShops =>
@@ -48,6 +53,7 @@ class HomeState extends Equatable {
     bool? hasMoreNewShops,
     bool? isLoadingMoreNewShops,
     bool? hasMoreRecommended,
+    UserLocation? userLocation,
   }) {
     return HomeState(
       recommendedShops: recommendedShops ?? this.recommendedShops,
@@ -61,6 +67,7 @@ class HomeState extends Equatable {
       isLoadingMoreNewShops:
           isLoadingMoreNewShops ?? this.isLoadingMoreNewShops,
       hasMoreRecommended: hasMoreRecommended ?? this.hasMoreRecommended,
+      userLocation: userLocation ?? this.userLocation,
     );
   }
 
@@ -76,6 +83,7 @@ class HomeState extends Equatable {
     hasMoreNewShops,
     isLoadingMoreNewShops,
     hasMoreRecommended,
+    userLocation,
   ];
 }
 
@@ -92,16 +100,22 @@ final getCategoriesUseCaseProvider = Provider<GetCategoriesUseCase>((ref) {
 class HomeNotifier extends StateNotifier<HomeState> {
   final GetFilteredShopsUseCase _getFilteredShopsUseCase;
   final GetCategoriesUseCase _getCategoriesUseCase;
+  final Future<UserLocation?> Function() _getCurrentLocation;
 
   HomeNotifier({
     required GetFilteredShopsUseCase getFilteredShopsUseCase,
     required GetCategoriesUseCase getCategoriesUseCase,
+    required Future<UserLocation?> Function() getCurrentLocation,
   }) : _getFilteredShopsUseCase = getFilteredShopsUseCase,
        _getCategoriesUseCase = getCategoriesUseCase,
+       _getCurrentLocation = getCurrentLocation,
        super(const HomeState());
 
   Future<void> loadData() async {
     state = state.copyWith(isLoading: true, error: null);
+
+    final userLocation = await _getCurrentLocation();
+    state = state.copyWith(userLocation: userLocation);
 
     final categoriesResult = await _getCategoriesUseCase();
     categoriesResult.fold(
@@ -121,7 +135,11 @@ class HomeNotifier extends StateNotifier<HomeState> {
     nearbyResult.fold(
       (failure) {},
       (pagedShops) {
-        state = state.copyWith(nearbyShops: pagedShops.items);
+        final processedShops = _processNearbyShops(
+          pagedShops.items,
+          userLocation,
+        );
+        state = state.copyWith(nearbyShops: processedShops);
       },
     );
 
@@ -137,8 +155,9 @@ class HomeNotifier extends StateNotifier<HomeState> {
         final hasMore =
             pagedShops.items.length > HomeState.recommendedDisplayLimit ||
                 pagedShops.hasNext;
+        final shopsWithDistance = _addDistanceToShops(pagedShops.items, userLocation);
         state = state.copyWith(
-          recommendedShops: pagedShops.items,
+          recommendedShops: shopsWithDistance,
           hasMoreRecommended: hasMore,
         );
       },
@@ -153,8 +172,9 @@ class HomeNotifier extends StateNotifier<HomeState> {
     newShopsResult.fold(
       (failure) {},
       (pagedShops) {
+        final shopsWithDistance = _addDistanceToShops(pagedShops.items, userLocation);
         state = state.copyWith(
-          newShops: pagedShops.items,
+          newShops: shopsWithDistance,
           hasMoreNewShops: pagedShops.hasNext,
           newShopsPage: 0,
         );
@@ -186,8 +206,9 @@ class HomeNotifier extends StateNotifier<HomeState> {
         );
       },
       (pagedShops) {
+        final shopsWithDistance = _addDistanceToShops(pagedShops.items, state.userLocation);
         state = state.copyWith(
-          newShops: [...state.newShops, ...pagedShops.items],
+          newShops: [...state.newShops, ...shopsWithDistance],
           hasMoreNewShops: pagedShops.hasNext,
           newShopsPage: nextPage,
           isLoadingMoreNewShops: false,
@@ -204,6 +225,55 @@ class HomeNotifier extends StateNotifier<HomeState> {
     );
     await loadData();
   }
+
+  List<BeautyShop> _processNearbyShops(
+    List<BeautyShop> shops,
+    UserLocation? userLocation,
+  ) {
+    if (userLocation == null) {
+      return shops;
+    }
+
+    final shopsWithDistance = _addDistanceToShops(shops, userLocation);
+
+    shopsWithDistance.sort((a, b) {
+      final distanceA = a.distance ?? double.infinity;
+      final distanceB = b.distance ?? double.infinity;
+
+      final distanceComparison = distanceA.compareTo(distanceB);
+      if (distanceComparison != 0) {
+        return distanceComparison;
+      }
+
+      return b.rating.compareTo(a.rating);
+    });
+
+    return shopsWithDistance;
+  }
+
+  List<BeautyShop> _addDistanceToShops(
+    List<BeautyShop> shops,
+    UserLocation? userLocation,
+  ) {
+    if (userLocation == null) {
+      return shops;
+    }
+
+    return shops.map((shop) {
+      if (shop.latitude == null || shop.longitude == null) {
+        return shop;
+      }
+
+      final distance = calculateDistanceKm(
+        userLocation.latitude,
+        userLocation.longitude,
+        shop.latitude!,
+        shop.longitude!,
+      );
+
+      return shop.copyWith(distance: distance);
+    }).toList();
+  }
 }
 
 final homeNotifierProvider = StateNotifierProvider<HomeNotifier, HomeState>((
@@ -212,5 +282,6 @@ final homeNotifierProvider = StateNotifierProvider<HomeNotifier, HomeState>((
   return HomeNotifier(
     getFilteredShopsUseCase: ref.watch(getFilteredShopsUseCaseProvider),
     getCategoriesUseCase: ref.watch(getCategoriesUseCaseProvider),
+    getCurrentLocation: () => ref.read(currentLocationProvider.future),
   );
 });

@@ -97,7 +97,7 @@ void main() {
 
       expect(shopDetail.rating, 4.8);
       expect(shopDetail.reviewCount, 234);
-      expect(shopDetail.formattedDistance, '300m');
+      expect(shopDetail.formattedDistance, '0.3km');
       expect(shopDetail.tags, ['네일', '젤네일']);
       expect(shopDetail.discountRate, 10);
     });

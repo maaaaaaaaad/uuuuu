@@ -17,6 +17,14 @@ void main() {
               return null;
             });
 
+        const naverMapChannel = MethodChannel('flutter_naver_map_sdk');
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(naverMapChannel, (
+              MethodCall methodCall,
+            ) async {
+              return null;
+            });
+
         await AppConfig.initializeApp();
 
         final orientationCall = calls.firstWhere(

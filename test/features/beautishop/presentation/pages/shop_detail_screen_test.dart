@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jellomark/features/beautishop/data/models/beauty_shop_model.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/full_screen_image_viewer.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbnail_grid.dart';
 import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
@@ -274,6 +277,169 @@ void main() {
           }
         }
         expect(hasGradientButton, isTrue);
+      });
+    });
+
+    group('Map Placeholder in SliverAppBar', () {
+      testWidgets('should display map placeholder instead of image gallery', (
+        tester,
+      ) async {
+        await tester.pumpWidget(createShopDetailScreen(shop: testShop));
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.map_outlined), findsOneWidget);
+      });
+
+      testWidgets('map height should be 40% of screen height', (
+        tester,
+      ) async {
+        await tester.pumpWidget(createShopDetailScreen(shop: testShop));
+        await tester.pumpAndSettle();
+
+        final sliverAppBar = tester.widget<SliverAppBar>(
+          find.byType(SliverAppBar),
+        );
+        final screenHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
+        final expectedHeight = screenHeight * 0.4;
+        expect(sliverAppBar.expandedHeight, expectedHeight);
+      });
+    });
+
+    group('Image Gallery in Body', () {
+      testWidgets('should display ImageThumbnailGrid when shop has images', (
+        tester,
+      ) async {
+        final shopWithImage = BeautyShopModel(
+          id: 'shop-1',
+          name: '블루밍 네일',
+          address: '서울시 강남구 역삼동 123-45',
+          rating: 4.8,
+          reviewCount: 234,
+          distance: 0.3,
+          tags: const ['네일', '젤네일'],
+          imageUrl: 'https://example.com/image.jpg',
+          phoneNumber: '02-1234-5678',
+          operatingTimeMap: const {'월': '09:00 - 18:00'},
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        await tester.pumpWidget(createShopDetailScreen(shop: shopWithImage));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ImageThumbnailGrid), findsOneWidget);
+      });
+
+      testWidgets('should not display ImageThumbnailGrid when shop has no images', (
+        tester,
+      ) async {
+        await tester.pumpWidget(createShopDetailScreen(shop: testShop));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ImageThumbnailGrid), findsNothing);
+      });
+
+      testWidgets('ImageThumbnailGrid should not be wrapped in GlassCard', (
+        tester,
+      ) async {
+        final shopWithImage = BeautyShopModel(
+          id: 'shop-1',
+          name: '블루밍 네일',
+          address: '서울시 강남구 역삼동 123-45',
+          rating: 4.8,
+          reviewCount: 234,
+          distance: 0.3,
+          tags: const ['네일', '젤네일'],
+          imageUrl: 'https://example.com/image.jpg',
+          phoneNumber: '02-1234-5678',
+          operatingTimeMap: const {'월': '09:00 - 18:00'},
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        await tester.pumpWidget(createShopDetailScreen(shop: shopWithImage));
+        await tester.pumpAndSettle();
+
+        final glassCards = tester.widgetList<GlassCard>(find.byType(GlassCard));
+        bool hasImageGridInGlassCard = false;
+        for (final glassCard in glassCards) {
+          if (glassCard.child is ImageThumbnailGrid) {
+            hasImageGridInGlassCard = true;
+            break;
+          }
+        }
+        expect(hasImageGridInGlassCard, isFalse);
+      });
+
+      testWidgets('ImageThumbnailGrid should have reduced image size', (
+        tester,
+      ) async {
+        final shopWithImage = BeautyShopModel(
+          id: 'shop-1',
+          name: '블루밍 네일',
+          address: '서울시 강남구 역삼동 123-45',
+          rating: 4.8,
+          reviewCount: 234,
+          distance: 0.3,
+          tags: const ['네일', '젤네일'],
+          imageUrl: 'https://example.com/image.jpg',
+          phoneNumber: '02-1234-5678',
+          operatingTimeMap: const {'월': '09:00 - 18:00'},
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        await tester.pumpWidget(createShopDetailScreen(shop: shopWithImage));
+        await tester.pumpAndSettle();
+
+        final imageGrid = tester.widget<ImageThumbnailGrid>(
+          find.byType(ImageThumbnailGrid),
+        );
+        expect(imageGrid.imageSize, 60);
+      });
+
+      testWidgets('should navigate to FullScreenImageViewer on thumbnail tap', (
+        tester,
+      ) async {
+        final shopWithImage = BeautyShopModel(
+          id: 'shop-1',
+          name: '블루밍 네일',
+          address: '서울시 강남구 역삼동 123-45',
+          rating: 4.8,
+          reviewCount: 234,
+          distance: 0.3,
+          tags: const ['네일', '젤네일'],
+          imageUrl: 'https://example.com/image.jpg',
+          phoneNumber: '02-1234-5678',
+          operatingTimeMap: const {'월': '09:00 - 18:00'},
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              shopTreatmentsProvider(shopWithImage.id).overrideWith(
+                (ref) async => [],
+              ),
+              shopReviewsNotifierProvider(shopWithImage.id).overrideWith(
+                (ref) => _MockShopReviewsNotifier(),
+              ),
+            ],
+            child: MaterialApp(
+              home: ShopDetailScreen(shop: shopWithImage),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('thumbnail_0')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(FullScreenImageViewer), findsOneWidget);
       });
     });
   });

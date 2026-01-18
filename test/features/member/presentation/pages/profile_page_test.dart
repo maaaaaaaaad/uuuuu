@@ -7,12 +7,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/auth/domain/entities/token_pair.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
+import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
+import 'package:jellomark/features/location/domain/repositories/location_setting_repository.dart';
+import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
+import 'package:jellomark/features/location/presentation/widgets/location_setting_toggle.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
 import 'package:jellomark/features/member/presentation/pages/profile_page.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/widgets/gradient_card.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockLocationSettingRepository extends Mock
+    implements LocationSettingRepository {}
+
+class MockLocationRepository extends Mock implements LocationRepository {}
 
 class MockAuthRepository implements AuthRepository {
   Member? memberResult;
@@ -56,9 +66,20 @@ class MockAuthRepository implements AuthRepository {
 void main() {
   group('ProfilePage', () {
     late MockAuthRepository mockAuthRepository;
+    late MockLocationSettingRepository mockLocationSettingRepository;
+    late MockLocationRepository mockLocationRepository;
 
     setUp(() {
       mockAuthRepository = MockAuthRepository();
+      mockLocationSettingRepository = MockLocationSettingRepository();
+      mockLocationRepository = MockLocationRepository();
+
+      when(
+        () => mockLocationSettingRepository.isLocationEnabled(),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockLocationRepository.checkPermissionStatus(),
+      ).thenAnswer((_) async => LocationPermissionResult.granted);
     });
 
     Widget createProfilePage() {
@@ -66,6 +87,12 @@ void main() {
         overrides: [
           getCurrentMemberUseCaseProvider.overrideWithValue(
             GetCurrentMember(repository: mockAuthRepository),
+          ),
+          locationSettingRepositoryProvider.overrideWithValue(
+            mockLocationSettingRepository,
+          ),
+          locationRepositoryForSettingProvider.overrideWithValue(
+            mockLocationRepository,
           ),
         ],
         child: MaterialApp(
@@ -281,6 +308,48 @@ void main() {
 
         expect(find.byType(BackdropFilter), findsWidgets);
       });
+    });
+
+    group('Location Setting Toggle', () {
+      testWidgets('should display location setting toggle', (tester) async {
+        mockAuthRepository.memberResult = const Member(
+          id: '1',
+          nickname: '테스트유저123',
+          displayName: '테스트유저',
+          socialProvider: 'KAKAO',
+          socialId: 'test-kakao-id',
+        );
+
+        await tester.pumpWidget(createProfilePage());
+        await tester.pumpAndSettle();
+
+        expect(find.byType(LocationSettingToggle), findsOneWidget);
+      });
+
+      testWidgets(
+        'location toggle should be between profile card and logout button',
+        (tester) async {
+          mockAuthRepository.memberResult = const Member(
+            id: '1',
+            nickname: '테스트유저123',
+            displayName: '테스트유저',
+            socialProvider: 'KAKAO',
+            socialId: 'test-kakao-id',
+          );
+
+          await tester.pumpWidget(createProfilePage());
+          await tester.pumpAndSettle();
+
+          final gradientCardY = tester.getCenter(find.byType(GradientCard)).dy;
+          final locationToggleY = tester
+              .getCenter(find.byType(LocationSettingToggle))
+              .dy;
+          final logoutButtonY = tester.getCenter(find.text('로그아웃')).dy;
+
+          expect(gradientCardY, lessThan(locationToggleY));
+          expect(locationToggleY, lessThan(logoutButtonY));
+        },
+      );
     });
   });
 }

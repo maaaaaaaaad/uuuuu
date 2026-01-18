@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/location/data/datasources/location_datasource.dart';
 import 'package:jellomark/features/location/data/repositories/location_repository_impl.dart';
+import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockLocationDataSource extends Mock implements LocationDataSource {}
@@ -30,8 +31,8 @@ void main() {
           () => mockDataSource.isLocationServiceEnabled(),
         ).thenAnswer((_) async => true);
         when(
-          () => mockDataSource.isPermissionGranted(),
-        ).thenAnswer((_) async => true);
+          () => mockDataSource.checkPermissionStatus(),
+        ).thenAnswer((_) async => LocationPermissionStatus.granted);
         when(
           () => mockDataSource.getCurrentPosition(),
         ).thenAnswer((_) async => mockPosition);
@@ -62,7 +63,7 @@ void main() {
         },
       );
 
-      test('should request permission when not granted', () async {
+      test('should request permission when denied (not forever)', () async {
         final mockPosition = MockPosition();
         when(() => mockPosition.latitude).thenReturn(37.5665);
         when(() => mockPosition.longitude).thenReturn(126.9780);
@@ -71,8 +72,8 @@ void main() {
           () => mockDataSource.isLocationServiceEnabled(),
         ).thenAnswer((_) async => true);
         when(
-          () => mockDataSource.isPermissionGranted(),
-        ).thenAnswer((_) async => false);
+          () => mockDataSource.checkPermissionStatus(),
+        ).thenAnswer((_) async => LocationPermissionStatus.denied);
         when(
           () => mockDataSource.requestPermission(),
         ).thenAnswer((_) async => true);
@@ -93,8 +94,8 @@ void main() {
             () => mockDataSource.isLocationServiceEnabled(),
           ).thenAnswer((_) async => true);
           when(
-            () => mockDataSource.isPermissionGranted(),
-          ).thenAnswer((_) async => false);
+            () => mockDataSource.checkPermissionStatus(),
+          ).thenAnswer((_) async => LocationPermissionStatus.denied);
           when(
             () => mockDataSource.requestPermission(),
           ).thenAnswer((_) async => false);
@@ -109,10 +110,34 @@ void main() {
           );
         },
       );
+
+      test(
+        'should return LocationPermissionDeniedForeverFailure when deniedForever',
+        () async {
+          when(
+            () => mockDataSource.isLocationServiceEnabled(),
+          ).thenAnswer((_) async => true);
+          when(
+            () => mockDataSource.checkPermissionStatus(),
+          ).thenAnswer((_) async => LocationPermissionStatus.deniedForever);
+
+          final result = await repository.getCurrentLocation();
+
+          expect(result, isA<Left>());
+          result.fold(
+            (failure) =>
+                expect(failure, isA<LocationPermissionDeniedForeverFailure>()),
+            (_) => fail('Should return failure'),
+          );
+        },
+      );
     });
 
     group('requestLocationPermission', () {
       test('should return true when permission granted', () async {
+        when(
+          () => mockDataSource.checkPermissionStatus(),
+        ).thenAnswer((_) async => LocationPermissionStatus.denied);
         when(
           () => mockDataSource.requestPermission(),
         ).thenAnswer((_) async => true);
@@ -124,12 +149,26 @@ void main() {
 
       test('should return false when permission denied', () async {
         when(
+          () => mockDataSource.checkPermissionStatus(),
+        ).thenAnswer((_) async => LocationPermissionStatus.denied);
+        when(
           () => mockDataSource.requestPermission(),
         ).thenAnswer((_) async => false);
 
         final result = await repository.requestLocationPermission();
 
         expect(result, const Right(false));
+      });
+
+      test('should return false when permission deniedForever', () async {
+        when(
+          () => mockDataSource.checkPermissionStatus(),
+        ).thenAnswer((_) async => LocationPermissionStatus.deniedForever);
+
+        final result = await repository.requestLocationPermission();
+
+        expect(result, const Right(false));
+        verifyNever(() => mockDataSource.requestPermission());
       });
     });
 
@@ -152,6 +191,52 @@ void main() {
         final result = await repository.isLocationPermissionGranted();
 
         expect(result, false);
+      });
+    });
+
+    group('checkPermissionStatus', () {
+      test('should return granted when permission is granted', () async {
+        when(
+          () => mockDataSource.checkPermissionStatus(),
+        ).thenAnswer((_) async => LocationPermissionStatus.granted);
+
+        final result = await repository.checkPermissionStatus();
+
+        expect(result, LocationPermissionResult.granted);
+      });
+
+      test('should return denied when permission is denied', () async {
+        when(
+          () => mockDataSource.checkPermissionStatus(),
+        ).thenAnswer((_) async => LocationPermissionStatus.denied);
+
+        final result = await repository.checkPermissionStatus();
+
+        expect(result, LocationPermissionResult.denied);
+      });
+
+      test('should return deniedForever when permission is deniedForever',
+          () async {
+        when(
+          () => mockDataSource.checkPermissionStatus(),
+        ).thenAnswer((_) async => LocationPermissionStatus.deniedForever);
+
+        final result = await repository.checkPermissionStatus();
+
+        expect(result, LocationPermissionResult.deniedForever);
+      });
+    });
+
+    group('openAppSettings', () {
+      test('should call openAppSettings on dataSource', () async {
+        when(
+          () => mockDataSource.openAppSettings(),
+        ).thenAnswer((_) async => true);
+
+        final result = await repository.openAppSettings();
+
+        expect(result, true);
+        verify(() => mockDataSource.openAppSettings()).called(1);
       });
     });
   });

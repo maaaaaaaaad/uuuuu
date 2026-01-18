@@ -9,6 +9,8 @@ import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops
 import 'package:jellomark/features/category/domain/entities/category.dart';
 import 'package:jellomark/features/category/domain/usecases/get_categories_usecase.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
+import 'package:jellomark/features/location/domain/entities/user_location.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGetFilteredShopsUseCase extends Mock
@@ -169,6 +171,9 @@ void main() {
             getCategoriesUseCaseProvider.overrideWithValue(
               mockGetCategoriesUseCase,
             ),
+            currentLocationProvider.overrideWith(
+              (ref) async => null,
+            ),
           ],
         );
 
@@ -202,6 +207,9 @@ void main() {
           ),
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
+          ),
+          currentLocationProvider.overrideWith(
+            (ref) async => null,
           ),
         ],
       );
@@ -237,6 +245,9 @@ void main() {
           ),
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
+          ),
+          currentLocationProvider.overrideWith(
+            (ref) async => null,
           ),
         ],
       );
@@ -278,6 +289,9 @@ void main() {
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
           ),
+          currentLocationProvider.overrideWith(
+            (ref) async => null,
+          ),
         ],
       );
 
@@ -308,6 +322,9 @@ void main() {
           ),
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
+          ),
+          currentLocationProvider.overrideWith(
+            (ref) async => null,
           ),
         ],
       );
@@ -353,6 +370,9 @@ void main() {
           ),
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
+          ),
+          currentLocationProvider.overrideWith(
+            (ref) async => null,
           ),
         ],
       );
@@ -414,6 +434,9 @@ void main() {
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
           ),
+          currentLocationProvider.overrideWith(
+            (ref) async => null,
+          ),
         ],
       );
 
@@ -451,6 +474,9 @@ void main() {
           ),
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
+          ),
+          currentLocationProvider.overrideWith(
+            (ref) async => null,
           ),
         ],
       );
@@ -506,6 +532,9 @@ void main() {
             ),
             getCategoriesUseCaseProvider.overrideWithValue(
               mockGetCategoriesUseCase,
+            ),
+            currentLocationProvider.overrideWith(
+              (ref) async => null,
             ),
           ],
         );
@@ -580,6 +609,9 @@ void main() {
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
           ),
+          currentLocationProvider.overrideWith(
+            (ref) async => null,
+          ),
         ],
       );
 
@@ -597,5 +629,149 @@ void main() {
       expect(state.newShopsPage, 0);
       expect(state.hasMoreNewShops, isTrue);
     });
+
+    test(
+      'loadData calculates distance and sorts nearbyShops by distance then rating',
+      () async {
+        const userLocation = UserLocation(latitude: 37.5172, longitude: 127.0473);
+
+        const nearbyShopsFromApi = [
+          BeautyShop(
+            id: '1',
+            name: 'Far High Rating',
+            address: 'Address',
+            latitude: 37.5547,
+            longitude: 126.9707,
+            rating: 4.9,
+          ),
+          BeautyShop(
+            id: '2',
+            name: 'Near Low Rating',
+            address: 'Address',
+            latitude: 37.5182,
+            longitude: 127.0483,
+            rating: 4.0,
+          ),
+          BeautyShop(
+            id: '3',
+            name: 'Near High Rating',
+            address: 'Address',
+            latitude: 37.5180,
+            longitude: 127.0480,
+            rating: 4.8,
+          ),
+        ];
+
+        when(
+          () => mockGetCategoriesUseCase(),
+        ).thenAnswer((_) async => const Right([]));
+
+        when(() => mockGetFilteredShopsUseCase(any())).thenAnswer((
+          invocation,
+        ) async {
+          final filter = invocation.positionalArguments[0] as BeautyShopFilter;
+          if (filter.sortBy == 'RATING' && filter.minRating == 4.0) {
+            return const Right(
+              PagedBeautyShops(
+                items: nearbyShopsFromApi,
+                hasNext: false,
+                totalElements: 3,
+              ),
+            );
+          }
+          return const Right(
+            PagedBeautyShops(items: [], hasNext: false, totalElements: 0),
+          );
+        });
+
+        final container = ProviderContainer(
+          overrides: [
+            getFilteredShopsUseCaseProvider.overrideWithValue(
+              mockGetFilteredShopsUseCase,
+            ),
+            getCategoriesUseCaseProvider.overrideWithValue(
+              mockGetCategoriesUseCase,
+            ),
+            currentLocationProvider.overrideWith(
+              (ref) async => userLocation,
+            ),
+          ],
+        );
+
+        final notifier = container.read(homeNotifierProvider.notifier);
+        await notifier.loadData();
+
+        final state = container.read(homeNotifierProvider);
+        expect(state.nearbyShops.length, 3);
+
+        expect(state.nearbyShops[0].name, 'Near High Rating');
+        expect(state.nearbyShops[1].name, 'Near Low Rating');
+        expect(state.nearbyShops[2].name, 'Far High Rating');
+
+        for (final shop in state.nearbyShops) {
+          expect(shop.distance, isNotNull);
+          expect(shop.distance, greaterThan(0));
+        }
+      },
+    );
+
+    test(
+      'loadData works without location when currentLocationProvider returns null',
+      () async {
+        const nearbyShopsFromApi = [
+          BeautyShop(
+            id: '1',
+            name: 'Shop A',
+            address: 'Address',
+            latitude: 37.5547,
+            longitude: 126.9707,
+            rating: 4.5,
+          ),
+        ];
+
+        when(
+          () => mockGetCategoriesUseCase(),
+        ).thenAnswer((_) async => const Right([]));
+
+        when(() => mockGetFilteredShopsUseCase(any())).thenAnswer((
+          invocation,
+        ) async {
+          final filter = invocation.positionalArguments[0] as BeautyShopFilter;
+          if (filter.sortBy == 'RATING' && filter.minRating == 4.0) {
+            return const Right(
+              PagedBeautyShops(
+                items: nearbyShopsFromApi,
+                hasNext: false,
+                totalElements: 1,
+              ),
+            );
+          }
+          return const Right(
+            PagedBeautyShops(items: [], hasNext: false, totalElements: 0),
+          );
+        });
+
+        final container = ProviderContainer(
+          overrides: [
+            getFilteredShopsUseCaseProvider.overrideWithValue(
+              mockGetFilteredShopsUseCase,
+            ),
+            getCategoriesUseCaseProvider.overrideWithValue(
+              mockGetCategoriesUseCase,
+            ),
+            currentLocationProvider.overrideWith(
+              (ref) async => null,
+            ),
+          ],
+        );
+
+        final notifier = container.read(homeNotifierProvider.notifier);
+        await notifier.loadData();
+
+        final state = container.read(homeNotifierProvider);
+        expect(state.nearbyShops.length, 1);
+        expect(state.nearbyShops[0].distance, isNull);
+      },
+    );
   });
 }

@@ -13,6 +13,7 @@ import 'package:jellomark/features/category/domain/usecases/get_categories_useca
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
 import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/mock_http_client.dart';
@@ -47,6 +48,7 @@ void main() {
         getCategoriesUseCaseProvider.overrideWithValue(
           mockGetCategoriesUseCase,
         ),
+        currentLocationProvider.overrideWith((ref) async => null),
       ],
       child: const MaterialApp(home: Scaffold(body: HomeTab())),
     );

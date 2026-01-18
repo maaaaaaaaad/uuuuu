@@ -20,6 +20,7 @@ import 'package:jellomark/shared/widgets/gradient_card.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/mock_http_client.dart';
@@ -88,6 +89,7 @@ void main() {
       overrides: [
         getFilteredShopsUseCaseProvider.overrideWithValue(filteredShopsUseCase),
         getCategoriesUseCaseProvider.overrideWithValue(categoriesUseCase),
+        currentLocationProvider.overrideWith((ref) async => null),
       ],
       child: const MaterialApp(home: Scaffold(body: HomeTab())),
     );
@@ -269,6 +271,7 @@ void main() {
                 .overrideWithValue(mockGetFilteredShopsUseCase),
             getCategoriesUseCaseProvider
                 .overrideWithValue(mockGetCategoriesUseCase),
+            currentLocationProvider.overrideWith((ref) async => null),
             shopTreatmentsProvider('1').overrideWith((ref) async => []),
             shopReviewsNotifierProvider('1').overrideWith(
               (ref) => _MockShopReviewsNotifier(),

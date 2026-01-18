@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/core/network/api_client.dart';
@@ -34,8 +35,11 @@ import 'package:jellomark/features/treatment/data/repositories/treatment_reposit
 import 'package:jellomark/features/treatment/domain/repositories/treatment_repository.dart';
 import 'package:jellomark/features/treatment/domain/usecases/get_shop_treatments_usecase.dart';
 import 'package:jellomark/features/location/data/datasources/location_datasource.dart';
+import 'package:jellomark/features/location/data/datasources/directions_remote_data_source.dart';
 import 'package:jellomark/features/location/data/repositories/location_repository_impl.dart';
+import 'package:jellomark/features/location/data/repositories/directions_repository_impl.dart';
 import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
+import 'package:jellomark/features/location/domain/repositories/directions_repository.dart';
 import 'package:jellomark/features/location/domain/usecases/get_current_location_usecase.dart';
 
 final sl = GetIt.instance;
@@ -180,6 +184,25 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<GetCurrentLocationUseCase>(
     () => GetCurrentLocationUseCase(sl<LocationRepository>()),
+  );
+
+  sl.registerLazySingleton<DirectionsRemoteDataSource>(
+    () {
+      final naverDio = Dio(BaseOptions(
+        baseUrl: EnvConfig.naverApiBaseUrl,
+        headers: {
+          'x-ncp-apigw-api-key-id': EnvConfig.naverClientId,
+          'x-ncp-apigw-api-key': EnvConfig.naverClientSecret,
+        },
+      ));
+      return DirectionsRemoteDataSourceImpl(dio: naverDio);
+    },
+  );
+
+  sl.registerLazySingleton<DirectionsRepository>(
+    () => DirectionsRepositoryImpl(
+      remoteDataSource: sl<DirectionsRemoteDataSource>(),
+    ),
   );
 
   _initialized = true;

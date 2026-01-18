@@ -89,7 +89,7 @@ void main() {
       expect(shop.formattedDistance, '1.5km');
     });
 
-    test('formattedDistance returns m for distances under 1km', () {
+    test('formattedDistance returns km for distances under 1km', () {
       const shop = BeautyShop(
         id: '1',
         name: '네일샵 A',
@@ -97,7 +97,72 @@ void main() {
         distance: 0.5,
       );
 
-      expect(shop.formattedDistance, '500m');
+      expect(shop.formattedDistance, '0.5km');
+    });
+
+    test('formattedDistance returns km with one decimal for small distance', () {
+      const shop = BeautyShop(
+        id: '1',
+        name: '네일샵 A',
+        address: '서울시 강남구',
+        distance: 0.35,
+      );
+
+      expect(shop.formattedDistance, '0.3km');
+    });
+
+    test('formattedDistance returns km with one decimal for whole number', () {
+      const shop = BeautyShop(
+        id: '1',
+        name: '네일샵 A',
+        address: '서울시 강남구',
+        distance: 2.0,
+      );
+
+      expect(shop.formattedDistance, '2.0km');
+    });
+
+    test('copyWith creates new instance with updated distance', () {
+      const shop = BeautyShop(
+        id: '1',
+        name: '네일샵 A',
+        address: '서울시 강남구',
+        rating: 4.5,
+      );
+
+      final updatedShop = shop.copyWith(distance: 1.5);
+
+      expect(updatedShop.id, '1');
+      expect(updatedShop.name, '네일샵 A');
+      expect(updatedShop.rating, 4.5);
+      expect(updatedShop.distance, 1.5);
+    });
+
+    test('copyWith preserves all fields when only distance is updated', () {
+      const shop = BeautyShop(
+        id: '1',
+        name: '네일샵 A',
+        address: '서울시 강남구',
+        latitude: 37.5172,
+        longitude: 127.0473,
+        rating: 4.5,
+        reviewCount: 100,
+        tags: ['네일'],
+        isNew: true,
+      );
+
+      final updatedShop = shop.copyWith(distance: 2.5);
+
+      expect(updatedShop.id, shop.id);
+      expect(updatedShop.name, shop.name);
+      expect(updatedShop.address, shop.address);
+      expect(updatedShop.latitude, shop.latitude);
+      expect(updatedShop.longitude, shop.longitude);
+      expect(updatedShop.rating, shop.rating);
+      expect(updatedShop.reviewCount, shop.reviewCount);
+      expect(updatedShop.tags, shop.tags);
+      expect(updatedShop.isNew, shop.isNew);
+      expect(updatedShop.distance, 2.5);
     });
 
     test('formattedRating returns rating with one decimal', () {

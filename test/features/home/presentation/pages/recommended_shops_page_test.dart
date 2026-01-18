@@ -10,6 +10,7 @@ import 'package:jellomark/features/beautishop/domain/entities/paged_beauty_shops
 import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops_usecase.dart';
 import 'package:jellomark/features/home/presentation/pages/recommended_shops_page.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/mock_http_client.dart';
@@ -37,6 +38,7 @@ void main() {
         getFilteredShopsUseCaseProvider.overrideWithValue(
           mockGetFilteredShopsUseCase,
         ),
+        currentLocationProvider.overrideWith((ref) async => null),
       ],
       child: const MaterialApp(home: RecommendedShopsPage()),
     );

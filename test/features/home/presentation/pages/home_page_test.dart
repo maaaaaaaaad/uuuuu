@@ -19,6 +19,10 @@ import 'package:jellomark/features/member/domain/usecases/get_current_member.dar
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/features/search/domain/usecases/manage_search_history_usecase.dart';
 import 'package:jellomark/features/search/presentation/providers/search_provider.dart';
+import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
+import 'package:jellomark/features/location/domain/repositories/location_setting_repository.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
+import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
 import 'package:jellomark/shared/widgets/glass_bottom_nav_bar.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -33,6 +37,11 @@ class MockManageSearchHistoryUseCase extends Mock
 class MockGetCategoriesUseCase extends Mock implements GetCategoriesUseCase {}
 
 class FakeBeautyShopFilter extends Fake implements BeautyShopFilter {}
+
+class MockLocationSettingRepository extends Mock
+    implements LocationSettingRepository {}
+
+class MockLocationRepository extends Mock implements LocationRepository {}
 
 class MockAuthRepository implements AuthRepository {
   @override
@@ -81,6 +90,8 @@ void main() {
     late MockGetFilteredShopsUseCase mockGetFilteredShopsUseCase;
     late MockGetCategoriesUseCase mockGetCategoriesUseCase;
     late MockManageSearchHistoryUseCase mockManageSearchHistoryUseCase;
+    late MockLocationSettingRepository mockLocationSettingRepository;
+    late MockLocationRepository mockLocationRepository;
 
     setUpAll(() {
       HttpOverrides.global = MockHttpOverrides();
@@ -92,6 +103,8 @@ void main() {
       mockGetFilteredShopsUseCase = MockGetFilteredShopsUseCase();
       mockGetCategoriesUseCase = MockGetCategoriesUseCase();
       mockManageSearchHistoryUseCase = MockManageSearchHistoryUseCase();
+      mockLocationSettingRepository = MockLocationSettingRepository();
+      mockLocationRepository = MockLocationRepository();
 
       when(
         () => mockGetCategoriesUseCase(),
@@ -104,9 +117,20 @@ void main() {
       when(
         () => mockManageSearchHistoryUseCase.getSearchHistory(),
       ).thenAnswer((_) async => const Right([]));
+      when(() => mockLocationSettingRepository.isLocationEnabled())
+          .thenAnswer((_) async => true);
+      when(() => mockLocationRepository.checkPermissionStatus())
+          .thenAnswer((_) async => LocationPermissionResult.granted);
     });
 
-    Widget createHomePage() {
+    Widget createHomePage({
+      LocationPermissionResult permissionStatus = LocationPermissionResult.granted,
+    }) {
+      when(() => mockLocationRepository.checkPermissionStatus())
+          .thenAnswer((_) async => permissionStatus);
+      when(() => mockLocationSettingRepository.isLocationEnabled())
+          .thenAnswer((_) async => permissionStatus == LocationPermissionResult.granted);
+
       return ProviderScope(
         overrides: [
           getCurrentMemberUseCaseProvider.overrideWithValue(
@@ -120,6 +144,13 @@ void main() {
           ),
           manageSearchHistoryUseCaseProvider.overrideWithValue(
             mockManageSearchHistoryUseCase,
+          ),
+          currentLocationProvider.overrideWith((ref) async => null),
+          locationSettingRepositoryProvider.overrideWithValue(
+            mockLocationSettingRepository,
+          ),
+          locationRepositoryForSettingProvider.overrideWithValue(
+            mockLocationRepository,
           ),
         ],
         child: const MaterialApp(home: HomePage()),
@@ -211,6 +242,83 @@ void main() {
         await tester.pump();
 
         expect(find.byType(FadeTransition), findsWidgets);
+      });
+    });
+
+    group('Location Permission Alert', () {
+      testWidgets('should show location permission alert when permission denied', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createHomePage(permissionStatus: LocationPermissionResult.denied),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('젤로마크는 위치 기반 서비스이므로 위치 정보 제공에 동의가 꼭 필요해요'),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('should not show alert when permission granted', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createHomePage(permissionStatus: LocationPermissionResult.granted),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('젤로마크는 위치 기반 서비스이므로 위치 정보 제공에 동의가 꼭 필요해요'),
+          findsNothing,
+        );
+      });
+
+      testWidgets('should close alert when cancel button tapped', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createHomePage(permissionStatus: LocationPermissionResult.denied),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('취소'), findsOneWidget);
+
+        await tester.tap(find.text('취소'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('젤로마크는 위치 기반 서비스이므로 위치 정보 제공에 동의가 꼭 필요해요'),
+          findsNothing,
+        );
+      });
+
+      testWidgets('should not show alert again after cancel in same session', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createHomePage(permissionStatus: LocationPermissionResult.denied),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('젤로마크는 위치 기반 서비스이므로 위치 정보 제공에 동의가 꼭 필요해요'),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.text('취소'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.search_outlined));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.home_outlined));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('젤로마크는 위치 기반 서비스이므로 위치 정보 제공에 동의가 꼭 필요해요'),
+          findsNothing,
+        );
       });
     });
   });
