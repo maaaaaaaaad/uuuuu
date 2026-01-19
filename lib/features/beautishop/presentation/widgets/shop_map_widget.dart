@@ -53,9 +53,6 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
         oldWidget.userLongitude != widget.userLongitude;
 
     if (routeChanged || userLocationChanged) {
-      debugPrint(
-        '[ShopMapWidget] Data changed - route: $routeChanged, userLocation: $userLocationChanged',
-      );
       _updateOverlays(fitCamera: routeChanged && _hasNewRouteData(oldWidget));
     }
   }
@@ -186,10 +183,6 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
 
     if (widget.routeCoordinates != null &&
         widget.routeCoordinates!.length >= 2) {
-      debugPrint(
-        '[ShopMapWidget] Drawing route with ${widget.routeCoordinates!.length} points',
-      );
-
       final pathCoords = widget.routeCoordinates!
           .map((c) => NLatLng(c.latitude, c.longitude))
           .toList();
@@ -202,8 +195,6 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
       );
       await controller.addOverlay(pathOverlay);
       _activeOverlayIds.add('route_path');
-
-      debugPrint('[ShopMapWidget] Route path overlay added');
     }
 
     if (fitCamera && boundsPoints.length >= 2) {
@@ -214,7 +205,6 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
       );
       await controller.updateCamera(cameraUpdate);
       _hasInitialCameraUpdate = true;
-      debugPrint('[ShopMapWidget] Camera fitted to bounds');
     } else if (!_hasInitialCameraUpdate && boundsPoints.length == 1) {
       _hasInitialCameraUpdate = true;
     }
