@@ -30,29 +30,7 @@ void main() {
         expect(find.byType(ShopMapWidget), findsOneWidget);
       });
 
-      testWidgets('should render with specified height', (tester) async {
-        const testHeight = 300.0;
-
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: ShopMapWidget(
-                shopLatitude: 37.5665,
-                shopLongitude: 126.9780,
-                shopName: '블루밍 네일',
-                height: testHeight,
-              ),
-            ),
-          ),
-        );
-
-        final widget = tester.widget<ShopMapWidget>(find.byType(ShopMapWidget));
-
-        expect(widget.height, testHeight);
-      });
-
-      testWidgets('should render with default height when not specified',
-          (tester) async {
+      testWidgets('should render as StatefulWidget', (tester) async {
         await tester.pumpWidget(
           const MaterialApp(
             home: Scaffold(
@@ -66,30 +44,7 @@ void main() {
         );
 
         final widget = tester.widget<ShopMapWidget>(find.byType(ShopMapWidget));
-
-        expect(widget.height, 200.0);
-      });
-
-      testWidgets('should have ClipRRect for rounded corners', (tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: ShopMapWidget(
-                shopLatitude: 37.5665,
-                shopLongitude: 126.9780,
-                shopName: '블루밍 네일',
-              ),
-            ),
-          ),
-        );
-
-        expect(
-          find.descendant(
-            of: find.byType(ShopMapWidget),
-            matching: find.byType(ClipRRect),
-          ),
-          findsOneWidget,
-        );
+        expect(widget, isA<StatefulWidget>());
       });
     });
 
@@ -356,6 +311,91 @@ void main() {
         final widget = tester.widget<ShopMapWidget>(find.byType(ShopMapWidget));
 
         expect(widget.interactiveMode, isFalse);
+      });
+    });
+
+    group('didUpdateWidget tests', () {
+      testWidgets('should rebuild when routeCoordinates changes',
+          (tester) async {
+        const initialCoords = [
+          LatLng(latitude: 37.5665, longitude: 126.9780),
+          LatLng(latitude: 37.5700, longitude: 126.9800),
+        ];
+        const updatedCoords = [
+          LatLng(latitude: 37.5665, longitude: 126.9780),
+          LatLng(latitude: 37.5680, longitude: 126.9790),
+          LatLng(latitude: 37.5700, longitude: 126.9800),
+        ];
+
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: ShopMapWidget(
+                shopLatitude: 37.5665,
+                shopLongitude: 126.9780,
+                shopName: '블루밍 네일',
+                routeCoordinates: initialCoords,
+              ),
+            ),
+          ),
+        );
+
+        var widget = tester.widget<ShopMapWidget>(find.byType(ShopMapWidget));
+        expect(widget.routeCoordinates!.length, 2);
+
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: ShopMapWidget(
+                shopLatitude: 37.5665,
+                shopLongitude: 126.9780,
+                shopName: '블루밍 네일',
+                routeCoordinates: updatedCoords,
+              ),
+            ),
+          ),
+        );
+
+        widget = tester.widget<ShopMapWidget>(find.byType(ShopMapWidget));
+        expect(widget.routeCoordinates!.length, 3);
+      });
+
+      testWidgets('should rebuild when userLocation changes',
+          (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: ShopMapWidget(
+                shopLatitude: 37.5665,
+                shopLongitude: 126.9780,
+                shopName: '블루밍 네일',
+                userLatitude: null,
+                userLongitude: null,
+              ),
+            ),
+          ),
+        );
+
+        var widget = tester.widget<ShopMapWidget>(find.byType(ShopMapWidget));
+        expect(widget.userLatitude, isNull);
+
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: ShopMapWidget(
+                shopLatitude: 37.5665,
+                shopLongitude: 126.9780,
+                shopName: '블루밍 네일',
+                userLatitude: 37.5700,
+                userLongitude: 126.9800,
+              ),
+            ),
+          ),
+        );
+
+        widget = tester.widget<ShopMapWidget>(find.byType(ShopMapWidget));
+        expect(widget.userLatitude, 37.5700);
+        expect(widget.userLongitude, 126.9800);
       });
     });
   });

@@ -7,18 +7,19 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/review_list_page.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/full_screen_image_viewer.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbnail_grid.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/operating_hours_card.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/service_menu_item.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_description.dart';
-import 'package:jellomark/features/beautishop/presentation/widgets/full_screen_image_viewer.dart';
-import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbnail_grid.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_map_widget.dart';
-import 'package:jellomark/features/location/domain/entities/route.dart' as domain;
+import 'package:jellomark/features/location/domain/entities/route.dart'
+    as domain;
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
-import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/glass_card.dart';
 
 class ShopDetailScreen extends ConsumerWidget {
@@ -102,7 +103,12 @@ class ShopDetailScreen extends ConsumerWidget {
         ),
         child: CustomScrollView(
           slivers: [
-            _buildSliverAppBar(context, shopDetail, userLocationAsync, routeAsync),
+            _buildSliverAppBar(
+              context,
+              shopDetail,
+              userLocationAsync,
+              routeAsync,
+            ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -132,7 +138,10 @@ class ShopDetailScreen extends ConsumerWidget {
                         name: shopDetail.name,
                         rating: shopDetail.rating,
                         reviewCount: shopDetail.reviewCount,
-                        distance: _getDisplayDistance(routeAsync, shopDetail.distance),
+                        distance: _getDisplayDistance(
+                          routeAsync,
+                          shopDetail.distance,
+                        ),
                         address: shopDetail.address,
                         onReviewTap: navigateToReviewList,
                       ),
@@ -141,7 +150,9 @@ class ShopDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       GlassCard(
                         padding: EdgeInsets.zero,
-                        child: ShopDescription(description: shopDetail.description),
+                        child: ShopDescription(
+                          description: shopDetail.description,
+                        ),
                       ),
                     ],
                     if (shopDetail.operatingHoursMap != null &&
@@ -222,14 +233,19 @@ class ShopDetailScreen extends ConsumerWidget {
     final mapHeight = MediaQuery.of(context).size.height * 0.4;
 
     if (shop.latitude == null || shop.longitude == null) {
-      debugPrint('[ShopDetailScreen] Shop coordinates missing: lat=${shop.latitude}, lng=${shop.longitude}');
-      return Container(
-        color: SemanticColors.background.cardAccent,
-        child: Center(
-          child: Icon(
-            Icons.map_outlined,
-            size: 48,
-            color: SemanticColors.icon.disabled,
+      debugPrint(
+        '[ShopDetailScreen] Shop coordinates missing: lat=${shop.latitude}, lng=${shop.longitude}',
+      );
+      return SizedBox(
+        height: mapHeight,
+        child: Container(
+          color: SemanticColors.background.cardAccent,
+          child: Center(
+            child: Icon(
+              Icons.map_outlined,
+              size: 48,
+              color: SemanticColors.icon.disabled,
+            ),
           ),
         ),
       );
@@ -239,20 +255,28 @@ class ShopDetailScreen extends ConsumerWidget {
     final route = routeAsync?.valueOrNull;
 
     debugPrint('[ShopDetailScreen] Building map widget');
-    debugPrint('[ShopDetailScreen] Shop: lat=${shop.latitude}, lng=${shop.longitude}');
+    debugPrint(
+      '[ShopDetailScreen] Shop: lat=${shop.latitude}, lng=${shop.longitude}',
+    );
     debugPrint('[ShopDetailScreen] User location: $userLocation');
-    debugPrint('[ShopDetailScreen] Route async state: ${routeAsync?.toString()}');
+    debugPrint(
+      '[ShopDetailScreen] Route async state: ${routeAsync?.toString()}',
+    );
     debugPrint('[ShopDetailScreen] Route: $route');
-    debugPrint('[ShopDetailScreen] Route coordinates count: ${route?.coordinates.length ?? 0}');
+    debugPrint(
+      '[ShopDetailScreen] Route coordinates count: ${route?.coordinates.length ?? 0}',
+    );
 
-    return ShopMapWidget(
-      shopLatitude: shop.latitude!,
-      shopLongitude: shop.longitude!,
-      shopName: shop.name,
-      userLatitude: userLocation?.latitude,
-      userLongitude: userLocation?.longitude,
-      routeCoordinates: route?.coordinates,
+    return SizedBox(
       height: mapHeight,
+      child: ShopMapWidget(
+        shopLatitude: shop.latitude!,
+        shopLongitude: shop.longitude!,
+        shopName: shop.name,
+        userLatitude: userLocation?.latitude,
+        userLongitude: userLocation?.longitude,
+        routeCoordinates: route?.coordinates,
+      ),
     );
   }
 
@@ -271,7 +295,9 @@ class ShopDetailScreen extends ConsumerWidget {
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: CircularProgressIndicator(color: SemanticColors.indicator.loading),
+              child: CircularProgressIndicator(
+                color: SemanticColors.indicator.loading,
+              ),
             ),
           ),
         ],

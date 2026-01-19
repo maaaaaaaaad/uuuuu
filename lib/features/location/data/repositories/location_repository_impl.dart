@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter/foundation.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/location/data/datasources/location_datasource.dart';
 import 'package:jellomark/features/location/domain/entities/user_location.dart';
@@ -31,10 +30,12 @@ class LocationRepositoryImpl implements LocationRepository {
       }
 
       final position = await dataSource.getCurrentPosition();
-      return Right(UserLocation(
-        latitude: position.latitude,
-        longitude: position.longitude,
-      ));
+      return Right(
+        UserLocation(
+          latitude: position.latitude,
+          longitude: position.longitude,
+        ),
+      );
     } catch (e) {
       return Left(LocationFailure('위치를 가져오는데 실패했습니다: ${e.toString()}'));
     }
@@ -43,14 +44,14 @@ class LocationRepositoryImpl implements LocationRepository {
   @override
   Future<Either<Failure, bool>> requestLocationPermission() async {
     try {
-      debugPrint('[LocationRepositoryImpl] requestLocationPermission called');
-      // deniedForever 상태라도 requestPermission을 호출해야 iOS 시스템 다이얼로그가 표시될 수 있음
-      debugPrint('[LocationRepositoryImpl] calling dataSource.requestPermission()');
+      final status = await dataSource.checkPermissionStatus();
+      if (status == LocationPermissionStatus.deniedForever) {
+        return const Right(false);
+      }
+
       final granted = await dataSource.requestPermission();
-      debugPrint('[LocationRepositoryImpl] granted: $granted');
       return Right(granted);
     } catch (e) {
-      debugPrint('[LocationRepositoryImpl] Exception: $e');
       return Left(LocationFailure('권한 요청에 실패했습니다: ${e.toString()}'));
     }
   }

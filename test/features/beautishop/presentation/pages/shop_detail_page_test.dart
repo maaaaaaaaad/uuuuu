@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
@@ -8,15 +9,27 @@ import 'package:jellomark/features/beautishop/presentation/widgets/operating_hou
 import 'package:jellomark/features/beautishop/presentation/widgets/review_card.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/service_menu_item.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_description.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/shop_map_widget.dart';
+import 'package:jellomark/features/location/domain/entities/user_location.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 
 void main() {
+  setUp(() {
+    ShopMapWidget.useTestMode = true;
+  });
+
+  tearDown(() {
+    ShopMapWidget.useTestMode = false;
+  });
+
   group('ShopDetailPage', () {
-    late ShopDetail testShopDetail;
+    late ShopDetail testShopDetailWithCoordinates;
+    late ShopDetail testShopDetailWithoutCoordinates;
     late List<ServiceMenu> testServices;
     late List<ShopReview> testReviews;
 
     setUp(() {
-      testShopDetail = const ShopDetail(
+      testShopDetailWithCoordinates = const ShopDetail(
         id: 'shop-1',
         name: '블루밍 네일',
         address: '서울시 강남구 역삼동 123-45',
@@ -39,6 +52,35 @@ void main() {
         reviewCount: 234,
         distance: 0.3,
         tags: ['네일', '젤네일'],
+        latitude: 37.5665,
+        longitude: 126.9780,
+      );
+
+      testShopDetailWithoutCoordinates = const ShopDetail(
+        id: 'shop-2',
+        name: '블루밍 네일',
+        address: '서울시 강남구 역삼동 123-45',
+        description: '10년 경력의 네일 아티스트가 운영하는 프리미엄 네일샵입니다.',
+        phoneNumber: '02-1234-5678',
+        images: [
+          'https://example.com/image1.jpg',
+          'https://example.com/image2.jpg',
+        ],
+        operatingHoursMap: {
+          '월': '10:00 - 20:00',
+          '화': '10:00 - 20:00',
+          '수': '10:00 - 20:00',
+          '목': '10:00 - 20:00',
+          '금': '10:00 - 21:00',
+          '토': '10:00 - 18:00',
+          '일': '휴무',
+        },
+        rating: 4.8,
+        reviewCount: 234,
+        distance: 0.3,
+        tags: ['네일', '젤네일'],
+        latitude: null,
+        longitude: null,
       );
 
       testServices = const [
@@ -82,152 +124,297 @@ void main() {
       ShopDetail? shopDetail,
       List<ServiceMenu>? services,
       List<ShopReview>? reviews,
+      List<Override>? overrides,
     }) {
-      return MaterialApp(
-        home: ShopDetailPage(
-          shopDetail: shopDetail ?? testShopDetail,
-          services: services ?? testServices,
-          reviews: reviews ?? testReviews,
+      return ProviderScope(
+        overrides:
+            overrides ??
+            [currentLocationProvider.overrideWith((ref) async => null)],
+        child: MaterialApp(
+          home: ShopDetailPage(
+            shopDetail: shopDetail ?? testShopDetailWithoutCoordinates,
+            services: services ?? testServices,
+            reviews: reviews ?? testReviews,
+          ),
         ),
       );
     }
 
-    testWidgets('should render shop detail page', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
+    group('basic rendering', () {
+      testWidgets('should render shop detail page', (tester) async {
+        await tester.pumpWidget(createShopDetailPage());
 
-      expect(find.byType(ShopDetailPage), findsOneWidget);
+        expect(find.byType(ShopDetailPage), findsOneWidget);
+      });
+
+      testWidgets('should render as ConsumerStatefulWidget', (tester) async {
+        await tester.pumpWidget(createShopDetailPage());
+
+        final widget = tester.widget<ShopDetailPage>(
+          find.byType(ShopDetailPage),
+        );
+        expect(widget, isA<ConsumerStatefulWidget>());
+      });
     });
 
-    testWidgets('should use CustomScrollView with slivers', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
+    group('fallback layout (no coordinates)', () {
+      testWidgets('should use CustomScrollView when no coordinates', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createShopDetailPage(shopDetail: testShopDetailWithoutCoordinates),
+        );
 
-      expect(find.byType(CustomScrollView), findsOneWidget);
+        expect(find.byType(CustomScrollView), findsOneWidget);
+      });
+
+      testWidgets('should display SliverAppBar with back button', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createShopDetailPage(shopDetail: testShopDetailWithoutCoordinates),
+        );
+
+        expect(find.byType(SliverAppBar), findsOneWidget);
+        expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+      });
+
+      testWidgets('should display shop name in app bar when collapsed', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createShopDetailPage(shopDetail: testShopDetailWithoutCoordinates),
+        );
+
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
+        await tester.pumpAndSettle();
+
+        expect(find.text('블루밍 네일'), findsAtLeastNWidgets(1));
+      });
     });
 
-    testWidgets('should display SliverAppBar with back button', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
+    group('backdrop map layout (with coordinates)', () {
+      testWidgets('should use Stack layout when coordinates present', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createShopDetailPage(shopDetail: testShopDetailWithCoordinates),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.byType(SliverAppBar), findsOneWidget);
-      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+        expect(find.byType(Stack), findsAtLeastNWidgets(1));
+      });
+
+      testWidgets('should display ShopMapWidget in background', (tester) async {
+        await tester.pumpWidget(
+          createShopDetailPage(shopDetail: testShopDetailWithCoordinates),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ShopMapWidget), findsOneWidget);
+      });
+
+      testWidgets('should display DraggableScrollableSheet as foreground', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createShopDetailPage(shopDetail: testShopDetailWithCoordinates),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(DraggableScrollableSheet), findsOneWidget);
+      });
+
+      testWidgets('should display back button overlay', (tester) async {
+        await tester.pumpWidget(
+          createShopDetailPage(shopDetail: testShopDetailWithCoordinates),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+      });
     });
 
-    testWidgets('should display shop name in app bar when collapsed', (
-      tester,
-    ) async {
-      await tester.pumpWidget(createShopDetailPage());
+    group('content display', () {
+      testWidgets('should display shop info header', (tester) async {
+        await tester.pumpWidget(createShopDetailPage());
 
-      await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
-      await tester.pumpAndSettle();
+        expect(find.text('블루밍 네일'), findsOneWidget);
+        expect(find.text('4.8'), findsOneWidget);
+      });
 
-      expect(find.text('블루밍 네일'), findsAtLeastNWidgets(1));
+      testWidgets('should display shop description section', (tester) async {
+        await tester.pumpWidget(createShopDetailPage());
+
+        expect(find.byType(ShopDescription), findsOneWidget);
+      });
+
+      testWidgets('should display operating hours card', (tester) async {
+        await tester.pumpWidget(createShopDetailPage());
+
+        expect(find.byType(OperatingHoursCard), findsOneWidget);
+      });
+
+      testWidgets('should display service menu section with title', (
+        tester,
+      ) async {
+        await tester.pumpWidget(createShopDetailPage());
+
+        expect(find.text('시술 메뉴'), findsOneWidget);
+      });
+
+      testWidgets('should display service menu items', (tester) async {
+        await tester.pumpWidget(createShopDetailPage());
+
+        expect(find.byType(ServiceMenuItem), findsNWidgets(2));
+        expect(find.text('50,000원'), findsOneWidget);
+        expect(find.text('70,000원'), findsOneWidget);
+      });
+
+      testWidgets('should display bottom reservation button', (tester) async {
+        await tester.pumpWidget(createShopDetailPage());
+
+        expect(find.text('예약하기'), findsOneWidget);
+      });
     });
 
-    testWidgets('should display shop info header', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
+    group('review section', () {
+      testWidgets(
+        'should display review section with title (fallback layout)',
+        (tester) async {
+          await tester.pumpWidget(
+            createShopDetailPage(shopDetail: testShopDetailWithoutCoordinates),
+          );
 
-      expect(find.text('블루밍 네일'), findsOneWidget);
-      expect(find.text('4.8'), findsOneWidget);
+          await tester.drag(
+            find.byType(CustomScrollView),
+            const Offset(0, -500),
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.text('리뷰'), findsOneWidget);
+        },
+      );
+
+      testWidgets('should display review cards (fallback layout)', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createShopDetailPage(shopDetail: testShopDetailWithoutCoordinates),
+        );
+
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ReviewCard), findsNWidgets(2));
+      });
     });
 
-    testWidgets('should display shop description section', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
-
-      expect(find.byType(ShopDescription), findsOneWidget);
-    });
-
-    testWidgets('should display operating hours card', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
-
-      expect(find.byType(OperatingHoursCard), findsOneWidget);
-    });
-
-    testWidgets('should display service menu section with title', (
-      tester,
-    ) async {
-      await tester.pumpWidget(createShopDetailPage());
-
-      expect(find.text('시술 메뉴'), findsOneWidget);
-    });
-
-    testWidgets('should display service menu items', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
-
-      expect(find.byType(ServiceMenuItem), findsNWidgets(2));
-      expect(find.text('50,000원'), findsOneWidget);
-      expect(find.text('70,000원'), findsOneWidget);
-    });
-
-    testWidgets('should display review section with title', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
-
-      await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
-      await tester.pumpAndSettle();
-
-      expect(find.text('리뷰'), findsOneWidget);
-    });
-
-    testWidgets('should display review cards', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
-
-      await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(ReviewCard), findsNWidgets(2));
-    });
-
-    testWidgets('should display bottom reservation button', (tester) async {
-      await tester.pumpWidget(createShopDetailPage());
-
-      expect(find.text('예약하기'), findsOneWidget);
-    });
-
-    testWidgets('should navigate back when back button is tapped', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
-            builder: (context) => Scaffold(
-              body: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ShopDetailPage(
-                        shopDetail: testShopDetail,
-                        services: testServices,
-                        reviews: testReviews,
-                      ),
-                    ),
-                  );
-                },
-                child: const Text('Go to detail'),
+    group('navigation', () {
+      testWidgets('should navigate back when back button is tapped', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              currentLocationProvider.overrideWith((ref) async => null),
+            ],
+            child: MaterialApp(
+              home: Builder(
+                builder: (context) => Scaffold(
+                  body: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ShopDetailPage(
+                            shopDetail: testShopDetailWithoutCoordinates,
+                            services: testServices,
+                            reviews: testReviews,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Go to detail'),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.text('Go to detail'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Go to detail'));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(ShopDetailPage), findsOneWidget);
+        expect(find.byType(ShopDetailPage), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.arrow_back));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(ShopDetailPage), findsNothing);
+        expect(find.byType(ShopDetailPage), findsNothing);
+      });
     });
 
-    testWidgets('should display image gallery in expanded app bar', (
-      tester,
-    ) async {
-      await tester.pumpWidget(createShopDetailPage());
+    group('location provider integration', () {
+      testWidgets('should pass user location to ShopMapWidget when available', (
+        tester,
+      ) async {
+        const mockLocation = UserLocation(
+          latitude: 37.5700,
+          longitude: 126.9800,
+        );
 
-      final sliverAppBar = tester.widget<SliverAppBar>(
-        find.byType(SliverAppBar),
-      );
-      expect(sliverAppBar.expandedHeight, greaterThan(200));
+        await tester.pumpWidget(
+          createShopDetailPage(
+            shopDetail: testShopDetailWithCoordinates,
+            overrides: [
+              currentLocationProvider.overrideWith((ref) async => mockLocation),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final mapWidget = tester.widget<ShopMapWidget>(
+          find.byType(ShopMapWidget),
+        );
+        expect(mapWidget.userLatitude, mockLocation.latitude);
+        expect(mapWidget.userLongitude, mockLocation.longitude);
+      });
+
+      testWidgets('should handle null user location gracefully', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createShopDetailPage(
+            shopDetail: testShopDetailWithCoordinates,
+            overrides: [
+              currentLocationProvider.overrideWith((ref) async => null),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final mapWidget = tester.widget<ShopMapWidget>(
+          find.byType(ShopMapWidget),
+        );
+        expect(mapWidget.userLatitude, isNull);
+        expect(mapWidget.userLongitude, isNull);
+      });
+    });
+
+    group('image gallery', () {
+      testWidgets('should display image gallery in expanded app bar', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createShopDetailPage(shopDetail: testShopDetailWithoutCoordinates),
+        );
+
+        final sliverAppBar = tester.widget<SliverAppBar>(
+          find.byType(SliverAppBar),
+        );
+        expect(sliverAppBar.expandedHeight, greaterThan(200));
+      });
     });
   });
 }
