@@ -25,6 +25,13 @@ import 'package:jellomark/shared/widgets/glass_card.dart';
 class ShopDetailScreen extends ConsumerWidget {
   final BeautyShop shop;
 
+  static const double _sheetInitialSize = 0.55;
+  static const double _sheetMinSize = 0.25;
+  static const double _sheetMaxSize = 0.95;
+  static const double _sheetBorderRadius = 24.0;
+  static const double _contentPadding = 16.0;
+  static const double _bottomButtonHeight = 56.0;
+
   const ShopDetailScreen({super.key, required this.shop});
 
   ShopDetail _buildShopDetail() {
@@ -87,157 +94,24 @@ class ShopDetailScreen extends ConsumerWidget {
       );
     }
 
-    void navigateToReviewList() {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) =>
-              ReviewListPage(shopId: shop.id, shopName: shop.name),
-        ),
-      );
-    }
-
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppGradients.softWhiteGradient,
-        ),
-        child: CustomScrollView(
-          slivers: [
-            _buildSliverAppBar(
-              context,
-              shopDetail,
-              userLocationAsync,
-              routeAsync,
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (shopDetail.images.isNotEmpty) ...[
-                      ImageThumbnailGrid(
-                        imageUrls: shopDetail.images,
-                        imageSize: 60,
-                        onImageTap: (index) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => FullScreenImageViewer(
-                                images: shopDetail.images,
-                                initialIndex: index,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    GlassCard(
-                      padding: EdgeInsets.zero,
-                      child: ShopInfoHeader(
-                        name: shopDetail.name,
-                        rating: shopDetail.rating,
-                        reviewCount: shopDetail.reviewCount,
-                        distance: _getDisplayDistance(
-                          routeAsync,
-                          shopDetail.distance,
-                        ),
-                        address: shopDetail.address,
-                        onReviewTap: navigateToReviewList,
-                      ),
-                    ),
-                    if (shopDetail.description.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      GlassCard(
-                        padding: EdgeInsets.zero,
-                        child: ShopDescription(
-                          description: shopDetail.description,
-                        ),
-                      ),
-                    ],
-                    if (shopDetail.operatingHoursMap != null &&
-                        shopDetail.operatingHoursMap!.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      GlassCard(
-                        padding: EdgeInsets.zero,
-                        child: OperatingHoursCard(
-                          operatingHours: shopDetail.operatingHoursMap!,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-                    _buildServiceMenuSection(treatmentsAsync),
-                    const SizedBox(height: 80),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomSheet: _buildBottomReservationButton(context),
-    );
-  }
-
-  SliverAppBar _buildSliverAppBar(
-    BuildContext context,
-    ShopDetail shopDetail,
-    AsyncValue<dynamic> userLocationAsync,
-    AsyncValue<domain.Route?>? routeAsync,
-  ) {
-    final mapHeight = MediaQuery.of(context).size.height * 0.4;
-    return SliverAppBar(
-      expandedHeight: mapHeight,
-      pinned: true,
-      backgroundColor: SemanticColors.special.transparent,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              decoration: BoxDecoration(
-                color: SemanticColors.background.appBar,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: SemanticColors.border.glass),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.of(context).pop(),
-                padding: EdgeInsets.zero,
-              ),
-            ),
-          ),
-        ),
-      ),
-      flexibleSpace: LayoutBuilder(
-        builder: (context, constraints) {
-          final isCollapsed =
-              constraints.maxHeight <=
-              kToolbarHeight + MediaQuery.of(context).padding.top;
-          return FlexibleSpaceBar(
-            title: isCollapsed ? Text(shopDetail.name) : null,
-            background: _buildMapWidget(context, userLocationAsync, routeAsync),
-          );
-        },
+      body: Stack(
+        children: [
+          _buildMapLayer(userLocationAsync, routeAsync),
+          _buildBackButton(context),
+          _buildShopInfoSheet(context, shopDetail, treatmentsAsync, routeAsync),
+          _buildBottomReservationButton(context),
+        ],
       ),
     );
   }
 
-  Widget _buildMapWidget(
-    BuildContext context,
+  Widget _buildMapLayer(
     AsyncValue<dynamic> userLocationAsync,
     AsyncValue<domain.Route?>? routeAsync,
   ) {
-    final mapHeight = MediaQuery.of(context).size.height * 0.4;
-
     if (shop.latitude == null || shop.longitude == null) {
-      debugPrint(
-        '[ShopDetailScreen] Shop coordinates missing: lat=${shop.latitude}, lng=${shop.longitude}',
-      );
-      return SizedBox(
-        height: mapHeight,
+      return Positioned.fill(
         child: Container(
           color: SemanticColors.background.cardAccent,
           child: Center(
@@ -254,21 +128,7 @@ class ShopDetailScreen extends ConsumerWidget {
     final userLocation = userLocationAsync.valueOrNull;
     final route = routeAsync?.valueOrNull;
 
-    debugPrint('[ShopDetailScreen] Building map widget');
-    debugPrint(
-      '[ShopDetailScreen] Shop: lat=${shop.latitude}, lng=${shop.longitude}',
-    );
-    debugPrint('[ShopDetailScreen] User location: $userLocation');
-    debugPrint(
-      '[ShopDetailScreen] Route async state: ${routeAsync?.toString()}',
-    );
-    debugPrint('[ShopDetailScreen] Route: $route');
-    debugPrint(
-      '[ShopDetailScreen] Route coordinates count: ${route?.coordinates.length ?? 0}',
-    );
-
-    return SizedBox(
-      height: mapHeight,
+    return Positioned.fill(
       child: ShopMapWidget(
         shopLatitude: shop.latitude!,
         shopLongitude: shop.longitude!,
@@ -276,6 +136,164 @@ class ShopDetailScreen extends ConsumerWidget {
         userLatitude: userLocation?.latitude,
         userLongitude: userLocation?.longitude,
         routeCoordinates: route?.coordinates,
+      ),
+    );
+  }
+
+  Widget _buildBackButton(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    return Positioned(
+      top: topPadding + 8,
+      left: 16,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: SemanticColors.background.appBar,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: SemanticColors.border.glass),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, size: 20),
+              onPressed: () => Navigator.of(context).pop(),
+              padding: EdgeInsets.zero,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShopInfoSheet(
+    BuildContext context,
+    ShopDetail shopDetail,
+    AsyncValue<List<ServiceMenu>> treatmentsAsync,
+    AsyncValue<domain.Route?>? routeAsync,
+  ) {
+    return DraggableScrollableSheet(
+      initialChildSize: _sheetInitialSize,
+      minChildSize: _sheetMinSize,
+      maxChildSize: _sheetMaxSize,
+      snap: true,
+      snapSizes: const [_sheetMinSize, _sheetInitialSize, _sheetMaxSize],
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: SemanticColors.background.card,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(_sheetBorderRadius),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: SemanticColors.overlay.shadowMedium,
+                blurRadius: 16,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: _buildSheetContent(
+            context,
+            scrollController,
+            shopDetail,
+            treatmentsAsync,
+            routeAsync,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSheetContent(
+    BuildContext context,
+    ScrollController scrollController,
+    ShopDetail shopDetail,
+    AsyncValue<List<ServiceMenu>> treatmentsAsync,
+    AsyncValue<domain.Route?>? routeAsync,
+  ) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    return ListView(
+      controller: scrollController,
+      padding: EdgeInsets.zero,
+      children: [
+        _buildDragHandle(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: _contentPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (shopDetail.images.isNotEmpty) ...[
+                ImageThumbnailGrid(
+                  imageUrls: shopDetail.images,
+                  imageSize: 60,
+                  onImageTap: (index) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => FullScreenImageViewer(
+                          images: shopDetail.images,
+                          initialIndex: index,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
+              GlassCard(
+                padding: EdgeInsets.zero,
+                child: ShopInfoHeader(
+                  name: shopDetail.name,
+                  rating: shopDetail.rating,
+                  reviewCount: shopDetail.reviewCount,
+                  distance: _getDisplayDistance(
+                    routeAsync,
+                    shopDetail.distance,
+                  ),
+                  address: shopDetail.address,
+                  onReviewTap: () => _navigateToReviewList(context),
+                ),
+              ),
+              if (shopDetail.description.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                GlassCard(
+                  padding: EdgeInsets.zero,
+                  child: ShopDescription(description: shopDetail.description),
+                ),
+              ],
+              if (shopDetail.operatingHoursMap != null &&
+                  shopDetail.operatingHoursMap!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                GlassCard(
+                  padding: EdgeInsets.zero,
+                  child: OperatingHoursCard(
+                    operatingHours: shopDetail.operatingHoursMap!,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              _buildServiceMenuSection(treatmentsAsync),
+              SizedBox(height: _bottomButtonHeight + bottomPadding + 24),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDragHandle() {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 12),
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: SemanticColors.border.divider,
+          borderRadius: BorderRadius.circular(2),
+        ),
       ),
     );
   }
@@ -359,34 +377,48 @@ class ShopDetailScreen extends ConsumerWidget {
     return null;
   }
 
-  Widget _buildBottomReservationButton(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppGradients.mintGradient,
-        boxShadow: [
-          BoxShadow(
-            color: SemanticColors.overlay.shadowMedium,
-            blurRadius: 12,
-            offset: const Offset(0, -4),
-          ),
-        ],
+  void _navigateToReviewList(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) =>
+            ReviewListPage(shopId: shop.id, shopName: shop.name),
       ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              foregroundColor: SemanticColors.button.secondaryText,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero,
-              ),
+    );
+  }
+
+  Widget _buildBottomReservationButton(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: AppGradients.mintGradient,
+          boxShadow: [
+            BoxShadow(
+              color: SemanticColors.overlay.shadowMedium,
+              blurRadius: 12,
+              offset: const Offset(0, -4),
             ),
-            child: const Text(
-              '예약하기',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: SizedBox(
+            width: double.infinity,
+            height: _bottomButtonHeight,
+            child: TextButton(
+              onPressed: () {},
+              style: TextButton.styleFrom(
+                foregroundColor: SemanticColors.button.secondaryText,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+              ),
+              child: const Text(
+                '예약하기',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ),
