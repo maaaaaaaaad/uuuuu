@@ -77,7 +77,7 @@ class ShopDetailScreen extends ConsumerWidget {
     final treatmentsAsync = ref.watch(shopTreatmentsProvider(shop.id));
     final userLocationAsync = ref.watch(currentLocationProvider);
     final screenHeight = MediaQuery.of(context).size.height;
-    final mapBottomPadding = screenHeight * _sheetMinSize;
+    final mapBottomPadding = (screenHeight * _sheetMinSize) + 120.0;
 
     final userLocation = userLocationAsync.valueOrNull;
     AsyncValue<domain.Route?>? routeAsync;
