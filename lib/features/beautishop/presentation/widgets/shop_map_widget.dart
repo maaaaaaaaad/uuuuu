@@ -54,6 +54,11 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
         oldWidget.userLatitude != widget.userLatitude ||
         oldWidget.userLongitude != widget.userLongitude;
 
+    if (routeChanged) {
+      final coordCount = widget.routeCoordinates?.length ?? 0;
+      debugPrint('[ShopMapWidget] Route updated: $coordCount coordinates');
+    }
+
     if (routeChanged || userLocationChanged) {
       _updateOverlays(fitCamera: routeChanged && _hasNewRouteData(oldWidget));
     }
@@ -194,7 +199,9 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
         id: 'route_path',
         coords: pathCoords,
         color: Colors.blue,
-        width: 5,
+        width: 6,
+        outlineColor: Colors.white,
+        outlineWidth: 2,
       );
       await controller.addOverlay(pathOverlay);
       _activeOverlayIds.add('route_path');
