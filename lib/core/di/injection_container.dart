@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/core/network/api_client.dart';
@@ -18,6 +17,13 @@ import 'package:jellomark/features/category/data/datasources/category_remote_dat
 import 'package:jellomark/features/category/data/repositories/category_repository_impl.dart';
 import 'package:jellomark/features/category/domain/repositories/category_repository.dart';
 import 'package:jellomark/features/category/domain/usecases/get_categories_usecase.dart';
+import 'package:jellomark/features/location/data/datasources/directions_remote_data_source.dart';
+import 'package:jellomark/features/location/data/datasources/location_datasource.dart';
+import 'package:jellomark/features/location/data/repositories/directions_repository_impl.dart';
+import 'package:jellomark/features/location/data/repositories/location_repository_impl.dart';
+import 'package:jellomark/features/location/domain/repositories/directions_repository.dart';
+import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
+import 'package:jellomark/features/location/domain/usecases/get_current_location_usecase.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
 import 'package:jellomark/features/review/data/datasources/review_remote_datasource.dart';
 import 'package:jellomark/features/review/data/repositories/review_repository_impl.dart';
@@ -34,13 +40,6 @@ import 'package:jellomark/features/treatment/data/datasources/treatment_remote_d
 import 'package:jellomark/features/treatment/data/repositories/treatment_repository_impl.dart';
 import 'package:jellomark/features/treatment/domain/repositories/treatment_repository.dart';
 import 'package:jellomark/features/treatment/domain/usecases/get_shop_treatments_usecase.dart';
-import 'package:jellomark/features/location/data/datasources/location_datasource.dart';
-import 'package:jellomark/features/location/data/datasources/directions_remote_data_source.dart';
-import 'package:jellomark/features/location/data/repositories/location_repository_impl.dart';
-import 'package:jellomark/features/location/data/repositories/directions_repository_impl.dart';
-import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
-import 'package:jellomark/features/location/domain/repositories/directions_repository.dart';
-import 'package:jellomark/features/location/domain/usecases/get_current_location_usecase.dart';
 
 final sl = GetIt.instance;
 
@@ -174,9 +173,7 @@ Future<void> initDependencies() async {
     () => ManageSearchHistoryUseCase(repository: sl<SearchRepository>()),
   );
 
-  sl.registerLazySingleton<LocationDataSource>(
-    () => LocationDataSourceImpl(),
-  );
+  sl.registerLazySingleton<LocationDataSource>(() => LocationDataSourceImpl());
 
   sl.registerLazySingleton<LocationRepository>(
     () => LocationRepositoryImpl(sl<LocationDataSource>()),
@@ -187,16 +184,7 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<DirectionsRemoteDataSource>(
-    () {
-      final naverDio = Dio(BaseOptions(
-        baseUrl: EnvConfig.naverApiBaseUrl,
-        headers: {
-          'x-ncp-apigw-api-key-id': EnvConfig.naverClientId,
-          'x-ncp-apigw-api-key': EnvConfig.naverClientSecret,
-        },
-      ));
-      return DirectionsRemoteDataSourceImpl(dio: naverDio);
-    },
+    DirectionsRemoteDataSourceImpl.create,
   );
 
   sl.registerLazySingleton<DirectionsRepository>(
