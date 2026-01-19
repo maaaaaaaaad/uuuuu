@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/features/location/data/models/directions_response_model.dart';
 
@@ -12,20 +13,17 @@ abstract class DirectionsRemoteDataSource {
 }
 
 class DirectionsRemoteDataSourceImpl implements DirectionsRemoteDataSource {
-  final Dio _dio;
+  static const String _baseUrl = 'https://naveropenapi.apigw.ntruss.com';
+  static const String _endpoint = '/map-direction/v1/driving';
 
-  DirectionsRemoteDataSourceImpl({required Dio dio}) : _dio = dio;
+  late final Dio _dio;
 
-  factory DirectionsRemoteDataSourceImpl.create() {
-    final dio = Dio(BaseOptions(
-      baseUrl: EnvConfig.naverApiBaseUrl,
-      headers: {
-        'X-NCP-APIGW-API-KEY-ID': EnvConfig.naverClientId,
-        'X-NCP-APIGW-API-KEY': EnvConfig.naverClientSecret,
-      },
-    ));
-    return DirectionsRemoteDataSourceImpl(dio: dio);
+  DirectionsRemoteDataSourceImpl() {
+    _dio = Dio();
   }
+
+  @visibleForTesting
+  DirectionsRemoteDataSourceImpl.withDio(Dio dio) : _dio = dio;
 
   @override
   Future<DirectionsResponseModel> getDirections({
@@ -36,15 +34,30 @@ class DirectionsRemoteDataSourceImpl implements DirectionsRemoteDataSource {
   }) async {
     final start = '$startLng,$startLat';
     final goal = '$endLng,$endLat';
+    final url = '$_baseUrl$_endpoint';
 
-    final response = await _dio.get<Map<String, dynamic>>(
-      '/map-direction/v1/driving',
-      queryParameters: {
-        'start': start,
-        'goal': goal,
-      },
-    );
+    debugPrint('[DirectionsAPI] Request: $url?start=$start&goal=$goal');
 
-    return DirectionsResponseModel.fromJson(response.data!);
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        url,
+        queryParameters: {'start': start, 'goal': goal, 'option': 'trafast'},
+        options: Options(
+          headers: {
+            'X-NCP-APIGW-API-KEY-ID': EnvConfig.naverMapClientId,
+            'X-NCP-APIGW-API-KEY': EnvConfig.naverClientSecret,
+          },
+        ),
+      );
+
+      debugPrint('[DirectionsAPI] Response: ${response.statusCode}');
+      return DirectionsResponseModel.fromJson(response.data!);
+    } on DioException catch (e) {
+      debugPrint(
+        '[DirectionsAPI] Error: ${e.response?.statusCode} - ${e.message}',
+      );
+      debugPrint('[DirectionsAPI] URL: ${e.requestOptions.uri}');
+      rethrow;
+    }
   }
 }
