@@ -76,6 +76,8 @@ class ShopDetailScreen extends ConsumerWidget {
     final shopDetail = _buildShopDetail();
     final treatmentsAsync = ref.watch(shopTreatmentsProvider(shop.id));
     final userLocationAsync = ref.watch(currentLocationProvider);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final mapBottomPadding = screenHeight * _sheetMinSize;
 
     final userLocation = userLocationAsync.valueOrNull;
     AsyncValue<domain.Route?>? routeAsync;
@@ -97,7 +99,7 @@ class ShopDetailScreen extends ConsumerWidget {
     return Scaffold(
       body: Stack(
         children: [
-          _buildMapLayer(userLocationAsync, routeAsync),
+          _buildMapLayer(userLocationAsync, routeAsync, mapBottomPadding),
           _buildBackButton(context),
           _buildShopInfoSheet(context, shopDetail, treatmentsAsync, routeAsync),
           _buildBottomReservationButton(context),
@@ -109,6 +111,7 @@ class ShopDetailScreen extends ConsumerWidget {
   Widget _buildMapLayer(
     AsyncValue<dynamic> userLocationAsync,
     AsyncValue<domain.Route?>? routeAsync,
+    double mapBottomPadding,
   ) {
     if (shop.latitude == null || shop.longitude == null) {
       return Positioned.fill(
@@ -136,6 +139,7 @@ class ShopDetailScreen extends ConsumerWidget {
         userLatitude: userLocation?.latitude,
         userLongitude: userLocation?.longitude,
         routeCoordinates: route?.coordinates,
+        bottomPadding: mapBottomPadding,
       ),
     );
   }
@@ -183,7 +187,7 @@ class ShopDetailScreen extends ConsumerWidget {
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
-            color: SemanticColors.background.card,
+            color: Colors.white,
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(_sheetBorderRadius),
             ),
@@ -288,11 +292,11 @@ class ShopDetailScreen extends ConsumerWidget {
     return Center(
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 12),
-        width: 40,
-        height: 4,
+        width: 48,
+        height: 5,
         decoration: BoxDecoration(
-          color: SemanticColors.border.divider,
-          borderRadius: BorderRadius.circular(2),
+          color: Colors.grey[400],
+          borderRadius: BorderRadius.circular(2.5),
         ),
       ),
     );
