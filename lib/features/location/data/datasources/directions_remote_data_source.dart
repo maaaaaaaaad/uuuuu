@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/features/location/data/models/directions_response_model.dart';
 
 abstract class DirectionsRemoteDataSource {
@@ -11,9 +12,20 @@ abstract class DirectionsRemoteDataSource {
 }
 
 class DirectionsRemoteDataSourceImpl implements DirectionsRemoteDataSource {
-  final Dio dio;
+  final Dio _dio;
 
-  DirectionsRemoteDataSourceImpl({required this.dio});
+  DirectionsRemoteDataSourceImpl({required Dio dio}) : _dio = dio;
+
+  factory DirectionsRemoteDataSourceImpl.create() {
+    final dio = Dio(BaseOptions(
+      baseUrl: EnvConfig.naverApiBaseUrl,
+      headers: {
+        'X-NCP-APIGW-API-KEY-ID': EnvConfig.naverClientId,
+        'X-NCP-APIGW-API-KEY': EnvConfig.naverClientSecret,
+      },
+    ));
+    return DirectionsRemoteDataSourceImpl(dio: dio);
+  }
 
   @override
   Future<DirectionsResponseModel> getDirections({
@@ -25,7 +37,7 @@ class DirectionsRemoteDataSourceImpl implements DirectionsRemoteDataSource {
     final start = '$startLng,$startLat';
     final goal = '$endLng,$endLat';
 
-    final response = await dio.get<Map<String, dynamic>>(
+    final response = await _dio.get<Map<String, dynamic>>(
       '/map-direction/v1/driving',
       queryParameters: {
         'start': start,
