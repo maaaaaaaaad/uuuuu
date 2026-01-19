@@ -49,13 +49,11 @@ void main() {
             }
             return Future.value(treatments ?? []);
           }),
-          shopReviewsNotifierProvider(shop.id).overrideWith(
-            (ref) => _MockShopReviewsNotifier(),
-          ),
+          shopReviewsNotifierProvider(
+            shop.id,
+          ).overrideWith((ref) => _MockShopReviewsNotifier()),
         ],
-        child: MaterialApp(
-          home: ShopDetailScreen(shop: shop),
-        ),
+        child: MaterialApp(home: ShopDetailScreen(shop: shop)),
       );
     }
 
@@ -73,13 +71,11 @@ void main() {
       expect(find.text('블루밍 네일'), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should display SliverAppBar with back button', (
-      tester,
-    ) async {
+    testWidgets('should display Stack with back button', (tester) async {
       await tester.pumpWidget(createShopDetailScreen(shop: testShop));
       await tester.pumpAndSettle();
 
-      expect(find.byType(SliverAppBar), findsOneWidget);
+      expect(find.byType(Stack), findsWidgets);
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
     });
 
@@ -100,13 +96,11 @@ void main() {
               await Future<void>.value();
               return const <ServiceMenu>[];
             }),
-            shopReviewsNotifierProvider(testShop.id).overrideWith(
-              (ref) => _MockShopReviewsNotifier(),
-            ),
+            shopReviewsNotifierProvider(
+              testShop.id,
+            ).overrideWith((ref) => _MockShopReviewsNotifier()),
           ],
-          child: MaterialApp(
-            home: ShopDetailScreen(shop: testShop),
-          ),
+          child: MaterialApp(home: ShopDetailScreen(shop: testShop)),
         ),
       );
 
@@ -173,9 +167,9 @@ void main() {
         ProviderScope(
           overrides: [
             shopTreatmentsProvider('shop-1').overrideWith((ref) async => []),
-            shopReviewsNotifierProvider('shop-1').overrideWith(
-              (ref) => _MockShopReviewsNotifier(),
-            ),
+            shopReviewsNotifierProvider(
+              'shop-1',
+            ).overrideWith((ref) => _MockShopReviewsNotifier()),
           ],
           child: MaterialApp(
             home: Builder(
@@ -209,18 +203,11 @@ void main() {
     });
 
     group('UI Redesign', () {
-      testWidgets('has lavender gradient background', (tester) async {
+      testWidgets('has DraggableScrollableSheet for shop info', (tester) async {
         await tester.pumpWidget(createShopDetailScreen(shop: testShop));
         await tester.pumpAndSettle();
 
-        final container = tester.widget<Container>(
-          find.descendant(
-            of: find.byType(Scaffold),
-            matching: find.byType(Container).first,
-          ),
-        );
-        final decoration = container.decoration as BoxDecoration?;
-        expect(decoration?.gradient, isNotNull);
+        expect(find.byType(DraggableScrollableSheet), findsOneWidget);
       });
 
       testWidgets('has BackdropFilter for glassmorphism', (tester) async {
@@ -245,13 +232,11 @@ void main() {
                 await Future<void>.value();
                 return const <ServiceMenu>[];
               }),
-              shopReviewsNotifierProvider(testShop.id).overrideWith(
-                (ref) => _MockShopReviewsNotifier(),
-              ),
+              shopReviewsNotifierProvider(
+                testShop.id,
+              ).overrideWith((ref) => _MockShopReviewsNotifier()),
             ],
-            child: MaterialApp(
-              home: ShopDetailScreen(shop: testShop),
-            ),
+            child: MaterialApp(home: ShopDetailScreen(shop: testShop)),
           ),
         );
 
@@ -280,8 +265,8 @@ void main() {
       });
     });
 
-    group('Map Placeholder in SliverAppBar', () {
-      testWidgets('should display map placeholder instead of image gallery', (
+    group('Map Placeholder in Background', () {
+      testWidgets('should display map placeholder when coordinates missing', (
         tester,
       ) async {
         await tester.pumpWidget(createShopDetailScreen(shop: testShop));
@@ -290,18 +275,14 @@ void main() {
         expect(find.byIcon(Icons.map_outlined), findsOneWidget);
       });
 
-      testWidgets('map height should be 40% of screen height', (
+      testWidgets('map should be full screen behind DraggableScrollableSheet', (
         tester,
       ) async {
         await tester.pumpWidget(createShopDetailScreen(shop: testShop));
         await tester.pumpAndSettle();
 
-        final sliverAppBar = tester.widget<SliverAppBar>(
-          find.byType(SliverAppBar),
-        );
-        final screenHeight = tester.view.physicalSize.height / tester.view.devicePixelRatio;
-        final expectedHeight = screenHeight * 0.4;
-        expect(sliverAppBar.expandedHeight, expectedHeight);
+        expect(find.byType(Positioned), findsWidgets);
+        expect(find.byType(DraggableScrollableSheet), findsOneWidget);
       });
     });
 
@@ -330,14 +311,15 @@ void main() {
         expect(find.byType(ImageThumbnailGrid), findsOneWidget);
       });
 
-      testWidgets('should not display ImageThumbnailGrid when shop has no images', (
-        tester,
-      ) async {
-        await tester.pumpWidget(createShopDetailScreen(shop: testShop));
-        await tester.pumpAndSettle();
+      testWidgets(
+        'should not display ImageThumbnailGrid when shop has no images',
+        (tester) async {
+          await tester.pumpWidget(createShopDetailScreen(shop: testShop));
+          await tester.pumpAndSettle();
 
-        expect(find.byType(ImageThumbnailGrid), findsNothing);
-      });
+          expect(find.byType(ImageThumbnailGrid), findsNothing);
+        },
+      );
 
       testWidgets('ImageThumbnailGrid should not be wrapped in GlassCard', (
         tester,
@@ -419,21 +401,16 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              shopTreatmentsProvider(shopWithImage.id).overrideWith(
-                (ref) async => [],
-              ),
-              shopReviewsNotifierProvider(shopWithImage.id).overrideWith(
-                (ref) => _MockShopReviewsNotifier(),
-              ),
+              shopTreatmentsProvider(
+                shopWithImage.id,
+              ).overrideWith((ref) async => []),
+              shopReviewsNotifierProvider(
+                shopWithImage.id,
+              ).overrideWith((ref) => _MockShopReviewsNotifier()),
             ],
-            child: MaterialApp(
-              home: ShopDetailScreen(shop: shopWithImage),
-            ),
+            child: MaterialApp(home: ShopDetailScreen(shop: shopWithImage)),
           ),
         );
-        await tester.pumpAndSettle();
-
-        await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
         await tester.pumpAndSettle();
 
         await tester.tap(find.byKey(const Key('thumbnail_0')));
