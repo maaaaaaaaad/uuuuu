@@ -10,6 +10,9 @@ void main() {
     late Dio dio;
     late DioAdapter dioAdapter;
 
+    const baseUrl = 'https://naveropenapi.apigw.ntruss.com';
+    const endpoint = '/map-direction/v1/driving';
+
     final successResponseJson = {
       'code': 0,
       'message': 'success',
@@ -20,10 +23,7 @@ void main() {
               [127.123, 37.456],
               [127.124, 37.457],
             ],
-            'summary': {
-              'distance': 1234,
-              'duration': 600000,
-            },
+            'summary': {'distance': 1234, 'duration': 600000},
           },
         ],
       },
@@ -36,21 +36,20 @@ void main() {
     };
 
     setUp(() {
-      dio = Dio(BaseOptions(
-        baseUrl: 'https://naveropenapi.apigw.ntruss.com',
-      ));
+      dio = Dio();
       dioAdapter = DioAdapter(dio: dio);
-      dataSource = DirectionsRemoteDataSourceImpl(dio: dio);
+      dataSource = DirectionsRemoteDataSourceImpl.withDio(dio);
     });
 
     group('getDirections', () {
       test('returns DirectionsResponseModel on success', () async {
         dioAdapter.onGet(
-          '/map-direction/v1/driving',
+          '$baseUrl$endpoint',
           (server) => server.reply(200, successResponseJson),
           queryParameters: {
             'start': '127.0,37.0',
             'goal': '127.5,37.5',
+            'option': 'trafast',
           },
         );
 
@@ -69,11 +68,12 @@ void main() {
 
       test('formats coordinates as lng,lat (longitude first)', () async {
         dioAdapter.onGet(
-          '/map-direction/v1/driving',
+          '$baseUrl$endpoint',
           (server) => server.reply(200, successResponseJson),
           queryParameters: {
             'start': '126.123,37.456',
             'goal': '127.789,38.012',
+            'option': 'trafast',
           },
         );
 
@@ -87,36 +87,41 @@ void main() {
         expect(result, isA<DirectionsResponseModel>());
       });
 
-      test('returns error response model when API returns error code', () async {
-        dioAdapter.onGet(
-          '/map-direction/v1/driving',
-          (server) => server.reply(200, errorResponseJson),
-          queryParameters: {
-            'start': '127.0,37.0',
-            'goal': '127.5,37.5',
-          },
-        );
+      test(
+        'returns error response model when API returns error code',
+        () async {
+          dioAdapter.onGet(
+            '$baseUrl$endpoint',
+            (server) => server.reply(200, errorResponseJson),
+            queryParameters: {
+              'start': '127.0,37.0',
+              'goal': '127.5,37.5',
+              'option': 'trafast',
+            },
+          );
 
-        final result = await dataSource.getDirections(
-          startLat: 37.0,
-          startLng: 127.0,
-          endLat: 37.5,
-          endLng: 127.5,
-        );
+          final result = await dataSource.getDirections(
+            startLat: 37.0,
+            startLng: 127.0,
+            endLat: 37.5,
+            endLng: 127.5,
+          );
 
-        expect(result, isA<DirectionsResponseModel>());
-        expect(result.isSuccess, isFalse);
-        expect(result.code, equals(1));
-        expect(result.message, equals('Route not found'));
-      });
+          expect(result, isA<DirectionsResponseModel>());
+          expect(result.isSuccess, isFalse);
+          expect(result.code, equals(1));
+          expect(result.message, equals('Route not found'));
+        },
+      );
 
       test('throws DioException on HTTP error', () async {
         dioAdapter.onGet(
-          '/map-direction/v1/driving',
+          '$baseUrl$endpoint',
           (server) => server.reply(500, {'error': 'Internal Server Error'}),
           queryParameters: {
             'start': '127.0,37.0',
             'goal': '127.5,37.5',
+            'option': 'trafast',
           },
         );
 
@@ -133,7 +138,7 @@ void main() {
 
       test('throws DioException on network error', () async {
         dioAdapter.onGet(
-          '/map-direction/v1/driving',
+          '$baseUrl$endpoint',
           (server) => server.throws(
             0,
             DioException(
@@ -145,6 +150,7 @@ void main() {
           queryParameters: {
             'start': '127.0,37.0',
             'goal': '127.5,37.5',
+            'option': 'trafast',
           },
         );
 

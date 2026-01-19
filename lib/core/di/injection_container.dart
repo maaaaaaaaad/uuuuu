@@ -184,7 +184,7 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<DirectionsRemoteDataSource>(
-    DirectionsRemoteDataSourceImpl.create,
+    DirectionsRemoteDataSourceImpl.new,
   );
 
   sl.registerLazySingleton<DirectionsRepository>(
