@@ -13,6 +13,7 @@ class ShopMapWidget extends StatefulWidget {
   final double? userLongitude;
   final List<domain.LatLng>? routeCoordinates;
   final bool interactiveMode;
+  final double bottomPadding;
 
   @visibleForTesting
   static bool useTestMode = false;
@@ -29,6 +30,7 @@ class ShopMapWidget extends StatefulWidget {
     this.userLongitude,
     this.routeCoordinates,
     this.interactiveMode = true,
+    this.bottomPadding = 0,
   });
 
   @override
@@ -97,6 +99,7 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
           target: NLatLng(widget.shopLatitude, widget.shopLongitude),
           zoom: 15,
         ),
+        contentPadding: EdgeInsets.only(bottom: widget.bottomPadding),
         minZoom: ShopMapWidget.defaultMinZoom,
         maxZoom: ShopMapWidget.defaultMaxZoom,
         scrollGesturesEnable: widget.interactiveMode,
