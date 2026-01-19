@@ -20,6 +20,9 @@ class DirectionsRemoteDataSourceImpl implements DirectionsRemoteDataSource {
 
   DirectionsRemoteDataSourceImpl() {
     _dio = Dio();
+    debugPrint(
+      '[DIRECT_API_CHECK] DirectionsRemoteDataSourceImpl created with NEW Dio()',
+    );
   }
 
   @visibleForTesting
@@ -36,7 +39,19 @@ class DirectionsRemoteDataSourceImpl implements DirectionsRemoteDataSource {
     final goal = '$endLng,$endLat';
     final url = '$_baseUrl$_endpoint';
 
-    debugPrint('[DirectionsAPI] Request: $url?start=$start&goal=$goal');
+    final clientId = EnvConfig.naverMapClientId;
+    final clientSecret = EnvConfig.naverClientSecret;
+
+    debugPrint('[DIRECT_API_CHECK] ===== DIRECTIONS API CALL =====');
+    debugPrint('[DIRECT_API_CHECK] URL: $url');
+    debugPrint('[DIRECT_API_CHECK] Start: $start');
+    debugPrint('[DIRECT_API_CHECK] Goal: $goal');
+    debugPrint(
+      '[DIRECT_API_CHECK] Client ID: ${clientId.isNotEmpty ? "${clientId.substring(0, 3)}..." : "EMPTY!"}',
+    );
+    debugPrint(
+      '[DIRECT_API_CHECK] Client Secret: ${clientSecret.isNotEmpty ? "${clientSecret.substring(0, 3)}..." : "EMPTY!"}',
+    );
 
     try {
       final response = await _dio.get<Map<String, dynamic>>(
@@ -44,19 +59,29 @@ class DirectionsRemoteDataSourceImpl implements DirectionsRemoteDataSource {
         queryParameters: {'start': start, 'goal': goal, 'option': 'trafast'},
         options: Options(
           headers: {
-            'X-NCP-APIGW-API-KEY-ID': EnvConfig.naverMapClientId,
-            'X-NCP-APIGW-API-KEY': EnvConfig.naverClientSecret,
+            'X-NCP-APIGW-API-KEY-ID': clientId,
+            'X-NCP-APIGW-API-KEY': clientSecret,
           },
         ),
       );
 
-      debugPrint('[DirectionsAPI] Response: ${response.statusCode}');
+      debugPrint('[DIRECT_API_CHECK] Response Status: ${response.statusCode}');
+      debugPrint('[DIRECT_API_CHECK] Response Code: ${response.data?['code']}');
+      debugPrint(
+        '[DIRECT_API_CHECK] Response Message: ${response.data?['message']}',
+      );
+
       return DirectionsResponseModel.fromJson(response.data!);
     } on DioException catch (e) {
+      debugPrint('[DIRECT_API_CHECK] ===== API ERROR =====');
+      debugPrint('[DIRECT_API_CHECK] Status: ${e.response?.statusCode}');
+      debugPrint('[DIRECT_API_CHECK] Error Type: ${e.type}');
+      debugPrint('[DIRECT_API_CHECK] Message: ${e.message}');
+      debugPrint('[DIRECT_API_CHECK] Response Body: ${e.response?.data}');
+      debugPrint('[DIRECT_API_CHECK] Request URL: ${e.requestOptions.uri}');
       debugPrint(
-        '[DirectionsAPI] Error: ${e.response?.statusCode} - ${e.message}',
+        '[DIRECT_API_CHECK] Request Headers: ${e.requestOptions.headers}',
       );
-      debugPrint('[DirectionsAPI] URL: ${e.requestOptions.uri}');
       rethrow;
     }
   }
