@@ -30,6 +30,7 @@ import 'package:jellomark/features/review/data/repositories/review_repository_im
 import 'package:jellomark/features/review/domain/repositories/review_repository.dart';
 import 'package:jellomark/features/review/domain/usecases/create_review_usecase.dart';
 import 'package:jellomark/features/review/domain/usecases/delete_review_usecase.dart';
+import 'package:jellomark/features/review/domain/usecases/get_my_reviews_usecase.dart';
 import 'package:jellomark/features/review/domain/usecases/get_shop_reviews_usecase.dart';
 import 'package:jellomark/features/review/domain/usecases/update_review_usecase.dart';
 import 'package:jellomark/features/search/data/datasources/search_local_datasource.dart';
@@ -166,6 +167,10 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<DeleteReviewUseCase>(
     () => DeleteReviewUseCase(repository: sl<ReviewRepository>()),
+  );
+
+  sl.registerLazySingleton<GetMyReviewsUseCase>(
+    () => GetMyReviewsUseCase(repository: sl<ReviewRepository>()),
   );
 
   sl.registerLazySingleton<SearchLocalDataSource>(

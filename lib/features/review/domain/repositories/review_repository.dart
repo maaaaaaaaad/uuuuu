@@ -10,6 +10,11 @@ abstract class ReviewRepository {
     required int size,
   });
 
+  Future<Either<Failure, PagedReviews>> getMyReviews({
+    required int page,
+    required int size,
+  });
+
   Future<Either<Failure, Review>> createReview({
     required String shopId,
     int? rating,

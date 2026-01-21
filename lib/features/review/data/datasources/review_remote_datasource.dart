@@ -9,6 +9,11 @@ abstract class ReviewRemoteDataSource {
     required int size,
   });
 
+  Future<PagedReviewsModel> getMyReviews({
+    required int page,
+    required int size,
+  });
+
   Future<ReviewModel> createReview({
     required String shopId,
     int? rating,
@@ -44,6 +49,19 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   }) async {
     final response = await _apiClient.get(
       '/api/beautishops/$shopId/reviews',
+      queryParameters: {'page': page, 'size': size},
+    );
+
+    return PagedReviewsModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<PagedReviewsModel> getMyReviews({
+    required int page,
+    required int size,
+  }) async {
+    final response = await _apiClient.get(
+      '/api/reviews/me',
       queryParameters: {'page': page, 'size': size},
     );
 

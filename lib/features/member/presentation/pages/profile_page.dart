@@ -5,12 +5,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/location/presentation/widgets/location_setting_toggle.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
+import 'package:jellomark/features/review/presentation/pages/my_reviews_page.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/widgets/gradient_card.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
+
+  Widget _buildMenuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: SemanticColors.icon.primary),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          color: SemanticColors.text.primary,
+        ),
+      ),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: SemanticColors.icon.secondary,
+      ),
+      onTap: onTap,
+    );
+  }
 
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
     final logoutUseCase = ref.read(logoutUseCaseProvider);
@@ -136,13 +159,34 @@ class ProfilePage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 24),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: SemanticColors.background.card,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: SemanticColors.border.glass),
                     ),
-                    child: const LocationSettingToggle(),
+                    child: Column(
+                      children: [
+                        _buildMenuItem(
+                          icon: Icons.rate_review_outlined,
+                          title: '내가 쓴 리뷰',
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const MyReviewsPage(),
+                              ),
+                            );
+                          },
+                        ),
+                        Divider(
+                          height: 1,
+                          color: SemanticColors.border.glass,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: LocationSettingToggle(),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
