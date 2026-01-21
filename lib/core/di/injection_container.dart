@@ -40,6 +40,13 @@ import 'package:jellomark/features/treatment/data/datasources/treatment_remote_d
 import 'package:jellomark/features/treatment/data/repositories/treatment_repository_impl.dart';
 import 'package:jellomark/features/treatment/domain/repositories/treatment_repository.dart';
 import 'package:jellomark/features/treatment/domain/usecases/get_shop_treatments_usecase.dart';
+import 'package:jellomark/features/favorite/data/datasources/favorite_remote_datasource.dart';
+import 'package:jellomark/features/favorite/data/repositories/favorite_repository_impl.dart';
+import 'package:jellomark/features/favorite/domain/repositories/favorite_repository.dart';
+import 'package:jellomark/features/favorite/domain/usecases/add_favorite_usecase.dart';
+import 'package:jellomark/features/favorite/domain/usecases/remove_favorite_usecase.dart';
+import 'package:jellomark/features/favorite/domain/usecases/get_favorites_usecase.dart';
+import 'package:jellomark/features/favorite/domain/usecases/check_favorite_usecase.dart';
 
 final sl = GetIt.instance;
 
@@ -191,6 +198,30 @@ Future<void> initDependencies() async {
     () => DirectionsRepositoryImpl(
       remoteDataSource: sl<DirectionsRemoteDataSource>(),
     ),
+  );
+
+  sl.registerLazySingleton<FavoriteRemoteDataSource>(
+    () => FavoriteRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  sl.registerLazySingleton<FavoriteRepository>(
+    () => FavoriteRepositoryImpl(remoteDataSource: sl<FavoriteRemoteDataSource>()),
+  );
+
+  sl.registerLazySingleton<AddFavoriteUseCase>(
+    () => AddFavoriteUseCase(sl<FavoriteRepository>()),
+  );
+
+  sl.registerLazySingleton<RemoveFavoriteUseCase>(
+    () => RemoveFavoriteUseCase(sl<FavoriteRepository>()),
+  );
+
+  sl.registerLazySingleton<GetFavoritesUseCase>(
+    () => GetFavoritesUseCase(sl<FavoriteRepository>()),
+  );
+
+  sl.registerLazySingleton<CheckFavoriteUseCase>(
+    () => CheckFavoriteUseCase(sl<FavoriteRepository>()),
   );
 
   _initialized = true;

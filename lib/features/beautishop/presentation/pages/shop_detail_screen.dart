@@ -14,6 +14,7 @@ import 'package:jellomark/features/beautishop/presentation/widgets/service_menu_
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_description.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_map_widget.dart';
+import 'package:jellomark/features/favorite/presentation/widgets/favorite_button.dart';
 import 'package:jellomark/features/location/domain/entities/route.dart'
     as domain;
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
@@ -101,6 +102,7 @@ class ShopDetailScreen extends ConsumerWidget {
         children: [
           _buildMapLayer(userLocationAsync, routeAsync, mapBottomPadding),
           _buildBackButton(context),
+          _buildFavoriteButton(context),
           _buildShopInfoSheet(context, shopDetail, treatmentsAsync, routeAsync),
           _buildBottomReservationButton(context),
         ],
@@ -169,6 +171,15 @@ class ShopDetailScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildFavoriteButton(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    return Positioned(
+      top: topPadding + 8,
+      right: 16,
+      child: FavoriteButton(shopId: shop.id),
     );
   }
 

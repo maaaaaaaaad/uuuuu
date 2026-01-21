@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jellomark/features/favorite/presentation/pages/favorites_page.dart';
 import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
 import 'package:jellomark/features/location/presentation/providers/location_permission_alert_provider.dart';
 import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
@@ -130,6 +131,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       label: '검색',
     ),
     BottomNavItem(
+      icon: Icons.favorite_border,
+      selectedIcon: Icons.favorite,
+      label: '즐겨찾기',
+    ),
+    BottomNavItem(
       icon: Icons.person_outline,
       selectedIcon: Icons.person,
       label: '마이',
@@ -143,7 +149,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       case 1:
         return const SearchPage(key: ValueKey(1));
       case 2:
-        return const ProfilePage(key: ValueKey(2));
+        return const FavoritesPage(key: ValueKey(2));
+      case 3:
+        return const ProfilePage(key: ValueKey(3));
       default:
         return HomeTab(key: const ValueKey(0), onSearchTap: _switchToSearchTab);
     }
