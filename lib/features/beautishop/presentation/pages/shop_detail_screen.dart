@@ -18,14 +18,23 @@ import 'package:jellomark/features/favorite/presentation/widgets/favorite_button
 import 'package:jellomark/features/location/domain/entities/route.dart'
     as domain;
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
+import 'package:jellomark/features/recent_shops/domain/entities/recent_shop.dart';
+import 'package:jellomark/features/recent_shops/presentation/providers/recent_shops_provider.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/glass_card.dart';
 
-class ShopDetailScreen extends ConsumerWidget {
+class ShopDetailScreen extends ConsumerStatefulWidget {
   final BeautyShop shop;
 
+  const ShopDetailScreen({super.key, required this.shop});
+
+  @override
+  ConsumerState<ShopDetailScreen> createState() => _ShopDetailScreenState();
+}
+
+class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
   static const double _sheetInitialSize = 0.55;
   static const double _sheetMinSize = 0.25;
   static const double _sheetMaxSize = 0.95;
@@ -33,7 +42,27 @@ class ShopDetailScreen extends ConsumerWidget {
   static const double _contentPadding = 16.0;
   static const double _bottomButtonHeight = 56.0;
 
-  const ShopDetailScreen({super.key, required this.shop});
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _saveToRecentShops();
+    });
+  }
+
+  void _saveToRecentShops() {
+    final recentShop = RecentShop(
+      shopId: widget.shop.id,
+      shopName: widget.shop.name,
+      thumbnailUrl: widget.shop.imageUrl,
+      address: widget.shop.address,
+      rating: widget.shop.rating,
+      viewedAt: DateTime.now(),
+    );
+    ref.read(recentShopsNotifierProvider.notifier).addRecentShop(recentShop);
+  }
+
+  BeautyShop get shop => widget.shop;
 
   ShopDetail _buildShopDetail() {
     String phoneNumber = '';
@@ -73,7 +102,7 @@ class ShopDetailScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final shopDetail = _buildShopDetail();
     final treatmentsAsync = ref.watch(shopTreatmentsProvider(shop.id));
     final userLocationAsync = ref.watch(currentLocationProvider);
