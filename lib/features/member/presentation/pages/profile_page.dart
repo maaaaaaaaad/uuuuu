@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/location/presentation/widgets/location_setting_toggle.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
+import 'package:jellomark/features/recent_shops/presentation/pages/recent_shops_page.dart';
 import 'package:jellomark/features/review/presentation/pages/my_reviews_page.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
@@ -173,6 +174,21 @@ class ProfilePage extends ConsumerWidget {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => const MyReviewsPage(),
+                              ),
+                            );
+                          },
+                        ),
+                        Divider(
+                          height: 1,
+                          color: SemanticColors.border.glass,
+                        ),
+                        _buildMenuItem(
+                          icon: Icons.history,
+                          title: '최근 본 샵',
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const RecentShopsPage(),
                               ),
                             );
                           },
