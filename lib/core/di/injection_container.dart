@@ -48,6 +48,12 @@ import 'package:jellomark/features/favorite/domain/usecases/add_favorite_usecase
 import 'package:jellomark/features/favorite/domain/usecases/remove_favorite_usecase.dart';
 import 'package:jellomark/features/favorite/domain/usecases/get_favorites_usecase.dart';
 import 'package:jellomark/features/favorite/domain/usecases/check_favorite_usecase.dart';
+import 'package:jellomark/features/recent_shops/data/datasources/recent_shops_local_datasource.dart';
+import 'package:jellomark/features/recent_shops/data/repositories/recent_shops_repository_impl.dart';
+import 'package:jellomark/features/recent_shops/domain/repositories/recent_shops_repository.dart';
+import 'package:jellomark/features/recent_shops/domain/usecases/add_recent_shop_usecase.dart';
+import 'package:jellomark/features/recent_shops/domain/usecases/clear_recent_shops_usecase.dart';
+import 'package:jellomark/features/recent_shops/domain/usecases/get_recent_shops_usecase.dart';
 
 final sl = GetIt.instance;
 
@@ -227,6 +233,26 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<CheckFavoriteUseCase>(
     () => CheckFavoriteUseCase(sl<FavoriteRepository>()),
+  );
+
+  sl.registerLazySingleton<RecentShopsLocalDataSource>(
+    () => RecentShopsLocalDataSourceImpl(),
+  );
+
+  sl.registerLazySingleton<RecentShopsRepository>(
+    () => RecentShopsRepositoryImpl(localDataSource: sl<RecentShopsLocalDataSource>()),
+  );
+
+  sl.registerLazySingleton<AddRecentShopUseCase>(
+    () => AddRecentShopUseCase(sl<RecentShopsRepository>()),
+  );
+
+  sl.registerLazySingleton<GetRecentShopsUseCase>(
+    () => GetRecentShopsUseCase(sl<RecentShopsRepository>()),
+  );
+
+  sl.registerLazySingleton<ClearRecentShopsUseCase>(
+    () => ClearRecentShopsUseCase(sl<RecentShopsRepository>()),
   );
 
   _initialized = true;
