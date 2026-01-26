@@ -130,5 +130,21 @@ void main() {
 
       expect(find.text('Login'), findsOneWidget);
     });
+
+    testWidgets('should have keyboard warmup TextField', (
+      tester,
+    ) async {
+      mockRepository.storedTokens = null;
+
+      await tester.pumpWidget(createSplashPage());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final warmupTextField = find.byKey(
+        const Key('keyboard_warmup_textfield'),
+        skipOffstage: false,
+      );
+      expect(warmupTextField, findsOneWidget);
+    });
   });
 }

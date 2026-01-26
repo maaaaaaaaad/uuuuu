@@ -10,12 +10,32 @@ class SplashPage extends ConsumerStatefulWidget {
 }
 
 class _SplashPageState extends ConsumerState<SplashPage> {
+  final _warmupController = TextEditingController();
+  final _warmupFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _warmupKeyboard();
       _checkAuthStatus();
     });
+  }
+
+  void _warmupKeyboard() {
+    _warmupFocusNode.requestFocus();
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (mounted) {
+        _warmupFocusNode.unfocus();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _warmupController.dispose();
+    _warmupFocusNode.dispose();
+    super.dispose();
   }
 
   Future<void> _checkAuthStatus() async {
@@ -33,12 +53,24 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Image.asset(
-          'assets/splash/splash-jellomark01.png',
-          width: 200,
-          height: 200,
-        ),
+      body: Stack(
+        children: [
+          Center(
+            child: Image.asset(
+              'assets/splash/splash-jellomark01.png',
+              width: 200,
+              height: 200,
+            ),
+          ),
+          Offstage(
+            offstage: true,
+            child: TextField(
+              key: const Key('keyboard_warmup_textfield'),
+              controller: _warmupController,
+              focusNode: _warmupFocusNode,
+            ),
+          ),
+        ],
       ),
     );
   }
