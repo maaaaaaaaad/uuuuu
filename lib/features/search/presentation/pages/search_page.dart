@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
+import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
 import 'package:jellomark/features/search/presentation/providers/search_provider.dart';
+import 'package:jellomark/features/search/presentation/widgets/shop_filter_bottom_sheet.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/pill_chip.dart';
@@ -67,6 +69,47 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     FocusScope.of(context).unfocus();
   }
 
+  void _showFilterBottomSheet() {
+    final state = ref.read(searchNotifierProvider);
+    final homeState = ref.read(homeNotifierProvider);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ShopFilterBottomSheet(
+        categories: homeState.categories,
+        selectedCategoryId: state.categoryId,
+        minRating: state.minRating,
+        sortBy: state.sortBy,
+        onCategoryChanged: (id) {
+          ref.read(searchNotifierProvider.notifier).setCategory(id);
+        },
+        onRatingChanged: (rating) {
+          ref.read(searchNotifierProvider.notifier).setMinRating(rating);
+        },
+        onSortChanged: (sort) {
+          ref.read(searchNotifierProvider.notifier).setSort(sort, 'DESC');
+        },
+        onApply: () {
+          Navigator.pop(context);
+          ref.read(searchNotifierProvider.notifier).applyFilters();
+        },
+        onReset: () {
+          ref.read(searchNotifierProvider.notifier).resetFilters();
+        },
+      ),
+    );
+  }
+
+  bool _shouldShowResults(SearchState state) {
+    if (state.query.isNotEmpty) return true;
+    if (state.isLoading) return true;
+    if (state.results.isNotEmpty) return true;
+    if (state.activeFilterCount > 0) return true;
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(searchNotifierProvider);
@@ -85,9 +128,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               children: [
                 _buildSearchHeader(),
                 Expanded(
-                  child: state.query.isEmpty
-                      ? _buildHistoryView(state)
-                      : _buildResultsView(state),
+                  child: _shouldShowResults(state)
+                      ? _buildResultsView(state)
+                      : _buildHistoryView(state),
                 ),
               ],
             ),
@@ -98,6 +141,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   Widget _buildSearchHeader() {
+    final state = ref.watch(searchNotifierProvider);
+    final activeFilterCount = state.activeFilterCount;
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -112,7 +158,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               autofocus: false,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
+          _FilterButton(
+            key: const Key('filter_button'),
+            activeCount: activeFilterCount,
+            onTap: _showFilterBottomSheet,
+          ),
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: _onClear,
             child: Container(
@@ -395,5 +447,68 @@ class _HistoryPillChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PillChip(label: keyword, icon: Icons.history, onTap: onTap);
+  }
+}
+
+class _FilterButton extends StatelessWidget {
+  final int activeCount;
+  final VoidCallback onTap;
+
+  const _FilterButton({
+    super.key,
+    required this.activeCount,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: SemanticColors.background.card,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: SemanticColors.border.glass),
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: Icon(
+                Icons.tune,
+                size: 22,
+                color: activeCount > 0
+                    ? SemanticColors.icon.accent
+                    : SemanticColors.icon.secondary,
+              ),
+            ),
+            if (activeCount > 0)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: SemanticColors.icon.accent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$activeCount',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: SemanticColors.text.onDark,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -6,7 +6,7 @@ import 'package:jellomark/features/home/presentation/pages/recommended_shops_pag
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/utils/category_icon_mapper.dart';
-import 'package:jellomark/shared/widgets/gradient_card.dart';
+import 'package:jellomark/shared/widgets/hero_carousel.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/sections/shop_section.dart';
@@ -112,7 +112,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                  SliverToBoxAdapter(child: _buildHeroSection()),
+                  const SliverToBoxAdapter(child: HeroCarousel()),
                   const SliverToBoxAdapter(child: SizedBox(height: 20)),
                   if (categories.isNotEmpty)
                     SliverToBoxAdapter(
@@ -236,44 +236,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildHeroSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GradientCard(
-        gradientType: GradientType.mint,
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '환영합니다! 👋',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: SemanticColors.text.onDark,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '오늘도 예뻐지는 하루 되세요',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: SemanticColors.text.onDarkSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.spa, size: 48, color: SemanticColors.icon.onDark),
-          ],
-        ),
       ),
     );
   }

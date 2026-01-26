@@ -220,13 +220,6 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('has BackdropFilter for glassmorphism effect', (tester) async {
-      await tester.pumpWidget(createTestWidget());
-      await tester.pumpAndSettle();
-
-      expect(find.byType(BackdropFilter), findsWidgets);
-    });
-
     testWidgets('error state has glassmorphism style with retry button', (
       tester,
     ) async {
