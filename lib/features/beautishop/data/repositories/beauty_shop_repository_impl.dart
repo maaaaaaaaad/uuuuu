@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/beautishop/data/datasources/beauty_shop_remote_datasource.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
@@ -160,8 +161,14 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
   }
 
   String _getErrorMessage(DioException e) {
+    debugPrint('[BeautyShopRepository] DioException: ${e.type}');
+    debugPrint('[BeautyShopRepository] Status: ${e.response?.statusCode}');
+    debugPrint('[BeautyShopRepository] Data: ${e.response?.data}');
     if (e.response?.data is Map) {
-      return (e.response?.data as Map)['error']?.toString() ?? '알 수 없는 오류';
+      final data = e.response?.data as Map;
+      return data['message']?.toString() ??
+          data['error']?.toString() ??
+          '알 수 없는 오류';
     }
     return e.message ?? '알 수 없는 오류';
   }
