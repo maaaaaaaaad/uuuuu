@@ -4,6 +4,7 @@ import 'package:jellomark/features/beautishop/presentation/pages/review_list_pag
 import 'package:jellomark/features/review/domain/entities/review.dart';
 import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/units/app_cached_image.dart';
 
 class ReviewSection extends ConsumerStatefulWidget {
   final String shopId;
@@ -163,20 +164,11 @@ class _ReviewItem extends StatelessWidget {
                 itemCount: review.images.length,
                 separatorBuilder: (context, index) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
-                  return ClipRRect(
+                  return AppCachedImage(
+                    imageUrl: review.images[index],
+                    width: 80,
+                    height: 80,
                     borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      color: SemanticColors.background.avatar,
-                      child: Image.network(
-                        review.images[index],
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.image, color: SemanticColors.icon.disabled);
-                        },
-                      ),
-                    ),
                   );
                 },
               ),

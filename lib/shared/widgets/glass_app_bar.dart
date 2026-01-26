@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -31,22 +29,17 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildGlassContent(BuildContext context) {
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          decoration: BoxDecoration(
-            color: SemanticColors.background.appBar,
-            border: Border(
-              bottom: BorderSide(
-                color: SemanticColors.border.glass,
-                width: 1,
-              ),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: SemanticColors.background.appBar,
+        border: Border(
+          bottom: BorderSide(
+            color: SemanticColors.border.glass,
+            width: 1,
           ),
-          child: _buildContent(context),
         ),
       ),
+      child: _buildContent(context),
     );
   }
 

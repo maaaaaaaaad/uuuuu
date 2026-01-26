@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -58,16 +59,17 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
                   minScale: 0.5,
                   maxScale: 4.0,
                   child: Center(
-                    child: Image.network(
-                      widget.images[index],
+                    child: CachedNetworkImage(
+                      imageUrl: widget.images[index],
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                          Icons.broken_image,
-                          size: 64,
-                          color: SemanticColors.icon.disabled,
-                        );
-                      },
+                      placeholder: (context, url) => CircularProgressIndicator(
+                        color: SemanticColors.indicator.loadingOnDark,
+                      ),
+                      errorWidget: (context, url, error) => Icon(
+                        Icons.broken_image,
+                        size: 64,
+                        color: SemanticColors.icon.disabled,
+                      ),
                     ),
                   ),
                 ),

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/favorite/presentation/providers/favorites_provider.dart';
@@ -88,49 +86,50 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton>
     required bool isFavorite,
     required bool isLoading,
   }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.size / 2),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: GestureDetector(
-          onTap: isLoading || _isToggling
-              ? null
-              : () => _toggleFavorite(isFavorite),
-          child: AnimatedBuilder(
-            animation: _scaleAnimation,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _scaleAnimation.value,
-                child: child,
-              );
-            },
-            child: Container(
-              width: widget.size,
-              height: widget.size,
-              decoration: BoxDecoration(
-                color: SemanticColors.background.appBar,
-                borderRadius: BorderRadius.circular(widget.size / 2),
-                border: Border.all(color: SemanticColors.border.glass),
+    return GestureDetector(
+      onTap: isLoading || _isToggling
+          ? null
+          : () => _toggleFavorite(isFavorite),
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: child,
+          );
+        },
+        child: Container(
+          width: widget.size,
+          height: widget.size,
+          decoration: BoxDecoration(
+            color: SemanticColors.background.appBar,
+            borderRadius: BorderRadius.circular(widget.size / 2),
+            border: Border.all(color: SemanticColors.border.glass),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-              child: Center(
-                child: _isToggling
-                    ? SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: SemanticColors.icon.accent,
-                        ),
-                      )
-                    : Icon(
-                        icon,
-                        size: 20,
-                        color: isFavorite
-                            ? SemanticColors.state.error
-                            : SemanticColors.icon.primary,
-                      ),
-              ),
-            ),
+            ],
+          ),
+          child: Center(
+            child: _isToggling
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: SemanticColors.icon.accent,
+                    ),
+                  )
+                : Icon(
+                    icon,
+                    size: 20,
+                    color: isFavorite
+                        ? SemanticColors.state.error
+                        : SemanticColors.icon.primary,
+                  ),
           ),
         ),
       ),

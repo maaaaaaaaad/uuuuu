@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/units/app_cached_image.dart';
 
 class ImageThumbnailGrid extends StatelessWidget {
   final List<String> imageUrls;
@@ -73,20 +74,10 @@ class ImageThumbnailGrid extends StatelessWidget {
     return GestureDetector(
       key: Key('thumbnail_$index'),
       onTap: () => onImageTap?.call(index),
-      child: ClipRRect(
+      child: AppCachedImage(
+        imageUrl: imageUrls[index],
         borderRadius: BorderRadius.circular(12),
-        child: Container(
-          color: SemanticColors.background.placeholder,
-          child: Image.network(
-            imageUrls[index],
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => _buildPlaceholder(index),
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return _buildPlaceholder(index);
-            },
-          ),
-        ),
+        errorWidget: _buildPlaceholder(index),
       ),
     );
   }

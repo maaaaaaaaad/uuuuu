@@ -190,6 +190,8 @@ class _StateColors {
 class _OverlayColors {
   Color get dialogBarrier => Colors.black.withValues(alpha: 0.3);
 
+  Color get loadingBackground => Colors.white.withValues(alpha: 0.85);
+
   Color get imageGradient => Colors.black.withValues(alpha: 0.5);
 
   Color get shadowLight => Colors.black.withValues(alpha: 0.1);

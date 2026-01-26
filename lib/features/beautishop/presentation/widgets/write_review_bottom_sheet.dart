@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -96,48 +94,49 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
 
     return GestureDetector(
       onTap: _dismissKeyboard,
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: SemanticColors.background.bottomSheet,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(30),
-              ),
-              border: Border.all(
-                color: SemanticColors.border.glass,
-                width: 1.5,
-              ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: SemanticColors.background.bottomSheet,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(30),
+          ),
+          border: Border.all(
+            color: SemanticColors.border.glass,
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
             ),
-            padding: EdgeInsets.only(bottom: bottomPadding),
-            child: SafeArea(
-              top: false,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildHandle(),
-                    _buildHeader(),
-                    Divider(height: 1, color: SemanticColors.border.divider),
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildRatingSection(),
-                          const SizedBox(height: 24),
-                          _buildContentSection(),
-                          const SizedBox(height: 24),
-                          _buildSubmitButton(),
-                        ],
-                      ),
-                    ),
-                  ],
+          ],
+        ),
+        padding: EdgeInsets.only(bottom: bottomPadding),
+        child: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHandle(),
+                _buildHeader(),
+                Divider(height: 1, color: SemanticColors.border.divider),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildRatingSection(),
+                      const SizedBox(height: 24),
+                      _buildContentSection(),
+                      const SizedBox(height: 24),
+                      _buildSubmitButton(),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -108,14 +109,16 @@ class _BannerCarouselState extends State<BannerCarousel> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Container(
-                decoration: BoxDecoration(
+              CachedNetworkImage(
+                imageUrl: banner.imageUrl,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                placeholder: (context, url) => Container(
                   color: SemanticColors.special.badge,
-                  image: DecorationImage(
-                    image: NetworkImage(banner.imageUrl),
-                    fit: BoxFit.cover,
-                    onError: (exception, stackTrace) {},
-                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: SemanticColors.special.badge,
                 ),
               ),
               Container(

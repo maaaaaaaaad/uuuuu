@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_review.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/units/app_cached_image.dart';
 
 class ReviewCard extends StatelessWidget {
   final ShopReview review;
@@ -23,15 +24,9 @@ class ReviewCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                CircleAvatar(
+                AppCachedAvatar(
+                  imageUrl: review.authorProfileImage,
                   radius: 18,
-                  backgroundColor: SemanticColors.background.avatar,
-                  backgroundImage: review.authorProfileImage != null
-                      ? NetworkImage(review.authorProfileImage!)
-                      : null,
-                  child: review.authorProfileImage == null
-                      ? Icon(Icons.person, color: SemanticColors.icon.secondary, size: 20)
-                      : null,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -112,23 +107,11 @@ class ReviewCard extends StatelessWidget {
                   itemCount: review.images.length,
                   separatorBuilder: (context, index) => const SizedBox(width: 8),
                   itemBuilder: (context, index) {
-                    return ClipRRect(
+                    return AppCachedImage(
+                      imageUrl: review.images[index],
+                      width: 80,
+                      height: 80,
                       borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        color: SemanticColors.background.avatar,
-                        child: Image.network(
-                          review.images[index],
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.image,
-                              color: SemanticColors.icon.disabled,
-                            );
-                          },
-                        ),
-                      ),
                     );
                   },
                 ),

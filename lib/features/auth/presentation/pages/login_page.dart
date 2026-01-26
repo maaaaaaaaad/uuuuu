@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
@@ -129,84 +127,78 @@ class LoginPage extends ConsumerWidget {
   }
 
   Widget _buildKakaoLoginButton(BuildContext context, WidgetRef ref, bool isLoading) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          width: double.infinity,
-          height: 56,
-          decoration: BoxDecoration(
-            color: SemanticColors.button.kakao,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: SemanticColors.button.kakaoBorder,
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: SemanticColors.overlay.shadowLight,
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        color: SemanticColors.button.kakao,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: SemanticColors.button.kakaoBorder,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: SemanticColors.overlay.shadowLight,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          child: ElevatedButton(
-            onPressed: isLoading
-                ? null
-                : () async {
-                    final success = await ref
-                        .read(authNotifierProvider.notifier)
-                        .loginWithKakao();
-                    if (success && context.mounted) {
-                      Navigator.of(context).pushReplacementNamed('/home');
-                    }
-                  },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: SemanticColors.special.transparent,
-              shadowColor: SemanticColors.special.transparent,
-              foregroundColor: SemanticColors.button.kakaoText,
-              disabledBackgroundColor: SemanticColors.special.transparent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            child: isLoading
-                ? SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(SemanticColors.text.disabled),
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/icons/kakao_icon.png',
-                        width: 24,
-                        height: 24,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            Icons.chat_bubble,
-                            color: SemanticColors.button.kakaoText,
-                            size: 24,
-                          );
-                        },
-                      ),
-                      const SizedBox(width: 12),
-                      const Text(
-                        '카카오로 시작하기',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: isLoading
+            ? null
+            : () async {
+                final success = await ref
+                    .read(authNotifierProvider.notifier)
+                    .loginWithKakao();
+                if (success && context.mounted) {
+                  Navigator.of(context).pushReplacementNamed('/home');
+                }
+              },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: SemanticColors.special.transparent,
+          shadowColor: SemanticColors.special.transparent,
+          foregroundColor: SemanticColors.button.kakaoText,
+          disabledBackgroundColor: SemanticColors.special.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
+        child: isLoading
+            ? SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(SemanticColors.text.disabled),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/icons/kakao_icon.png',
+                    width: 24,
+                    height: 24,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.chat_bubble,
+                        color: SemanticColors.button.kakaoText,
+                        size: 24,
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    '카카오로 시작하기',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }

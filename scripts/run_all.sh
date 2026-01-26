@@ -1,12 +1,14 @@
 #!/bin/bash
 
-FLUTTER_BIN="/Users/vector/dev/flutter/bin/flutter"
-PROJECT_DIR="/Users/vector/dev/jellomark/jellomark-mobile"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
+FLUTTER_BIN="${FLUTTER_HOME:-/Users/mad/Desktop/dev/flutter/bin/flutter}"
 EMULATOR_BIN=~/Library/Android/sdk/emulator/emulator
 ADB_BIN=~/Library/Android/sdk/platform-tools/adb
 
-IOS_LARGE="2C1F3472-8ED7-4516-B3DC-14DD1481B8B9"
-ANDROID_SMALL_AVD="Small_Phone"
+IOS_LARGE="${IOS_SIMULATOR_UDID:-7EE6E485-F227-4E39-9851-9E8C4DC88492}"
+ANDROID_SMALL_AVD="${ANDROID_AVD_NAME:-Medium_Phone_API_36.1}"
 
 ENV_FILE="$PROJECT_DIR/.env.dev"
 if [ ! -f "$ENV_FILE" ]; then
@@ -70,23 +72,23 @@ echo ""
 
 cat > /tmp/run_ios_large.sh << SCRIPT
 #!/bin/bash
-cd /Users/vector/dev/jellomark/jellomark-mobile
+cd $PROJECT_DIR
 echo "=== iPhone 17 Pro (Large) ==="
 echo "환경: $ENV | API: $API_BASE_URL"
 echo "Hot Reload: r | Hot Restart: R | Quit: q"
 echo ""
-/Users/vector/dev/flutter/bin/flutter run -d 2C1F3472-8ED7-4516-B3DC-14DD1481B8B9 $DART_DEFINES
+$FLUTTER_BIN run -d $IOS_LARGE $DART_DEFINES
 SCRIPT
 chmod +x /tmp/run_ios_large.sh
 
 cat > /tmp/run_android_small.sh << SCRIPT
 #!/bin/bash
-cd /Users/vector/dev/jellomark/jellomark-mobile
+cd $PROJECT_DIR
 echo "=== Android Small Phone ==="
 echo "환경: $ENV | API: $API_BASE_URL"
 echo "Hot Reload: r | Hot Restart: R | Quit: q"
 echo ""
-/Users/vector/dev/flutter/bin/flutter run -d emulator-5556 $DART_DEFINES
+$FLUTTER_BIN run -d emulator-5556 $DART_DEFINES
 SCRIPT
 chmod +x /tmp/run_android_small.sh
 

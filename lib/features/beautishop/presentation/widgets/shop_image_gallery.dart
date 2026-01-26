@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -66,20 +67,23 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () => widget.onImageTap?.call(index),
-                child: Container(
-                  decoration: BoxDecoration(
+                child: CachedNetworkImage(
+                  imageUrl: widget.images[index],
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
                     color: SemanticColors.background.avatar,
-                    image: DecorationImage(
-                      image: NetworkImage(widget.images[index]),
-                      fit: BoxFit.cover,
-                      onError: (exception, stackTrace) {},
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: SemanticColors.indicator.loading,
+                      ),
                     ),
                   ),
-                  child: widget.images[index].isEmpty
-                      ? Center(
-                          child: Icon(Icons.image, size: 48, color: SemanticColors.icon.disabled),
-                        )
-                      : null,
+                  errorWidget: (context, url, error) => Container(
+                    color: SemanticColors.background.avatar,
+                    child: Center(
+                      child: Icon(Icons.image, size: 48, color: SemanticColors.icon.disabled),
+                    ),
+                  ),
                 ),
               );
             },

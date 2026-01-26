@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -35,31 +33,32 @@ class _LocationPermissionAlertContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: SemanticColors.special.transparent,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: SemanticColors.background.card,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: SemanticColors.border.glass,
-                width: 1.5,
-              ),
-            ),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildIcon(),
-                const SizedBox(height: 16),
-                _buildMessage(),
-                const SizedBox(height: 24),
-                _buildButtons(context),
-              ],
-            ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: SemanticColors.background.card,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: SemanticColors.border.glass,
+            width: 1.5,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildIcon(),
+            const SizedBox(height: 16),
+            _buildMessage(),
+            const SizedBox(height: 24),
+            _buildButtons(context),
+          ],
         ),
       ),
     );

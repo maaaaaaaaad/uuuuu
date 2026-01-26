@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
@@ -55,14 +53,8 @@ class ProfilePage extends ConsumerWidget {
         title: const Text('프로필'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: SemanticColors.special.transparent,
+        backgroundColor: SemanticColors.background.appBar,
         foregroundColor: SemanticColors.text.primary,
-        flexibleSpace: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(color: SemanticColors.special.transparent),
-          ),
-        ),
       ),
       body: Container(
         decoration: const BoxDecoration(

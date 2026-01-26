@@ -7,6 +7,7 @@ import 'package:jellomark/features/recent_shops/presentation/providers/recent_sh
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/glass_card.dart';
+import 'package:jellomark/shared/widgets/units/app_cached_image.dart';
 
 class RecentShopsPage extends ConsumerStatefulWidget {
   const RecentShopsPage({super.key});
@@ -191,29 +192,26 @@ class _RecentShopsPageState extends ConsumerState<RecentShopsPage> {
       backgroundColor: SemanticColors.background.cardAccent,
       child: Row(
         children: [
-          Container(
+          AppCachedImage(
+            imageUrl: shop.thumbnailUrl,
             width: 100,
             height: 100,
-            decoration: BoxDecoration(
-              borderRadius:
-                  const BorderRadius.horizontal(left: Radius.circular(16)),
-              color: SemanticColors.background.imagePlaceholder,
-              image: shop.thumbnailUrl != null
-                  ? DecorationImage(
-                      image: NetworkImage(shop.thumbnailUrl!),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
+            borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+            errorWidget: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+                color: SemanticColors.background.imagePlaceholder,
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.storefront,
+                  size: 32,
+                  color: SemanticColors.icon.disabled,
+                ),
+              ),
             ),
-            child: shop.thumbnailUrl == null
-                ? Center(
-                    child: Icon(
-                      Icons.storefront,
-                      size: 32,
-                      color: SemanticColors.icon.disabled,
-                    ),
-                  )
-                : null,
           ),
           Expanded(
             child: Padding(

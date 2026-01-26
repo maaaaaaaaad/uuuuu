@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
@@ -12,6 +10,7 @@ import 'package:jellomark/shared/widgets/gradient_card.dart';
 import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/sections/shop_section.dart';
+import 'package:jellomark/shared/widgets/units/section_header.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
@@ -55,16 +54,15 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
   void _navigateToShopDetail(String shopId, List<BeautyShop> shops) {
     final shop = shops.firstWhere((s) => s.id == shopId);
-
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => ShopDetailScreen(shop: shop)));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ShopDetailScreen(shop: shop)),
+    );
   }
 
   void _navigateToRecommendedShops() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const RecommendedShopsPage()));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const RecommendedShopsPage()),
+    );
   }
 
   @override
@@ -100,52 +98,125 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                 _onScrollNotification(notification);
                 return false;
               },
-              child: SingleChildScrollView(
+              child: CustomScrollView(
                 key: const Key('home_tab_scroll_view'),
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16),
-                    SearchSection(
+                cacheExtent: 500,
+                slivers: [
+                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                  SliverToBoxAdapter(
+                    child: SearchSection(
                       locationText: '현재 위치',
                       onSearchTap: widget.onSearchTap,
                     ),
-                    const SizedBox(height: 20),
-                    _buildHeroSection(),
-                    const SizedBox(height: 20),
-                    if (categories.isNotEmpty)
-                      CategorySection(categories: categories),
-                    const SizedBox(height: 24),
-                    if (homeState.nearbyShops.isNotEmpty)
-                      HorizontalShopSection(
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                  SliverToBoxAdapter(child: _buildHeroSection()),
+                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                  if (categories.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: CategorySection(categories: categories),
+                    ),
+                  if (categories.isNotEmpty)
+                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                  if (homeState.nearbyShops.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: HorizontalShopSection(
                         title: '내 주변 인기 샵',
                         shops: homeState.nearbyShops,
                         showMore: true,
                         onShopTap: (id) =>
                             _navigateToShopDetail(id, homeState.nearbyShops),
                       ),
-                    if (homeState.nearbyShops.isNotEmpty)
-                      const SizedBox(height: 24),
-                    VerticalShopSection(
+                    ),
+                  if (homeState.nearbyShops.isNotEmpty)
+                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                  SliverToBoxAdapter(
+                    child: SectionHeader(
                       title: '추천 샵',
-                      shops: homeState.displayedRecommendedShops,
                       showMore: homeState.hasMoreRecommended,
-                      onMoreTap: () => _navigateToRecommendedShops(),
-                      onShopTap: (id) =>
-                          _navigateToShopDetail(id, homeState.recommendedShops),
+                      onMoreTap: _navigateToRecommendedShops,
                     ),
-                    const SizedBox(height: 24),
-                    _NewShopsSection(
-                      shops: homeState.newShops,
-                      isLoadingMore: homeState.isLoadingMoreNewShops,
-                      onShopTap: (id) =>
-                          _navigateToShopDetail(id, homeState.newShops),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final shop =
+                              homeState.displayedRecommendedShops[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: ShopCard(
+                              shop: shop,
+                              width: double.infinity,
+                              onTap: () => _navigateToShopDetail(
+                                shop.id,
+                                homeState.recommendedShops,
+                              ),
+                            ),
+                          );
+                        },
+                        childCount: homeState.displayedRecommendedShops.length,
+                        addAutomaticKeepAlives: false,
+                        addRepaintBoundaries: true,
+                      ),
                     ),
-                    const SizedBox(height: 100),
-                  ],
-                ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        '새로 입점한 샵',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final shop = homeState.newShops[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: ShopCard(
+                              shop: shop,
+                              width: double.infinity,
+                              onTap: () => _navigateToShopDetail(
+                                shop.id,
+                                homeState.newShops,
+                              ),
+                            ),
+                          );
+                        },
+                        childCount: homeState.newShops.length,
+                        addAutomaticKeepAlives: false,
+                        addRepaintBoundaries: true,
+                      ),
+                    ),
+                  ),
+                  if (homeState.isLoadingMoreNewShops)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            key: const Key('new_shops_loading_indicator'),
+                            color: SemanticColors.indicator.loading,
+                          ),
+                        ),
+                      ),
+                    ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                ],
               ),
             ),
           ),
@@ -221,62 +292,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   }
 }
 
-class _NewShopsSection extends StatelessWidget {
-  final List<BeautyShop> shops;
-  final bool isLoadingMore;
-  final void Function(String id)? onShopTap;
-
-  const _NewShopsSection({
-    required this.shops,
-    required this.isLoadingMore,
-    this.onShopTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            '새로 입점한 샵',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-        const SizedBox(height: 12),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: shops.length,
-          itemBuilder: (context, index) {
-            final shop = shops[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: ShopCard(
-                shop: shop,
-                width: double.infinity,
-                onTap: () => onShopTap?.call(shop.id),
-              ),
-            );
-          },
-        ),
-        if (isLoadingMore)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Center(
-              child: CircularProgressIndicator(
-                key: const Key('new_shops_loading_indicator'),
-                color: SemanticColors.indicator.loading,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
 class _FloatingSearchButton extends StatelessWidget {
   final VoidCallback? onTap;
 
@@ -286,30 +301,25 @@ class _FloatingSearchButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: SemanticColors.background.card,
-              shape: BoxShape.circle,
-              border: Border.all(color: SemanticColors.border.glass, width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: SemanticColors.icon.accent.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: SemanticColors.background.card,
+          shape: BoxShape.circle,
+          border: Border.all(color: SemanticColors.border.glass, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: SemanticColors.icon.accent.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: Icon(
-              Icons.search,
-              color: SemanticColors.icon.accent,
-              size: 24,
-            ),
-          ),
+          ],
+        ),
+        child: Icon(
+          Icons.search,
+          color: SemanticColors.icon.accent,
+          size: 24,
         ),
       ),
     );

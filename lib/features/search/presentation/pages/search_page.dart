@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
@@ -117,28 +115,22 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           const SizedBox(width: 12),
           GestureDetector(
             onTap: _onClear,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: SemanticColors.background.card,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: SemanticColors.border.glass),
-                  ),
-                  child: Text(
-                    '취소',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: SemanticColors.button.textButton,
-                    ),
-                  ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 10,
+              ),
+              decoration: BoxDecoration(
+                color: SemanticColors.background.card,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: SemanticColors.border.glass),
+              ),
+              child: Text(
+                '취소',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: SemanticColors.button.textButton,
                 ),
               ),
             ),

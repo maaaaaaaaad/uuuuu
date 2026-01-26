@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/data/models/beauty_shop_model.dart';
@@ -180,24 +178,25 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
     return Positioned(
       top: topPadding + 8,
       left: 16,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: SemanticColors.background.appBar,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: SemanticColors.border.glass),
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: SemanticColors.background.appBar,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: SemanticColors.border.glass),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, size: 20),
-              onPressed: () => Navigator.of(context).pop(),
-              padding: EdgeInsets.zero,
-            ),
-          ),
+          ],
+        ),
+        child: IconButton(
+          icon: const Icon(Icons.arrow_back, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+          padding: EdgeInsets.zero,
         ),
       ),
     );

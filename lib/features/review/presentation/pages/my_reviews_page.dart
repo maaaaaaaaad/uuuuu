@@ -5,6 +5,7 @@ import 'package:jellomark/features/review/presentation/providers/review_provider
 import 'package:jellomark/features/review/presentation/widgets/edit_review_bottom_sheet.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/units/app_cached_image.dart';
 
 class MyReviewsPage extends ConsumerStatefulWidget {
   const MyReviewsPage({super.key});
@@ -244,23 +245,11 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
                   itemCount: review.images.length,
                   separatorBuilder: (context, index) => const SizedBox(width: 8),
                   itemBuilder: (context, index) {
-                    return ClipRRect(
+                    return AppCachedImage(
+                      imageUrl: review.images[index],
+                      width: 60,
+                      height: 60,
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        review.images[index],
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          width: 60,
-                          height: 60,
-                          color: SemanticColors.background.input,
-                          child: Icon(
-                            Icons.broken_image,
-                            color: SemanticColors.icon.disabled,
-                          ),
-                        ),
-                      ),
                     );
                   },
                 ),

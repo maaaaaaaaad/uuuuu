@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/glass_card.dart';
+import 'package:jellomark/shared/widgets/units/app_cached_image.dart';
 
 class ShopCard extends StatelessWidget {
   final BeautyShop shop;
@@ -74,27 +75,25 @@ class ShopCard extends StatelessWidget {
   Widget _buildImageSection() {
     return Stack(
       children: [
-        Container(
+        AppCachedImage(
+          imageUrl: shop.imageUrl,
           height: 120,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            color: SemanticColors.background.imagePlaceholder,
-            image: shop.imageUrl != null
-                ? DecorationImage(
-                    image: NetworkImage(shop.imageUrl!),
-                    fit: BoxFit.cover,
-                  )
-                : null,
+          width: double.infinity,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          errorWidget: Container(
+            height: 120,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              color: SemanticColors.background.imagePlaceholder,
+            ),
+            child: Center(
+              child: Icon(
+                Icons.storefront,
+                size: 40,
+                color: SemanticColors.icon.disabled,
+              ),
+            ),
           ),
-          child: shop.imageUrl == null
-              ? Center(
-                  child: Icon(
-                    Icons.storefront,
-                    size: 40,
-                    color: SemanticColors.icon.disabled,
-                  ),
-                )
-              : null,
         ),
         if (shop.discountRate != null)
           Positioned(

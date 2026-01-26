@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/app_shadows.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -74,32 +72,26 @@ class _GlassSearchBarState extends State<GlassSearchBar> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.isInputMode ? null : widget.onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: SemanticColors.background.inputTranslucent,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: _isFocused
-                    ? SemanticColors.border.focus
-                    : SemanticColors.border.glass,
-                width: _isFocused ? 2 : 1,
-              ),
-              boxShadow: AppShadows.card3D,
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.search, color: SemanticColors.icon.secondary),
-                const SizedBox(width: 12),
-                Expanded(child: _buildContent()),
-                ..._buildTrailing(),
-              ],
-            ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: SemanticColors.background.inputTranslucent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _isFocused
+                ? SemanticColors.border.focus
+                : SemanticColors.border.glass,
+            width: _isFocused ? 2 : 1,
           ),
+          boxShadow: AppShadows.card3D,
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.search, color: SemanticColors.icon.secondary),
+            const SizedBox(width: 12),
+            Expanded(child: _buildContent()),
+            ..._buildTrailing(),
+          ],
         ),
       ),
     );

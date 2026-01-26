@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/app_dimensions.dart';
 import 'package:jellomark/shared/theme/app_shadows.dart';
@@ -61,28 +59,17 @@ class _GlassCardState extends State<GlassCard> {
         child: Container(
           margin: widget.margin,
           decoration: BoxDecoration(
+            color: widget.backgroundColor ?? SemanticColors.background.card,
             borderRadius: BorderRadius.circular(widget.borderRadius),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.5),
+              width: 1.5,
+            ),
             boxShadow: AppShadows.cardPopOut,
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: widget.backgroundColor ?? SemanticColors.background.card,
-                  borderRadius: BorderRadius.circular(widget.borderRadius),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    width: 1.5,
-                  ),
-                ),
-                child: Padding(
-                  padding: widget.padding,
-                  child: widget.child,
-                ),
-              ),
-            ),
+          child: Padding(
+            padding: widget.padding,
+            child: widget.child,
           ),
         ),
       ),
