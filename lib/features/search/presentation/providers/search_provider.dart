@@ -1,10 +1,12 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/core/di/injection_container.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop_filter.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops_usecase.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
+import 'package:jellomark/features/location/domain/usecases/get_current_location_usecase.dart';
 import 'package:jellomark/features/search/domain/entities/search_history.dart';
 import 'package:jellomark/features/search/domain/usecases/manage_search_history_usecase.dart';
 
@@ -20,6 +22,7 @@ class SearchState extends Equatable {
   final String? categoryId;
   final String sortBy;
   final String sortOrder;
+  final double? minRating;
 
   const SearchState({
     this.query = '',
@@ -33,7 +36,16 @@ class SearchState extends Equatable {
     this.categoryId,
     this.sortBy = 'RATING',
     this.sortOrder = 'DESC',
+    this.minRating,
   });
+
+  int get activeFilterCount {
+    int count = 0;
+    if (categoryId != null) count++;
+    if (minRating != null) count++;
+    if (sortBy != 'RATING') count++;
+    return count;
+  }
 
   SearchState copyWith({
     String? query,
@@ -45,8 +57,11 @@ class SearchState extends Equatable {
     int? page,
     bool? isLoadingMore,
     String? categoryId,
+    bool clearCategoryId = false,
     String? sortBy,
     String? sortOrder,
+    double? minRating,
+    bool clearMinRating = false,
   }) {
     return SearchState(
       query: query ?? this.query,
@@ -57,9 +72,10 @@ class SearchState extends Equatable {
       hasMore: hasMore ?? this.hasMore,
       page: page ?? this.page,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
-      categoryId: categoryId ?? this.categoryId,
+      categoryId: clearCategoryId ? null : (categoryId ?? this.categoryId),
       sortBy: sortBy ?? this.sortBy,
       sortOrder: sortOrder ?? this.sortOrder,
+      minRating: clearMinRating ? null : (minRating ?? this.minRating),
     );
   }
 
@@ -76,6 +92,7 @@ class SearchState extends Equatable {
     categoryId,
     sortBy,
     sortOrder,
+    minRating,
   ];
 }
 
@@ -116,6 +133,7 @@ class SearchNotifier extends StateNotifier<SearchState> {
       sortBy: state.sortBy,
       sortOrder: state.sortOrder,
       categoryId: state.categoryId,
+      minRating: state.minRating,
       page: 0,
     );
 
@@ -145,6 +163,7 @@ class SearchNotifier extends StateNotifier<SearchState> {
       sortBy: state.sortBy,
       sortOrder: state.sortOrder,
       categoryId: state.categoryId,
+      minRating: state.minRating,
       page: nextPage,
     );
 
@@ -179,11 +198,91 @@ class SearchNotifier extends StateNotifier<SearchState> {
   }
 
   void setCategory(String? categoryId) {
-    state = state.copyWith(categoryId: categoryId);
+    if (categoryId == null) {
+      state = state.copyWith(clearCategoryId: true);
+    } else {
+      state = state.copyWith(categoryId: categoryId);
+    }
   }
 
   void setSort(String sortBy, String sortOrder) {
     state = state.copyWith(sortBy: sortBy, sortOrder: sortOrder);
+  }
+
+  void setMinRating(double? rating) {
+    if (rating == null) {
+      state = state.copyWith(clearMinRating: true);
+    } else {
+      state = state.copyWith(minRating: rating);
+    }
+  }
+
+  void resetFilters() {
+    state = state.copyWith(
+      clearCategoryId: true,
+      clearMinRating: true,
+      sortBy: 'RATING',
+      sortOrder: 'DESC',
+    );
+  }
+
+  Future<void> applyFilters() async {
+    state = state.copyWith(
+      isLoading: true,
+      page: 0,
+      results: [],
+      hasMore: true,
+      error: null,
+    );
+
+    double? latitude;
+    double? longitude;
+
+    if (state.sortBy == 'DISTANCE') {
+      try {
+        final locationUseCase = sl<GetCurrentLocationUseCase>();
+        final locationResult = await locationUseCase();
+        locationResult.fold(
+          (failure) {
+            debugPrint('[SearchNotifier] Location failed: ${failure.message}');
+          },
+          (location) {
+            latitude = location.latitude;
+            longitude = location.longitude;
+            debugPrint('[SearchNotifier] Location: $latitude, $longitude');
+          },
+        );
+      } catch (e) {
+        debugPrint('[SearchNotifier] Location error: $e');
+      }
+    }
+
+    debugPrint('[SearchNotifier] Filter: sortBy=${state.sortBy}, lat=$latitude, lng=$longitude');
+
+    final filter = BeautyShopFilter(
+      keyword: state.query.isEmpty ? null : state.query,
+      sortBy: state.sortBy,
+      sortOrder: state.sortBy == 'DISTANCE' ? 'ASC' : state.sortOrder,
+      categoryId: state.categoryId,
+      minRating: state.minRating,
+      latitude: latitude,
+      longitude: longitude,
+      page: 0,
+    );
+
+    final result = await _getFilteredShopsUseCase(filter);
+    result.fold(
+      (failure) {
+        state = state.copyWith(isLoading: false, error: failure.message);
+      },
+      (pagedShops) {
+        state = state.copyWith(
+          isLoading: false,
+          results: pagedShops.items,
+          hasMore: pagedShops.hasNext,
+        );
+      },
+    );
   }
 }
 
