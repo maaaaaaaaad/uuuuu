@@ -93,6 +93,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         },
         onApply: () {
           Navigator.pop(context);
+          _dismissKeyboard();
           ref.read(searchNotifierProvider.notifier).applyFilters();
         },
         onReset: () {
