@@ -23,6 +23,8 @@ class SearchState extends Equatable {
   final String sortBy;
   final String sortOrder;
   final double? minRating;
+  final double? latitude;
+  final double? longitude;
 
   const SearchState({
     this.query = '',
@@ -37,6 +39,8 @@ class SearchState extends Equatable {
     this.sortBy = 'RATING',
     this.sortOrder = 'DESC',
     this.minRating,
+    this.latitude,
+    this.longitude,
   });
 
   int get activeFilterCount {
@@ -62,6 +66,8 @@ class SearchState extends Equatable {
     String? sortOrder,
     double? minRating,
     bool clearMinRating = false,
+    double? latitude,
+    double? longitude,
   }) {
     return SearchState(
       query: query ?? this.query,
@@ -76,6 +82,8 @@ class SearchState extends Equatable {
       sortBy: sortBy ?? this.sortBy,
       sortOrder: sortOrder ?? this.sortOrder,
       minRating: clearMinRating ? null : (minRating ?? this.minRating),
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
     );
   }
 
@@ -93,6 +101,8 @@ class SearchState extends Equatable {
     sortBy,
     sortOrder,
     minRating,
+    latitude,
+    longitude,
   ];
 }
 
@@ -128,12 +138,31 @@ class SearchNotifier extends StateNotifier<SearchState> {
 
     await _manageSearchHistoryUseCase.saveSearchHistory(query);
 
+    double? latitude;
+    double? longitude;
+
+    try {
+      final locationUseCase = sl<GetCurrentLocationUseCase>();
+      final locationResult = await locationUseCase();
+      locationResult.fold(
+        (failure) {},
+        (location) {
+          latitude = location.latitude;
+          longitude = location.longitude;
+        },
+      );
+    } catch (_) {}
+
+    state = state.copyWith(latitude: latitude, longitude: longitude);
+
     final filter = BeautyShopFilter(
       keyword: query,
       sortBy: state.sortBy,
-      sortOrder: state.sortOrder,
+      sortOrder: state.sortBy == 'DISTANCE' ? 'ASC' : state.sortOrder,
       categoryId: state.categoryId,
       minRating: state.minRating,
+      latitude: latitude,
+      longitude: longitude,
       page: 0,
     );
 
@@ -153,17 +182,20 @@ class SearchNotifier extends StateNotifier<SearchState> {
   }
 
   Future<void> loadMore() async {
-    if (!state.hasMore || state.isLoadingMore || state.query.isEmpty) return;
+    if (!state.hasMore || state.isLoadingMore) return;
+    if (state.query.isEmpty && state.activeFilterCount == 0) return;
 
     state = state.copyWith(isLoadingMore: true);
 
     final nextPage = state.page + 1;
     final filter = BeautyShopFilter(
-      keyword: state.query,
+      keyword: state.query.isEmpty ? null : state.query,
       sortBy: state.sortBy,
-      sortOrder: state.sortOrder,
+      sortOrder: state.sortBy == 'DISTANCE' ? 'ASC' : state.sortOrder,
       categoryId: state.categoryId,
       minRating: state.minRating,
+      latitude: state.latitude,
+      longitude: state.longitude,
       page: nextPage,
     );
 
@@ -238,24 +270,24 @@ class SearchNotifier extends StateNotifier<SearchState> {
     double? latitude;
     double? longitude;
 
-    if (state.sortBy == 'DISTANCE') {
-      try {
-        final locationUseCase = sl<GetCurrentLocationUseCase>();
-        final locationResult = await locationUseCase();
-        locationResult.fold(
-          (failure) {
-            debugPrint('[SearchNotifier] Location failed: ${failure.message}');
-          },
-          (location) {
-            latitude = location.latitude;
-            longitude = location.longitude;
-            debugPrint('[SearchNotifier] Location: $latitude, $longitude');
-          },
-        );
-      } catch (e) {
-        debugPrint('[SearchNotifier] Location error: $e');
-      }
+    try {
+      final locationUseCase = sl<GetCurrentLocationUseCase>();
+      final locationResult = await locationUseCase();
+      locationResult.fold(
+        (failure) {
+          debugPrint('[SearchNotifier] Location failed: ${failure.message}');
+        },
+        (location) {
+          latitude = location.latitude;
+          longitude = location.longitude;
+          debugPrint('[SearchNotifier] Location: $latitude, $longitude');
+        },
+      );
+    } catch (e) {
+      debugPrint('[SearchNotifier] Location error: $e');
     }
+
+    state = state.copyWith(latitude: latitude, longitude: longitude);
 
     debugPrint('[SearchNotifier] Filter: sortBy=${state.sortBy}, lat=$latitude, lng=$longitude');
 

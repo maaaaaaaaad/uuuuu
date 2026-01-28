@@ -125,21 +125,19 @@ class HomeNotifier extends StateNotifier<HomeState> {
       },
     );
 
-    const nearbyShopsFilter = BeautyShopFilter(
-      sortBy: 'RATING',
-      sortOrder: 'DESC',
+    final nearbyShopsFilter = BeautyShopFilter(
+      sortBy: 'DISTANCE',
+      sortOrder: 'ASC',
       minRating: 4.0,
       size: 10,
+      latitude: userLocation?.latitude,
+      longitude: userLocation?.longitude,
     );
     final nearbyResult = await _getFilteredShopsUseCase(nearbyShopsFilter);
     nearbyResult.fold(
       (failure) {},
       (pagedShops) {
-        final processedShops = _processNearbyShops(
-          pagedShops.items,
-          userLocation,
-        );
-        state = state.copyWith(nearbyShops: processedShops);
+        state = state.copyWith(nearbyShops: pagedShops.items);
       },
     );
 
@@ -224,31 +222,6 @@ class HomeNotifier extends StateNotifier<HomeState> {
       hasMoreNewShops: true,
     );
     await loadData();
-  }
-
-  List<BeautyShop> _processNearbyShops(
-    List<BeautyShop> shops,
-    UserLocation? userLocation,
-  ) {
-    if (userLocation == null) {
-      return shops;
-    }
-
-    final shopsWithDistance = _addDistanceToShops(shops, userLocation);
-
-    shopsWithDistance.sort((a, b) {
-      final distanceA = a.distance ?? double.infinity;
-      final distanceB = b.distance ?? double.infinity;
-
-      final distanceComparison = distanceA.compareTo(distanceB);
-      if (distanceComparison != 0) {
-        return distanceComparison;
-      }
-
-      return b.rating.compareTo(a.rating);
-    });
-
-    return shopsWithDistance;
   }
 
   List<BeautyShop> _addDistanceToShops(
