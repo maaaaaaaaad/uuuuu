@@ -3,7 +3,6 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 class ShopDetail extends BeautyShop {
   final String description;
   final String phoneNumber;
-  final List<String> images;
   final Map<String, String>? operatingHoursMap;
   final String? notice;
 
@@ -13,12 +12,11 @@ class ShopDetail extends BeautyShop {
     required super.address,
     required this.description,
     required this.phoneNumber,
-    this.images = const [],
+    super.images,
     this.operatingHoursMap,
     this.notice,
     super.latitude,
     super.longitude,
-    super.imageUrl,
     super.rating,
     super.reviewCount,
     super.distance,
@@ -33,7 +31,6 @@ class ShopDetail extends BeautyShop {
         ...super.props,
         description,
         phoneNumber,
-        images,
         operatingHoursMap,
         notice,
       ];
