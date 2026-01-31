@@ -12,6 +12,12 @@ fi
 
 source "$ENV_FILE"
 
+# 자동 IP 감지 (API_BASE_URL 오버라이드)
+CURRENT_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null)
+if [ -n "$CURRENT_IP" ]; then
+    API_BASE_URL="http://$CURRENT_IP:8080"
+fi
+
 DART_DEFINES="--dart-define=ENV=$ENV --dart-define=API_BASE_URL=$API_BASE_URL --dart-define=KAKAO_NATIVE_APP_KEY=$KAKAO_NATIVE_APP_KEY"
 
 echo "🔍 연결된 실기기 검색 중..."
