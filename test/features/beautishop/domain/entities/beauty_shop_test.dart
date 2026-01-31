@@ -22,7 +22,7 @@ void main() {
         address: '서울시 강남구',
         latitude: 37.5172,
         longitude: 127.0473,
-        imageUrl: 'https://example.com/image.jpg',
+        images: ['https://example.com/image.jpg'],
         rating: 4.5,
         reviewCount: 120,
         distance: 1.2,
