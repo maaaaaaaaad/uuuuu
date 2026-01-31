@@ -66,20 +66,12 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
     String phoneNumber = '';
     String? description;
     Map<String, String>? operatingHoursMap;
-    List<String> images = [];
 
     if (shop is BeautyShopModel) {
       final model = shop as BeautyShopModel;
       phoneNumber = model.phoneNumber;
       description = model.description;
       operatingHoursMap = model.operatingTimeMap;
-      if (model.imageUrl != null) {
-        images = [model.imageUrl!];
-      }
-    } else {
-      if (shop.imageUrl != null) {
-        images = [shop.imageUrl!];
-      }
     }
 
     return ShopDetail(
@@ -88,7 +80,7 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
       address: shop.address,
       description: description ?? '',
       phoneNumber: phoneNumber,
-      images: images,
+      images: shop.images,
       operatingHoursMap: operatingHoursMap,
       rating: shop.rating,
       reviewCount: shop.reviewCount,
@@ -272,7 +264,7 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
               if (shopDetail.images.isNotEmpty) ...[
                 ImageThumbnailGrid(
                   imageUrls: shopDetail.images,
-                  imageSize: 60,
+                  imageSize: 100,
                   onImageTap: (index) {
                     Navigator.of(context).push(
                       MaterialPageRoute(
