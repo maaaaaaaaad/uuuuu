@@ -13,7 +13,7 @@ class BeautyShopModel extends BeautyShop {
     required super.address,
     super.latitude,
     super.longitude,
-    super.imageUrl,
+    super.images,
     super.rating,
     super.reviewCount,
     super.distance,
@@ -51,13 +51,16 @@ class BeautyShopModel extends BeautyShop {
     final createdAt = DateTime.parse(json['createdAt'] as String);
     final isNew = DateTime.now().difference(createdAt).inDays <= 30;
 
+    final imagesRaw = json['images'] as List<dynamic>? ?? [];
+    final images = imagesRaw.map((e) => e as String).toList();
+
     return BeautyShopModel(
       id: json['id'] as String,
       name: json['name'] as String,
       address: json['address'] as String,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
-      imageUrl: json['image'] as String?,
+      images: images,
       rating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
       reviewCount: json['reviewCount'] as int? ?? 0,
       distance: (json['distance'] as num?)?.toDouble(),
@@ -79,7 +82,7 @@ class BeautyShopModel extends BeautyShop {
       'address': address,
       'latitude': latitude,
       'longitude': longitude,
-      'image': imageUrl,
+      'images': images,
       'averageRating': rating,
       'reviewCount': reviewCount,
       'distance': distance,
@@ -124,7 +127,7 @@ class BeautyShopModel extends BeautyShop {
     String? address,
     double? latitude,
     double? longitude,
-    String? imageUrl,
+    List<String>? images,
     double? rating,
     int? reviewCount,
     double? distance,
@@ -144,7 +147,7 @@ class BeautyShopModel extends BeautyShop {
       address: address ?? this.address,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
-      imageUrl: imageUrl ?? this.imageUrl,
+      images: images ?? this.images,
       rating: rating ?? this.rating,
       reviewCount: reviewCount ?? this.reviewCount,
       distance: distance ?? this.distance,
