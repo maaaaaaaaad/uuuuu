@@ -30,7 +30,7 @@ class _RecentShopsPageState extends ConsumerState<RecentShopsPage> {
       id: recentShop.shopId,
       name: recentShop.shopName,
       address: recentShop.address ?? '',
-      imageUrl: recentShop.thumbnailUrl,
+      images: recentShop.thumbnailUrl != null ? [recentShop.thumbnailUrl!] : [],
       rating: recentShop.rating ?? 0.0,
     );
     Navigator.of(context).push(
