@@ -66,7 +66,8 @@ void main() {
       expect(find.byKey(const Key('indicator_dot_1_inactive')), findsOneWidget);
 
       await tester.fling(find.byType(PageView), const Offset(-300, 0), 1000);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byKey(const Key('indicator_dot_0_inactive')), findsOneWidget);
       expect(find.byKey(const Key('indicator_dot_1_active')), findsOneWidget);
@@ -84,23 +85,20 @@ void main() {
       expect(find.byIcon(Icons.store), findsOneWidget);
     });
 
-    testWidgets('should have specified height', (tester) async {
+    testWidgets('should use square aspect ratio by default', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
             body: ShopImageGallery(
               images: ['image1.jpg'],
-              height: 300,
             ),
           ),
         ),
       );
 
-      final container = tester.widget<SizedBox>(
-        find.byType(SizedBox).first,
-      );
-
-      expect(container.height, 300);
+      expect(find.byType(AspectRatio), findsOneWidget);
+      final aspectRatio = tester.widget<AspectRatio>(find.byType(AspectRatio));
+      expect(aspectRatio.aspectRatio, 1.0);
     });
 
     testWidgets('should call onTap when image is tapped', (tester) async {
