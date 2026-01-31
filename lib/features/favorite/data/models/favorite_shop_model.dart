@@ -5,7 +5,7 @@ class ShopSummary {
   final String id;
   final String name;
   final String address;
-  final String? image;
+  final List<String> images;
   final double averageRating;
   final int reviewCount;
 
@@ -13,17 +13,20 @@ class ShopSummary {
     required this.id,
     required this.name,
     required this.address,
-    this.image,
+    this.images = const [],
     required this.averageRating,
     required this.reviewCount,
   });
 
   factory ShopSummary.fromJson(Map<String, dynamic> json) {
+    final imagesRaw = json['images'] as List<dynamic>? ?? [];
+    final images = imagesRaw.map((e) => e as String).toList();
+
     return ShopSummary(
       id: json['id'] as String,
       name: json['name'] as String,
       address: json['address'] as String,
-      image: json['image'] as String?,
+      images: images,
       averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
       reviewCount: json['reviewCount'] as int? ?? 0,
     );
@@ -34,7 +37,7 @@ class ShopSummary {
       id: id,
       name: name,
       address: address,
-      imageUrl: image,
+      images: images,
       rating: averageRating,
       reviewCount: reviewCount,
     );
