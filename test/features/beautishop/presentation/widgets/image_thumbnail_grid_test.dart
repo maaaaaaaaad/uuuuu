@@ -229,7 +229,7 @@ void main() {
       expect(gridView.physics, isA<NeverScrollableScrollPhysics>());
     });
 
-    testWidgets('should support custom image size via mainAxisExtent', (tester) async {
+    testWidgets('should support custom image size with square aspect ratio', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -242,9 +242,10 @@ void main() {
       );
 
       final gridView = tester.widget<GridView>(find.byType(GridView));
-      final delegate = gridView.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      final delegate = gridView.gridDelegate as SliverGridDelegateWithMaxCrossAxisExtent;
 
-      expect(delegate.mainAxisExtent, 80);
+      expect(delegate.maxCrossAxisExtent, 80);
+      expect(delegate.childAspectRatio, 1.0);
     });
 
     testWidgets('should use childAspectRatio when imageSize is null', (tester) async {
