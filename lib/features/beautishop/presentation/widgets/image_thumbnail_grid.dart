@@ -22,22 +22,24 @@ class ImageThumbnailGrid extends StatelessWidget {
       return _buildEmptyState();
     }
 
+    final SliverGridDelegate gridDelegate = imageSize != null
+        ? SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: imageSize!,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 8.0,
+            childAspectRatio: 1.0,
+          )
+        : SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 8.0,
+            childAspectRatio: 1.0,
+          );
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: imageSize != null
-          ? SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-              mainAxisExtent: imageSize,
-            )
-          : SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-              childAspectRatio: 1.0,
-            ),
+      gridDelegate: gridDelegate,
       itemCount: imageUrls.length,
       itemBuilder: (context, index) => _buildThumbnail(index),
     );
