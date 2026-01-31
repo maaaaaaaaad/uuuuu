@@ -9,6 +9,7 @@ import 'package:jellomark/features/beautishop/presentation/widgets/operating_hou
 import 'package:jellomark/features/beautishop/presentation/widgets/review_card.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/service_menu_item.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_description.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/full_screen_image_viewer.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_image_gallery.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_map_widget.dart';
@@ -33,19 +34,11 @@ class ShopDetailPage extends ConsumerStatefulWidget {
     String phoneNumber = '';
     String? description;
     Map<String, String>? operatingHoursMap;
-    List<String> images = [];
 
     if (shop is BeautyShopModel) {
       phoneNumber = shop.phoneNumber;
       description = shop.description;
       operatingHoursMap = shop.operatingTimeMap;
-      if (shop.imageUrl != null) {
-        images = [shop.imageUrl!];
-      }
-    } else {
-      if (shop.imageUrl != null) {
-        images = [shop.imageUrl!];
-      }
     }
 
     final shopDetail = ShopDetail(
@@ -54,7 +47,7 @@ class ShopDetailPage extends ConsumerStatefulWidget {
       address: shop.address,
       description: description ?? '',
       phoneNumber: phoneNumber,
-      images: images,
+      images: shop.images,
       operatingHoursMap: operatingHoursMap,
       rating: shop.rating,
       reviewCount: shop.reviewCount,
@@ -194,12 +187,13 @@ class _ShopDetailPageState extends ConsumerState<ShopDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (widget.shopDetail.images.isNotEmpty) ...[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: SizedBox(
-                        height: 200,
+                    SizedBox(
+                      width: double.infinity,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
                         child: ShopImageGallery(
                           images: widget.shopDetail.images,
+                          onImageTap: (index) => _openFullScreenViewer(index),
                         ),
                       ),
                     ),
@@ -336,9 +330,10 @@ class _ShopDetailPageState extends ConsumerState<ShopDetailPage> {
   }
 
   SliverAppBar _buildSliverAppBar(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return SliverAppBar(
       expandedHeight: widget.shopDetail.images.isNotEmpty
-          ? 250
+          ? screenWidth
           : kToolbarHeight,
       pinned: true,
       leading: IconButton(
@@ -353,7 +348,10 @@ class _ShopDetailPageState extends ConsumerState<ShopDetailPage> {
           return FlexibleSpaceBar(
             title: isCollapsed ? Text(widget.shopDetail.name) : null,
             background: widget.shopDetail.images.isNotEmpty
-                ? ShopImageGallery(images: widget.shopDetail.images)
+                ? ShopImageGallery(
+                    images: widget.shopDetail.images,
+                    onImageTap: (index) => _openFullScreenViewer(index),
+                  )
                 : Container(color: SemanticColors.background.cardPink),
           );
         },
@@ -443,6 +441,17 @@ class _ShopDetailPageState extends ConsumerState<ShopDetailPage> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _openFullScreenViewer(int initialIndex) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => FullScreenImageViewer(
+          images: widget.shopDetail.images,
+          initialIndex: initialIndex,
         ),
       ),
     );
