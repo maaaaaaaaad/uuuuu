@@ -6,7 +6,7 @@ class BeautyShop extends Equatable {
   final String address;
   final double? latitude;
   final double? longitude;
-  final String? imageUrl;
+  final List<String> images;
   final double rating;
   final int reviewCount;
   final double? distance;
@@ -21,7 +21,7 @@ class BeautyShop extends Equatable {
     required this.address,
     this.latitude,
     this.longitude,
-    this.imageUrl,
+    this.images = const [],
     this.rating = 0.0,
     this.reviewCount = 0,
     this.distance,
@@ -30,6 +30,8 @@ class BeautyShop extends Equatable {
     this.isNew = false,
     this.operatingHours,
   });
+
+  String? get imageUrl => images.isNotEmpty ? images.first : null;
 
   String? get formattedDistance {
     if (distance == null) return null;
@@ -42,7 +44,7 @@ class BeautyShop extends Equatable {
     String? address,
     double? latitude,
     double? longitude,
-    String? imageUrl,
+    List<String>? images,
     double? rating,
     int? reviewCount,
     double? distance,
@@ -57,7 +59,7 @@ class BeautyShop extends Equatable {
       address: address ?? this.address,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
-      imageUrl: imageUrl ?? this.imageUrl,
+      images: images ?? this.images,
       rating: rating ?? this.rating,
       reviewCount: reviewCount ?? this.reviewCount,
       distance: distance ?? this.distance,
@@ -77,7 +79,7 @@ class BeautyShop extends Equatable {
         address,
         latitude,
         longitude,
-        imageUrl,
+        images,
         rating,
         reviewCount,
         distance,
