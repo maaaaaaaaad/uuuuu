@@ -4,14 +4,14 @@ import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class ShopImageGallery extends StatefulWidget {
   final List<String> images;
-  final double height;
   final void Function(int index)? onImageTap;
+  final bool useSquareAspectRatio;
 
   const ShopImageGallery({
     super.key,
     required this.images,
-    this.height = 250,
     this.onImageTap,
+    this.useSquareAspectRatio = true,
   });
 
   @override
@@ -37,9 +37,8 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
   @override
   Widget build(BuildContext context) {
     if (widget.images.isEmpty) {
-      return SizedBox(
-        height: widget.height,
-        child: Container(
+      return _wrapWithAspectRatio(
+        Container(
           color: SemanticColors.background.placeholder,
           child: Center(
             child: Icon(
@@ -52,9 +51,8 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
       );
     }
 
-    return SizedBox(
-      height: widget.height,
-      child: Stack(
+    return _wrapWithAspectRatio(
+      Stack(
         children: [
           PageView.builder(
             controller: _pageController,
@@ -106,6 +104,13 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
         ],
       ),
     );
+  }
+
+  Widget _wrapWithAspectRatio(Widget child) {
+    if (widget.useSquareAspectRatio) {
+      return AspectRatio(aspectRatio: 1.0, child: child);
+    }
+    return child;
   }
 
   Widget _buildIndicatorDot(int index) {
