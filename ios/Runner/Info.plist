@@ -66,6 +66,11 @@
 		</array>
 		<key>NMFClientId</key>
 		<string>5yi4ydr7p1</string>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>주변 뷰티샵을 찾고 경로를 안내받기 위해 위치 정보가 필요합니다.</string>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
