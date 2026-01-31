@@ -6,12 +6,12 @@ class EnvConfig {
 
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.219.100:8080',
+    defaultValue: 'http://192.168.219.109:8080',
   );
 
   static const String kakaoNativeAppKey = String.fromEnvironment(
     'KAKAO_NATIVE_APP_KEY',
-    defaultValue: '',
+    defaultValue: 'ad02572b85e29bfae8eb15bfd1b503f0',
   );
 
   static const String naverMapClientId = String.fromEnvironment(
