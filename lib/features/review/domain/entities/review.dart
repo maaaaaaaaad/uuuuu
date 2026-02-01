@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 class Review extends Equatable {
   final String id;
   final String shopId;
+  final String? shopName;
+  final String? shopImage;
   final String memberId;
   final int? rating;
   final String? content;
@@ -13,6 +15,8 @@ class Review extends Equatable {
   const Review({
     required this.id,
     required this.shopId,
+    this.shopName,
+    this.shopImage,
     required this.memberId,
     this.rating,
     this.content,
@@ -22,6 +26,8 @@ class Review extends Equatable {
   });
 
   bool get hasImages => images.isNotEmpty;
+
+  bool get isEdited => updatedAt.isAfter(createdAt.add(const Duration(seconds: 1)));
 
   String get formattedDate {
     final now = DateTime.now();
@@ -45,6 +51,8 @@ class Review extends Equatable {
   List<Object?> get props => [
         id,
         shopId,
+        shopName,
+        shopImage,
         memberId,
         rating,
         content,
