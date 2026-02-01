@@ -4,6 +4,8 @@ import 'package:jellomark/features/review/domain/entities/review.dart';
 class ReviewModel extends Equatable {
   final String id;
   final String shopId;
+  final String? shopName;
+  final String? shopImage;
   final String memberId;
   final int? rating;
   final String? content;
@@ -14,6 +16,8 @@ class ReviewModel extends Equatable {
   const ReviewModel({
     required this.id,
     required this.shopId,
+    this.shopName,
+    this.shopImage,
     required this.memberId,
     this.rating,
     this.content,
@@ -26,6 +30,8 @@ class ReviewModel extends Equatable {
     return ReviewModel(
       id: json['id'] as String,
       shopId: json['shopId'] as String,
+      shopName: json['shopName'] as String?,
+      shopImage: json['shopImage'] as String?,
       memberId: json['memberId'] as String,
       rating: json['rating'] as int?,
       content: json['content'] as String?,
@@ -42,6 +48,8 @@ class ReviewModel extends Equatable {
     return {
       'id': id,
       'shopId': shopId,
+      'shopName': shopName,
+      'shopImage': shopImage,
       'memberId': memberId,
       'rating': rating,
       'content': content,
@@ -55,6 +63,8 @@ class ReviewModel extends Equatable {
     return Review(
       id: id,
       shopId: shopId,
+      shopName: shopName,
+      shopImage: shopImage,
       memberId: memberId,
       rating: rating,
       content: content,
@@ -68,6 +78,8 @@ class ReviewModel extends Equatable {
   List<Object?> get props => [
         id,
         shopId,
+        shopName,
+        shopImage,
         memberId,
         rating,
         content,
