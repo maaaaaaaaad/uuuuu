@@ -14,6 +14,7 @@ abstract class BeautyShopRemoteDataSource {
     double? latitude,
     double? longitude,
     double? minRating,
+    double? radiusKm,
   });
 
   Future<BeautyShopModel> getBeautyShopById(String shopId);
@@ -43,6 +44,7 @@ class BeautyShopRemoteDataSourceImpl implements BeautyShopRemoteDataSource {
     double? latitude,
     double? longitude,
     double? minRating,
+    double? radiusKm,
   }) async {
     final queryParameters = <String, dynamic>{'page': page, 'size': size};
 
@@ -53,6 +55,7 @@ class BeautyShopRemoteDataSourceImpl implements BeautyShopRemoteDataSource {
     if (latitude != null) queryParameters['latitude'] = latitude;
     if (longitude != null) queryParameters['longitude'] = longitude;
     if (minRating != null) queryParameters['minRating'] = minRating;
+    if (radiusKm != null) queryParameters['radiusKm'] = radiusKm;
 
     final response = await _apiClient.get(
       '/api/beautishops',
