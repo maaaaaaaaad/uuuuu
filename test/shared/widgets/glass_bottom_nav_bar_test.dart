@@ -176,5 +176,76 @@ void main() {
       expect(find.text('Profile'), findsOneWidget);
       expect(find.byIcon(Icons.person), findsOneWidget);
     });
+
+    testWidgets('should render floating item with elevated style', (tester) async {
+      const floatingItems = [
+        BottomNavItem(icon: Icons.home_outlined, label: 'Home'),
+        BottomNavItem(icon: Icons.explore, label: 'Explore', isFloating: true),
+        BottomNavItem(icon: Icons.person_outline, label: 'Profile'),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            bottomNavigationBar: GlassBottomNavBar(
+              currentIndex: 0,
+              onTap: (_) {},
+              items: floatingItems,
+            ),
+          ),
+        ),
+      );
+
+      final floatingButton = find.byKey(const Key('floating_nav_item_1'));
+      expect(floatingButton, findsOneWidget);
+    });
+
+    testWidgets('floating item should be tappable', (tester) async {
+      int? tappedIndex;
+      const floatingItems = [
+        BottomNavItem(icon: Icons.home_outlined, label: 'Home'),
+        BottomNavItem(icon: Icons.explore, label: 'Explore', isFloating: true),
+        BottomNavItem(icon: Icons.person_outline, label: 'Profile'),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            bottomNavigationBar: GlassBottomNavBar(
+              currentIndex: 0,
+              onTap: (index) => tappedIndex = index,
+              items: floatingItems,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(const Key('floating_nav_item_1')));
+      await tester.pump();
+
+      expect(tappedIndex, 1);
+    });
+
+    testWidgets('should not show label for floating item even when selected', (tester) async {
+      const floatingItems = [
+        BottomNavItem(icon: Icons.home_outlined, label: 'Home'),
+        BottomNavItem(icon: Icons.explore, label: 'Explore', isFloating: true),
+        BottomNavItem(icon: Icons.person_outline, label: 'Profile'),
+      ];
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            bottomNavigationBar: GlassBottomNavBar(
+              currentIndex: 1,
+              onTap: (_) {},
+              items: floatingItems,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Explore'), findsNothing);
+    });
   });
 }
