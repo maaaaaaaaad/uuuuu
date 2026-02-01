@@ -38,7 +38,7 @@ class _BackgroundColors {
 
   Color get inputTranslucent => Colors.white.withValues(alpha: 0.5);
 
-  final Color navigation = AppColors.glassWhite;
+  final Color navigation = Color(0xFFFAFAFA);
 
   final Color appBar = AppColors.glassWhite;
 
@@ -55,6 +55,8 @@ class _BackgroundColors {
   Color get imagePlaceholder => Colors.grey[200]!;
 
   Color get avatar => Colors.grey[300]!;
+
+  Color get skeleton => Colors.grey[200]!;
 }
 
 class _ButtonColors {
