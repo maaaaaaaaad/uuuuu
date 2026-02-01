@@ -21,6 +21,7 @@ class GetFilteredShopsUseCase {
       latitude: filter.latitude,
       longitude: filter.longitude,
       minRating: filter.minRating,
+      radiusKm: filter.radiusKm,
     );
   }
 }
