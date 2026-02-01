@@ -28,6 +28,7 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
     double? latitude,
     double? longitude,
     double? minRating,
+    double? radiusKm,
   }) async {
     try {
       final pagedModel = await _remoteDataSource.getBeautyShops(
@@ -40,6 +41,7 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
         latitude: latitude,
         longitude: longitude,
         minRating: minRating,
+        radiusKm: radiusKm,
       );
 
       return Right(
@@ -73,9 +75,12 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
     try {
       final pagedModel = await _remoteDataSource.getBeautyShops(
         page: 0,
-        size: 10,
+        size: 100,
         latitude: latitude,
         longitude: longitude,
+        radiusKm: radiusKm,
+        sortBy: 'DISTANCE',
+        sortOrder: 'ASC',
       );
       return Right(pagedModel.items);
     } on DioException catch (e) {
