@@ -10,6 +10,7 @@ class BeautyShopFilter extends Equatable {
   final double? latitude;
   final double? longitude;
   final double? minRating;
+  final double? radiusKm;
 
   const BeautyShopFilter({
     this.page = 0,
@@ -21,6 +22,7 @@ class BeautyShopFilter extends Equatable {
     this.latitude,
     this.longitude,
     this.minRating,
+    this.radiusKm,
   });
 
   BeautyShopFilter copyWith({
@@ -33,6 +35,7 @@ class BeautyShopFilter extends Equatable {
     double? latitude,
     double? longitude,
     double? minRating,
+    double? radiusKm,
   }) {
     return BeautyShopFilter(
       page: page ?? this.page,
@@ -44,6 +47,7 @@ class BeautyShopFilter extends Equatable {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       minRating: minRating ?? this.minRating,
+      radiusKm: radiusKm ?? this.radiusKm,
     );
   }
 
@@ -58,5 +62,6 @@ class BeautyShopFilter extends Equatable {
     latitude,
     longitude,
     minRating,
+    radiusKm,
   ];
 }
