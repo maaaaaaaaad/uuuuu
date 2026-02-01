@@ -183,6 +183,7 @@ class MyReviewsState {
   final bool hasMore;
   final int page;
   final String? error;
+  final String? loadMoreError;
 
   const MyReviewsState({
     this.reviews = const [],
@@ -191,6 +192,7 @@ class MyReviewsState {
     this.hasMore = true,
     this.page = 0,
     this.error,
+    this.loadMoreError,
   });
 
   MyReviewsState copyWith({
@@ -200,6 +202,8 @@ class MyReviewsState {
     bool? hasMore,
     int? page,
     String? error,
+    String? loadMoreError,
+    bool clearLoadMoreError = false,
   }) {
     return MyReviewsState(
       reviews: reviews ?? this.reviews,
@@ -208,6 +212,7 @@ class MyReviewsState {
       hasMore: hasMore ?? this.hasMore,
       page: page ?? this.page,
       error: error,
+      loadMoreError: clearLoadMoreError ? null : (loadMoreError ?? this.loadMoreError),
     );
   }
 }
@@ -241,7 +246,7 @@ class MyReviewsNotifier extends StateNotifier<MyReviewsState> {
 
   Future<void> loadMore() async {
     if (!state.hasMore || state.isLoadingMore) return;
-    state = state.copyWith(isLoadingMore: true);
+    state = state.copyWith(isLoadingMore: true, clearLoadMoreError: true);
 
     final nextPage = state.page + 1;
     final useCase = _ref.read(getMyReviewsUseCaseProvider);
@@ -249,7 +254,10 @@ class MyReviewsNotifier extends StateNotifier<MyReviewsState> {
 
     result.fold(
       (failure) {
-        state = state.copyWith(isLoadingMore: false, error: failure.message);
+        state = state.copyWith(
+          isLoadingMore: false,
+          loadMoreError: failure.message,
+        );
       },
       (pagedReviews) {
         state = state.copyWith(
@@ -257,6 +265,7 @@ class MyReviewsNotifier extends StateNotifier<MyReviewsState> {
           hasMore: pagedReviews.hasNext,
           page: nextPage,
           isLoadingMore: false,
+          clearLoadMoreError: true,
         );
       },
     );
