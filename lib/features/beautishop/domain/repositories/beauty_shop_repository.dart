@@ -17,6 +17,7 @@ abstract class BeautyShopRepository {
     double? latitude,
     double? longitude,
     double? minRating,
+    double? radiusKm,
   });
 
   Future<Either<Failure, BeautyShop>> getBeautyShopById(String shopId);
