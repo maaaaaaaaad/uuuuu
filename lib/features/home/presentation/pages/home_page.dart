@@ -6,6 +6,7 @@ import 'package:jellomark/features/location/presentation/providers/location_perm
 import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
 import 'package:jellomark/features/location/presentation/widgets/location_permission_alert_dialog.dart';
 import 'package:jellomark/features/member/presentation/pages/profile_page.dart';
+import 'package:jellomark/features/nearby_shops/presentation/pages/nearby_shops_map_page.dart';
 import 'package:jellomark/features/search/presentation/pages/search_page.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/widgets/glass_bottom_nav_bar.dart';
@@ -131,6 +132,12 @@ class _HomePageState extends ConsumerState<HomePage> {
       label: '검색',
     ),
     BottomNavItem(
+      icon: Icons.near_me_outlined,
+      selectedIcon: Icons.near_me,
+      label: '주변',
+      isFloating: true,
+    ),
+    BottomNavItem(
       icon: Icons.favorite_border,
       selectedIcon: Icons.favorite,
       label: '즐겨찾기',
@@ -149,9 +156,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       case 1:
         return const SearchPage(key: ValueKey(1));
       case 2:
-        return const FavoritesPage(key: ValueKey(2));
+        return const NearbyShopsMapPage(key: ValueKey(2));
       case 3:
-        return const ProfilePage(key: ValueKey(3));
+        return const FavoritesPage(key: ValueKey(3));
+      case 4:
+        return const ProfilePage(key: ValueKey(4));
       default:
         return HomeTab(key: const ValueKey(0), onSearchTap: _switchToSearchTab);
     }
