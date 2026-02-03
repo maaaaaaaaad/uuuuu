@@ -8,6 +8,8 @@ class ShopSummary {
   final List<String> images;
   final double averageRating;
   final int reviewCount;
+  final double? latitude;
+  final double? longitude;
 
   const ShopSummary({
     required this.id,
@@ -16,6 +18,8 @@ class ShopSummary {
     this.images = const [],
     required this.averageRating,
     required this.reviewCount,
+    this.latitude,
+    this.longitude,
   });
 
   factory ShopSummary.fromJson(Map<String, dynamic> json) {
@@ -29,6 +33,8 @@ class ShopSummary {
       images: images,
       averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0.0,
       reviewCount: json['reviewCount'] as int? ?? 0,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
     );
   }
 
@@ -40,6 +46,8 @@ class ShopSummary {
       images: images,
       rating: averageRating,
       reviewCount: reviewCount,
+      latitude: latitude,
+      longitude: longitude,
     );
   }
 }
