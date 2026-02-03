@@ -32,6 +32,9 @@ class _RecentShopsPageState extends ConsumerState<RecentShopsPage> {
       address: recentShop.address ?? '',
       images: recentShop.thumbnailUrl != null ? [recentShop.thumbnailUrl!] : [],
       rating: recentShop.rating ?? 0.0,
+      latitude: recentShop.latitude,
+      longitude: recentShop.longitude,
+      distance: recentShop.distance,
     );
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => ShopDetailScreen(shop: shop)),
@@ -257,6 +260,22 @@ class _RecentShopsPageState extends ConsumerState<RecentShopsPage> {
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: SemanticColors.text.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      if (shop.formattedDistance != null) ...[
+                        Icon(
+                          Icons.location_on,
+                          size: 14,
+                          color: SemanticColors.icon.disabled,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          shop.formattedDistance!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: SemanticColors.text.hint,
                           ),
                         ),
                         const SizedBox(width: 8),
