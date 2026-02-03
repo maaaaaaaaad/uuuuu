@@ -5,8 +5,6 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/review_list_page.dart';
-import 'package:jellomark/features/beautishop/presentation/providers/review_list_provider.dart';
-import 'package:jellomark/features/beautishop/presentation/widgets/review_card.dart';
 import 'package:jellomark/features/beautishop/presentation/providers/shop_provider.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/full_screen_image_viewer.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbnail_grid.dart';
@@ -35,8 +33,7 @@ class ShopDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<ShopDetailScreen> createState() => _ShopDetailScreenState();
 }
 
-class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen>
-    with TickerProviderStateMixin {
+class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
   static const double _sheetInitialSize = 0.55;
   static const double _sheetMinSize = 0.25;
   static const double _sheetMaxSize = 0.95;
@@ -45,21 +42,17 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen>
   static const double _bottomButtonHeight = 56.0;
 
   bool _savedToRecent = false;
-  late TabController _tabController;
+  bool _isTreatmentExpanded = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(reviewListNotifierProvider(widget.shop.id).notifier).loadReviews();
-    });
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+  void _toggleTreatmentMenu() {
+    setState(() {
+      _isTreatmentExpanded = !_isTreatmentExpanded;
+    });
   }
 
   void _saveToRecentShops(BeautyShop shop) {
@@ -325,8 +318,11 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen>
                   ),
                   address: shopDetail.address,
                   onReviewTap: () => _navigateToReviewList(context, shopDetail),
+                  onTreatmentTap: _toggleTreatmentMenu,
+                  isTreatmentExpanded: _isTreatmentExpanded,
                 ),
               ),
+              _buildAnimatedTreatmentCard(treatmentsAsync),
               if (shopDetail.description.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 GlassCard(
@@ -344,171 +340,10 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen>
                   ),
                 ),
               ],
-              const SizedBox(height: 16),
-              _buildTabSection(shopDetail, treatmentsAsync),
               SizedBox(height: _bottomButtonHeight + bottomPadding + 24),
             ],
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildTabSection(
-    ShopDetail shopDetail,
-    AsyncValue<List<ServiceMenu>> treatmentsAsync,
-  ) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: SemanticColors.background.card,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: TabBar(
-            controller: _tabController,
-            labelColor: SemanticColors.text.primary,
-            unselectedLabelColor: SemanticColors.text.hint,
-            labelStyle: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
-            indicator: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: SemanticColors.overlay.shadowLight,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            indicatorSize: TabBarIndicatorSize.tab,
-            indicatorPadding: const EdgeInsets.all(4),
-            dividerColor: Colors.transparent,
-            tabs: const [
-              Tab(text: '리뷰'),
-              Tab(text: '시술메뉴'),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        AnimatedBuilder(
-          animation: _tabController,
-          builder: (context, child) {
-            return IndexedStack(
-              index: _tabController.index,
-              children: [
-                _buildReviewTabContent(shopDetail),
-                _buildServiceMenuSection(treatmentsAsync),
-              ],
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildReviewTabContent(ShopDetail shopDetail) {
-    final state = ref.watch(reviewListNotifierProvider(shopDetail.id));
-
-    if (state.isLoading && state.reviews.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: CircularProgressIndicator(
-            color: SemanticColors.indicator.loading,
-          ),
-        ),
-      );
-    }
-
-    if (state.error != null && state.reviews.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: SemanticColors.icon.disabled,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                '리뷰를 불러올 수 없습니다',
-                style: TextStyle(color: SemanticColors.text.secondary),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  ref
-                      .read(reviewListNotifierProvider(shopDetail.id).notifier)
-                      .refresh();
-                },
-                child: const Text('다시 시도'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (state.reviews.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            children: [
-              Icon(
-                Icons.rate_review_outlined,
-                size: 48,
-                color: SemanticColors.icon.disabled,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                '아직 리뷰가 없어요',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: SemanticColors.text.secondary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => _navigateToReviewList(context, shopDetail),
-                child: const Text('첫 리뷰 작성하기'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final displayReviews = state.reviews.take(3).toList();
-    return Column(
-      children: [
-        ...displayReviews.map(
-          (review) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: ReviewCard(review: review),
-          ),
-        ),
-        if (state.reviews.length > 3)
-          TextButton(
-            onPressed: () => _navigateToReviewList(context, shopDetail),
-            child: Text(
-              '리뷰 ${state.totalElements}개 전체보기',
-              style: TextStyle(
-                color: SemanticColors.button.textButton,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
       ],
     );
   }
@@ -527,66 +362,68 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen>
     );
   }
 
-  Widget _buildServiceMenuSection(
+  Widget _buildAnimatedTreatmentCard(
     AsyncValue<List<ServiceMenu>> treatmentsAsync,
   ) {
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      alignment: Alignment.topCenter,
+      child: _isTreatmentExpanded
+          ? Column(
+              children: [
+                const SizedBox(height: 16),
+                GlassCard(
+                  padding: const EdgeInsets.all(16),
+                  child: _buildTreatmentContent(treatmentsAsync),
+                ),
+              ],
+            )
+          : const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildTreatmentContent(AsyncValue<List<ServiceMenu>> treatmentsAsync) {
     return treatmentsAsync.when(
-      loading: () => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '시술 메뉴',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      loading: () => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: CircularProgressIndicator(
+            color: SemanticColors.indicator.loading,
           ),
-          const SizedBox(height: 12),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: CircularProgressIndicator(
-                color: SemanticColors.indicator.loading,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
-      error: (error, stack) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '시술 메뉴',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      error: (error, stack) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            '시술 정보를 불러올 수 없습니다',
+            style: TextStyle(color: SemanticColors.text.secondary),
           ),
-          const SizedBox(height: 12),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                '시술 정보를 불러올 수 없습니다',
-                style: TextStyle(color: SemanticColors.text.secondary),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
       data: (treatments) {
         if (treatments.isEmpty) {
-          return const SizedBox.shrink();
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                '등록된 시술이 없습니다',
+                style: TextStyle(color: SemanticColors.text.secondary),
+              ),
+            ),
+          );
         }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '시술 메뉴',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            ...treatments.map(
-              (service) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: ServiceMenuItem(menu: service),
-              ),
-            ),
-          ],
+          children: treatments
+              .map(
+                (service) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: ServiceMenuItem(menu: service),
+                ),
+              )
+              .toList(),
         );
       },
     );
