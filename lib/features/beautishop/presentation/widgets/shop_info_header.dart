@@ -36,26 +36,7 @@ class ShopInfoHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              Flexible(child: _buildReviewButton()),
-              if (distance != null) ...[
-                const SizedBox(width: 12),
-                Icon(Icons.location_on, size: 16, color: SemanticColors.icon.secondary),
-                const SizedBox(width: 2),
-                Flexible(
-                  child: Text(
-                    distance!,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: SemanticColors.text.secondary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ],
-          ),
+          _buildReviewButton(),
           if (tags != null && tags!.isNotEmpty) ...[
             const SizedBox(height: 12),
             Wrap(
@@ -70,15 +51,35 @@ class ShopInfoHeader extends StatelessWidget {
               children: [
                 Icon(Icons.place, size: 16, color: SemanticColors.icon.secondary),
                 const SizedBox(width: 4),
-                Expanded(
+                Flexible(
                   child: Text(
                     address!,
                     style: TextStyle(
                       fontSize: 14,
                       color: SemanticColors.text.secondary,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                if (distance != null) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    '|',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: SemanticColors.text.hint,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    distance!,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: SemanticColors.text.secondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ],
             ),
           ],
