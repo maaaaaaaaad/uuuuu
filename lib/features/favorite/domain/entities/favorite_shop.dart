@@ -14,6 +14,20 @@ class FavoriteShop extends Equatable {
     this.shop,
   });
 
+  FavoriteShop copyWith({
+    String? id,
+    String? shopId,
+    DateTime? createdAt,
+    BeautyShop? shop,
+  }) {
+    return FavoriteShop(
+      id: id ?? this.id,
+      shopId: shopId ?? this.shopId,
+      createdAt: createdAt ?? this.createdAt,
+      shop: shop ?? this.shop,
+    );
+  }
+
   @override
   List<Object?> get props => [id, shopId, createdAt, shop];
 }
