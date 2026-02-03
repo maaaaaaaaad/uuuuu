@@ -9,6 +9,8 @@ class ShopInfoHeader extends StatelessWidget {
   final List<String>? tags;
   final String? address;
   final VoidCallback? onReviewTap;
+  final VoidCallback? onTreatmentTap;
+  final bool isTreatmentExpanded;
 
   const ShopInfoHeader({
     super.key,
@@ -19,6 +21,8 @@ class ShopInfoHeader extends StatelessWidget {
     this.tags,
     this.address,
     this.onReviewTap,
+    this.onTreatmentTap,
+    this.isTreatmentExpanded = false,
   });
 
   @override
@@ -36,7 +40,13 @@ class ShopInfoHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          _buildReviewButton(),
+          Row(
+            children: [
+              _buildReviewButton(),
+              const SizedBox(width: 8),
+              _buildTreatmentButton(),
+            ],
+          ),
           if (tags != null && tags!.isNotEmpty) ...[
             const SizedBox(height: 12),
             Wrap(
@@ -133,6 +143,64 @@ class ShopInfoHeader extends StatelessWidget {
               Icon(
                 Icons.chevron_right_rounded,
                 color: SemanticColors.text.count,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTreatmentButton() {
+    return Material(
+      color: SemanticColors.special.transparent,
+      child: InkWell(
+        onTap: onTreatmentTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: isTreatmentExpanded
+                ? SemanticColors.special.pinkHighlight
+                : SemanticColors.background.card,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isTreatmentExpanded
+                  ? SemanticColors.special.pinkHighlightText
+                  : SemanticColors.border.input,
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.content_cut_rounded,
+                color: isTreatmentExpanded
+                    ? SemanticColors.special.pinkHighlightText
+                    : SemanticColors.icon.secondary,
+                size: 16,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '시술',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: isTreatmentExpanded
+                      ? SemanticColors.special.pinkHighlightText
+                      : SemanticColors.text.secondary,
+                ),
+              ),
+              const SizedBox(width: 2),
+              Icon(
+                isTreatmentExpanded
+                    ? Icons.keyboard_arrow_up_rounded
+                    : Icons.keyboard_arrow_down_rounded,
+                color: isTreatmentExpanded
+                    ? SemanticColors.special.pinkHighlightText
+                    : SemanticColors.icon.secondary,
                 size: 16,
               ),
             ],
