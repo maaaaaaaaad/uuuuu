@@ -29,6 +29,8 @@ class RecentShopsLocalDataSourceImpl implements RecentShopsLocalDataSource {
       'address': shop.address,
       'rating': shop.rating,
       'viewedAt': shop.viewedAt.toIso8601String(),
+      'latitude': shop.latitude,
+      'longitude': shop.longitude,
     });
 
     if (shopsList.length > _maxShopsCount) {
@@ -52,6 +54,8 @@ class RecentShopsLocalDataSourceImpl implements RecentShopsLocalDataSource {
             address: item['address'] as String?,
             rating: (item['rating'] as num?)?.toDouble(),
             viewedAt: DateTime.parse(item['viewedAt'] as String),
+            latitude: (item['latitude'] as num?)?.toDouble(),
+            longitude: (item['longitude'] as num?)?.toDouble(),
           ),
         )
         .toList();
