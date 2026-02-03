@@ -5,6 +5,9 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/domain/entities/shop_detail.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/review_list_page.dart';
+import 'package:jellomark/features/beautishop/presentation/providers/review_list_provider.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/review_card.dart';
+import 'package:jellomark/features/beautishop/presentation/providers/shop_provider.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/full_screen_image_viewer.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbnail_grid.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/operating_hours_card.dart';
@@ -32,7 +35,8 @@ class ShopDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<ShopDetailScreen> createState() => _ShopDetailScreenState();
 }
 
-class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
+class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen>
+    with TickerProviderStateMixin {
   static const double _sheetInitialSize = 0.55;
   static const double _sheetMinSize = 0.25;
   static const double _sheetMaxSize = 0.95;
@@ -40,35 +44,56 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
   static const double _contentPadding = 16.0;
   static const double _bottomButtonHeight = 56.0;
 
+  bool _savedToRecent = false;
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _saveToRecentShops();
+      ref.read(reviewListNotifierProvider(widget.shop.id).notifier).loadReviews();
     });
   }
 
-  void _saveToRecentShops() {
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _saveToRecentShops(BeautyShop shop) {
+    if (_savedToRecent) return;
+    _savedToRecent = true;
+
     final recentShop = RecentShop(
-      shopId: widget.shop.id,
-      shopName: widget.shop.name,
-      thumbnailUrl: widget.shop.imageUrl,
-      address: widget.shop.address,
-      rating: widget.shop.rating,
+      shopId: shop.id,
+      shopName: shop.name,
+      thumbnailUrl: shop.imageUrl,
+      address: shop.address,
+      rating: shop.rating,
       viewedAt: DateTime.now(),
+      latitude: shop.latitude,
+      longitude: shop.longitude,
     );
     ref.read(recentShopsNotifierProvider.notifier).addRecentShop(recentShop);
   }
 
-  BeautyShop get shop => widget.shop;
+  BeautyShop _getEffectiveShop(AsyncValue<BeautyShop> shopAsync) {
+    return shopAsync.when(
+      data: (shop) => shop,
+      loading: () => widget.shop,
+      error: (_, __) => widget.shop,
+    );
+  }
 
-  ShopDetail _buildShopDetail() {
+  ShopDetail _buildShopDetail(BeautyShop shop) {
     String phoneNumber = '';
     String? description;
     Map<String, String>? operatingHoursMap;
 
     if (shop is BeautyShopModel) {
-      final model = shop as BeautyShopModel;
+      final model = shop;
       phoneNumber = model.phoneNumber;
       description = model.description;
       operatingHoursMap = model.operatingTimeMap;
@@ -93,7 +118,16 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final shopDetail = _buildShopDetail();
+    final shopAsync = ref.watch(shopByIdProvider(widget.shop.id));
+    final shop = _getEffectiveShop(shopAsync);
+
+    if (shopAsync is AsyncData) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _saveToRecentShops(shop);
+      });
+    }
+
+    final shopDetail = _buildShopDetail(shop);
     final treatmentsAsync = ref.watch(shopTreatmentsProvider(shop.id));
     final userLocationAsync = ref.watch(currentLocationProvider);
     final screenHeight = MediaQuery.of(context).size.height;
@@ -119,9 +153,9 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          _buildMapLayer(userLocationAsync, routeAsync, mapBottomPadding),
+          _buildMapLayer(shop, userLocationAsync, routeAsync, mapBottomPadding),
           _buildBackButton(context),
-          _buildFavoriteButton(context),
+          _buildFavoriteButton(context, shop),
           _buildShopInfoSheet(context, shopDetail, treatmentsAsync, routeAsync),
           _buildBottomReservationButton(context),
         ],
@@ -130,6 +164,7 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
   }
 
   Widget _buildMapLayer(
+    BeautyShop shop,
     AsyncValue<dynamic> userLocationAsync,
     AsyncValue<domain.Route?>? routeAsync,
     double mapBottomPadding,
@@ -194,7 +229,7 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
     );
   }
 
-  Widget _buildFavoriteButton(BuildContext context) {
+  Widget _buildFavoriteButton(BuildContext context, BeautyShop shop) {
     final topPadding = MediaQuery.of(context).padding.top;
     return Positioned(
       top: topPadding + 8,
@@ -289,7 +324,7 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
                     shopDetail.distance,
                   ),
                   address: shopDetail.address,
-                  onReviewTap: () => _navigateToReviewList(context),
+                  onReviewTap: () => _navigateToReviewList(context, shopDetail),
                 ),
               ),
               if (shopDetail.description.isNotEmpty) ...[
@@ -310,11 +345,170 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
                 ),
               ],
               const SizedBox(height: 16),
-              _buildServiceMenuSection(treatmentsAsync),
+              _buildTabSection(shopDetail, treatmentsAsync),
               SizedBox(height: _bottomButtonHeight + bottomPadding + 24),
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildTabSection(
+    ShopDetail shopDetail,
+    AsyncValue<List<ServiceMenu>> treatmentsAsync,
+  ) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: SemanticColors.background.card,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: TabBar(
+            controller: _tabController,
+            labelColor: SemanticColors.text.primary,
+            unselectedLabelColor: SemanticColors.text.hint,
+            labelStyle: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+            ),
+            indicator: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: SemanticColors.overlay.shadowLight,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicatorPadding: const EdgeInsets.all(4),
+            dividerColor: Colors.transparent,
+            tabs: const [
+              Tab(text: '리뷰'),
+              Tab(text: '시술메뉴'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        AnimatedBuilder(
+          animation: _tabController,
+          builder: (context, child) {
+            return IndexedStack(
+              index: _tabController.index,
+              children: [
+                _buildReviewTabContent(shopDetail),
+                _buildServiceMenuSection(treatmentsAsync),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReviewTabContent(ShopDetail shopDetail) {
+    final state = ref.watch(reviewListNotifierProvider(shopDetail.id));
+
+    if (state.isLoading && state.reviews.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: CircularProgressIndicator(
+            color: SemanticColors.indicator.loading,
+          ),
+        ),
+      );
+    }
+
+    if (state.error != null && state.reviews.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 48,
+                color: SemanticColors.icon.disabled,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '리뷰를 불러올 수 없습니다',
+                style: TextStyle(color: SemanticColors.text.secondary),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () {
+                  ref
+                      .read(reviewListNotifierProvider(shopDetail.id).notifier)
+                      .refresh();
+                },
+                child: const Text('다시 시도'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (state.reviews.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            children: [
+              Icon(
+                Icons.rate_review_outlined,
+                size: 48,
+                color: SemanticColors.icon.disabled,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '아직 리뷰가 없어요',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: SemanticColors.text.secondary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => _navigateToReviewList(context, shopDetail),
+                child: const Text('첫 리뷰 작성하기'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final displayReviews = state.reviews.take(3).toList();
+    return Column(
+      children: [
+        ...displayReviews.map(
+          (review) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: ReviewCard(review: review),
+          ),
+        ),
+        if (state.reviews.length > 3)
+          TextButton(
+            onPressed: () => _navigateToReviewList(context, shopDetail),
+            child: Text(
+              '리뷰 ${state.totalElements}개 전체보기',
+              style: TextStyle(
+                color: SemanticColors.button.textButton,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -412,11 +606,11 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
     return null;
   }
 
-  void _navigateToReviewList(BuildContext context) {
+  void _navigateToReviewList(BuildContext context, ShopDetail shopDetail) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) =>
-            ReviewListPage(shopId: shop.id, shopName: shop.name),
+            ReviewListPage(shopId: shopDetail.id, shopName: shopDetail.name),
       ),
     );
   }
