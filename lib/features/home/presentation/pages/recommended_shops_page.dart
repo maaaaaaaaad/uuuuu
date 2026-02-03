@@ -4,6 +4,9 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop_filter.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
+import 'package:jellomark/features/location/domain/entities/user_location.dart';
+import 'package:jellomark/features/location/domain/utils/distance_calculator.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
 
@@ -14,6 +17,7 @@ class RecommendedShopsState {
   final bool hasMore;
   final int page;
   final String? error;
+  final UserLocation? userLocation;
 
   const RecommendedShopsState({
     this.shops = const [],
@@ -22,6 +26,7 @@ class RecommendedShopsState {
     this.hasMore = true,
     this.page = 0,
     this.error,
+    this.userLocation,
   });
 
   RecommendedShopsState copyWith({
@@ -31,6 +36,7 @@ class RecommendedShopsState {
     bool? hasMore,
     int? page,
     String? error,
+    UserLocation? userLocation,
   }) {
     return RecommendedShopsState(
       shops: shops ?? this.shops,
@@ -39,6 +45,7 @@ class RecommendedShopsState {
       hasMore: hasMore ?? this.hasMore,
       page: page ?? this.page,
       error: error,
+      userLocation: userLocation ?? this.userLocation,
     );
   }
 }
@@ -51,6 +58,9 @@ class RecommendedShopsNotifier extends StateNotifier<RecommendedShopsState> {
   Future<void> loadInitial() async {
     if (state.isLoading) return;
     state = state.copyWith(isLoading: true, error: null);
+
+    final userLocation = await _ref.read(currentLocationProvider.future);
+    state = state.copyWith(userLocation: userLocation);
 
     const filter = BeautyShopFilter(
       sortBy: 'RATING',
@@ -67,8 +77,9 @@ class RecommendedShopsNotifier extends StateNotifier<RecommendedShopsState> {
         state = state.copyWith(isLoading: false, error: failure.message);
       },
       (pagedShops) {
+        final shopsWithDistance = _addDistanceToShops(pagedShops.items, userLocation);
         state = state.copyWith(
-          shops: pagedShops.items,
+          shops: shopsWithDistance,
           hasMore: pagedShops.hasNext,
           page: 0,
           isLoading: false,
@@ -97,14 +108,39 @@ class RecommendedShopsNotifier extends StateNotifier<RecommendedShopsState> {
         state = state.copyWith(isLoadingMore: false, error: failure.message);
       },
       (pagedShops) {
+        final shopsWithDistance = _addDistanceToShops(pagedShops.items, state.userLocation);
         state = state.copyWith(
-          shops: [...state.shops, ...pagedShops.items],
+          shops: [...state.shops, ...shopsWithDistance],
           hasMore: pagedShops.hasNext,
           page: nextPage,
           isLoadingMore: false,
         );
       },
     );
+  }
+
+  List<BeautyShop> _addDistanceToShops(
+    List<BeautyShop> shops,
+    UserLocation? userLocation,
+  ) {
+    if (userLocation == null) {
+      return shops;
+    }
+
+    return shops.map((shop) {
+      if (shop.latitude == null || shop.longitude == null) {
+        return shop;
+      }
+
+      final distance = calculateDistanceKm(
+        userLocation.latitude,
+        userLocation.longitude,
+        shop.latitude!,
+        shop.longitude!,
+      );
+
+      return shop.copyWith(distance: distance);
+    }).toList();
   }
 }
 
