@@ -73,7 +73,10 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<AuthInterceptor>(
-    () => AuthInterceptor(tokenProvider: sl<TokenProvider>()),
+    () => AuthInterceptor(
+      tokenProvider: sl<TokenProvider>(),
+      baseUrl: EnvConfig.apiBaseUrl,
+    ),
   );
 
   sl.registerLazySingleton<ApiClient>(
