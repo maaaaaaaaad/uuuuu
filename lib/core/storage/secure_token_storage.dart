@@ -48,8 +48,20 @@ class SecureTokenStorage implements TokenProvider {
   Future<void> saveRefreshToken(String token) =>
       _secureStorage.write(key: _refreshTokenKey, value: token);
 
+  @override
   Future<String?> getRefreshToken() =>
       _secureStorage.read(key: _refreshTokenKey);
+
+  @override
+  Future<void> saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  }) async {
+    await Future.wait([
+      saveAccessToken(accessToken),
+      saveRefreshToken(refreshToken),
+    ]);
+  }
 
   @override
   Future<void> clearTokens() async {
