@@ -3,14 +3,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/network/auth_interceptor.dart';
 
 class MockTokenProvider implements TokenProvider {
-  String? token;
+  String? accessToken;
+  String? refreshToken;
 
   @override
-  Future<String?> getAccessToken() async => token;
+  Future<String?> getAccessToken() async => accessToken;
+
+  @override
+  Future<String?> getRefreshToken() async => refreshToken;
+
+  @override
+  Future<void> saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  }) async {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+  }
 
   @override
   Future<void> clearTokens() async {
-    token = null;
+    accessToken = null;
+    refreshToken = null;
   }
 }
 
@@ -23,12 +37,15 @@ void main() {
     setUp(() {
       dio = Dio();
       tokenProvider = MockTokenProvider();
-      interceptor = AuthInterceptor(tokenProvider: tokenProvider);
+      interceptor = AuthInterceptor(
+        tokenProvider: tokenProvider,
+        baseUrl: 'http://localhost:8080',
+      );
       dio.interceptors.add(interceptor);
     });
 
     test('should add Authorization header when token exists', () async {
-      tokenProvider.token = 'test_access_token';
+      tokenProvider.accessToken = 'test_access_token';
 
       final options = RequestOptions(path: '/test');
       final handler = _MockRequestInterceptorHandler();
@@ -40,7 +57,7 @@ void main() {
     });
 
     test('should not add Authorization header when token is null', () async {
-      tokenProvider.token = null;
+      tokenProvider.accessToken = null;
 
       final options = RequestOptions(path: '/test');
       final handler = _MockRequestInterceptorHandler();
