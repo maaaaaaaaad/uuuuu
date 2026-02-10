@@ -1,9 +1,15 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/core/di/injection_container.dart';
+import 'package:jellomark/core/notification/fcm_service.dart';
+import 'package:jellomark/core/notification/local_notification_service.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class AppConfig {
   static Future<void> initializeApp() async {
@@ -20,10 +26,18 @@ class AppConfig {
       ),
     );
 
+    tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Asia/Seoul'));
+
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
     KakaoSdk.init(nativeAppKey: EnvConfig.kakaoNativeAppKey);
 
     await FlutterNaverMap().init(clientId: EnvConfig.naverMapClientId);
 
     await initDependencies();
+
+    await sl<LocalNotificationService>().initialize();
   }
 }
