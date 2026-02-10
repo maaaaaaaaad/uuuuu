@@ -6,13 +6,27 @@ import 'package:jellomark/core/network/auth_interceptor.dart';
 
 class MockTokenProvider implements TokenProvider {
   String? token;
+  String? refreshToken;
 
   @override
   Future<String?> getAccessToken() async => token;
 
   @override
+  Future<String?> getRefreshToken() async => refreshToken;
+
+  @override
+  Future<void> saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  }) async {
+    token = accessToken;
+    this.refreshToken = refreshToken;
+  }
+
+  @override
   Future<void> clearTokens() async {
     token = null;
+    refreshToken = null;
   }
 }
 
@@ -130,7 +144,10 @@ void main() {
     group('AuthInterceptor', () {
       test('should add AuthInterceptor when provided', () {
         final mockTokenProvider = MockTokenProvider();
-        final authInterceptor = AuthInterceptor(tokenProvider: mockTokenProvider);
+        final authInterceptor = AuthInterceptor(
+          tokenProvider: mockTokenProvider,
+          baseUrl: 'https://api.example.com',
+        );
         final client = ApiClient(
           baseUrl: 'https://api.example.com',
           authInterceptor: authInterceptor,
