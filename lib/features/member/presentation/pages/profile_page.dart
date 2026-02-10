@@ -5,6 +5,7 @@ import 'package:jellomark/features/location/presentation/widgets/location_settin
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/features/recent_shops/presentation/pages/recent_shops_page.dart';
 import 'package:jellomark/features/review/presentation/pages/my_reviews_page.dart';
+import 'package:jellomark/features/usage_history/presentation/pages/usage_history_page.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/widgets/gradient_card.dart';
@@ -166,6 +167,21 @@ class ProfilePage extends ConsumerWidget {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => const MyReviewsPage(),
+                              ),
+                            );
+                          },
+                        ),
+                        Divider(
+                          height: 1,
+                          color: SemanticColors.border.glass,
+                        ),
+                        _buildMenuItem(
+                          icon: Icons.receipt_long_outlined,
+                          title: '이용기록',
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const UsageHistoryPage(),
                               ),
                             );
                           },
