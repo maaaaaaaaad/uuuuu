@@ -7,9 +7,16 @@ import 'package:jellomark/features/location/presentation/providers/location_sett
 import 'package:jellomark/features/location/presentation/widgets/location_permission_alert_dialog.dart';
 import 'package:jellomark/features/member/presentation/pages/profile_page.dart';
 import 'package:jellomark/features/nearby_shops/presentation/pages/nearby_shops_map_page.dart';
+import 'package:jellomark/features/reservation/presentation/pages/reservation_detail_page.dart';
+import 'package:jellomark/features/reservation/presentation/providers/current_reservation_provider.dart';
+import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
+import 'package:jellomark/features/reservation/presentation/widgets/confirmed_reservation_toast.dart';
+import 'package:jellomark/features/reservation/presentation/widgets/current_reservation_bar.dart';
 import 'package:jellomark/features/search/presentation/pages/search_page.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
+import 'package:jellomark/features/notification/presentation/providers/notification_provider.dart';
 import 'package:jellomark/shared/widgets/glass_bottom_nav_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -18,15 +25,68 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver {
+  static const _dismissedToastKeyPrefix = 'dismissed_reservation_';
+
   int _currentIndex = 0;
+  Set<String> _dismissedToastIds = {};
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeFcm();
       _checkLocationPermission();
+      _loadCurrentReservations();
+      _loadDismissedToastIds();
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadCurrentReservations();
+    }
+  }
+
+  void _initializeFcm() {
+    ref.read(notificationInitProvider);
+  }
+
+  void _loadCurrentReservations() {
+    ref.read(currentReservationNotifierProvider.notifier).load();
+  }
+
+  Future<void> _loadDismissedToastIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys().where((k) => k.startsWith(_dismissedToastKeyPrefix));
+    setState(() {
+      _dismissedToastIds = keys.map((k) => k.substring(_dismissedToastKeyPrefix.length)).toSet();
+    });
+  }
+
+  Future<void> _dismissToast(String reservationId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('$_dismissedToastKeyPrefix$reservationId', true);
+    setState(() {
+      _dismissedToastIds = {..._dismissedToastIds, reservationId};
+    });
+  }
+
+  void _navigateToReservationDetail(String reservationId) {
+    ref.read(myReservationsNotifierProvider.notifier).loadReservations();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ReservationDetailPage(reservationId: reservationId),
+      ),
+    );
   }
 
   Future<void> _checkLocationPermission() async {
@@ -168,21 +228,58 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final reservationState = ref.watch(currentReservationNotifierProvider);
+    final todayReservation = reservationState.todayReservation;
+    final upcomingReservation = reservationState.upcomingReservation;
+
+    final showToast = upcomingReservation != null &&
+        !_dismissedToastIds.contains(upcomingReservation.id);
+
     return Scaffold(
       extendBody: true,
       body: Container(
         decoration: const BoxDecoration(
           gradient: AppGradients.softWhiteGradient,
         ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (child, animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-          child: _buildTab(_currentIndex),
+        child: Stack(
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: child,
+                );
+              },
+              child: _buildTab(_currentIndex),
+            ),
+            if (showToast)
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 8,
+                left: 0,
+                right: 0,
+                child: ConfirmedReservationToast(
+                  reservation: upcomingReservation,
+                  onTap: () => _navigateToReservationDetail(upcomingReservation.id),
+                  onDismiss: () => _dismissToast(upcomingReservation.id),
+                ),
+              ),
+            if (todayReservation != null)
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom + 78,
+                  ),
+                  child: CurrentReservationBar(
+                    reservation: todayReservation,
+                    onTap: () => _navigateToReservationDetail(todayReservation.id),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
       bottomNavigationBar: GlassBottomNavBar(
