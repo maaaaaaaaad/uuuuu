@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "662621136369",
+    "project_id": "jellomark-24a7f",
+    "storage_bucket": "jellomark-24a7f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:662621136369:android:a2220fcdbabb7c28079050",
+        "android_client_info": {
+          "package_name": "com.jello.jellomark"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHFYuOANAiS8rMW-U-9-Am9M2hBjOaO8c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
