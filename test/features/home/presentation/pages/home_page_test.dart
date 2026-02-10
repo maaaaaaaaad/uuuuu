@@ -17,6 +17,8 @@ import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
+import 'package:jellomark/features/reservation/domain/usecases/get_my_reservations_usecase.dart';
+import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:jellomark/features/search/domain/usecases/manage_search_history_usecase.dart';
 import 'package:jellomark/features/search/presentation/providers/search_provider.dart';
 import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
@@ -42,6 +44,9 @@ class MockLocationSettingRepository extends Mock
     implements LocationSettingRepository {}
 
 class MockLocationRepository extends Mock implements LocationRepository {}
+
+class MockGetMyReservationsUseCase extends Mock
+    implements GetMyReservationsUseCase {}
 
 class MockAuthRepository implements AuthRepository {
   @override
@@ -92,6 +97,7 @@ void main() {
     late MockManageSearchHistoryUseCase mockManageSearchHistoryUseCase;
     late MockLocationSettingRepository mockLocationSettingRepository;
     late MockLocationRepository mockLocationRepository;
+    late MockGetMyReservationsUseCase mockGetMyReservationsUseCase;
 
     setUpAll(() {
       HttpOverrides.global = MockHttpOverrides();
@@ -105,7 +111,10 @@ void main() {
       mockManageSearchHistoryUseCase = MockManageSearchHistoryUseCase();
       mockLocationSettingRepository = MockLocationSettingRepository();
       mockLocationRepository = MockLocationRepository();
+      mockGetMyReservationsUseCase = MockGetMyReservationsUseCase();
 
+      when(() => mockGetMyReservationsUseCase())
+          .thenAnswer((_) async => const Right([]));
       when(
         () => mockGetCategoriesUseCase(),
       ).thenAnswer((_) async => const Right([]));
@@ -151,6 +160,9 @@ void main() {
           ),
           locationRepositoryForSettingProvider.overrideWithValue(
             mockLocationRepository,
+          ),
+          getMyReservationsUseCaseProvider.overrideWithValue(
+            mockGetMyReservationsUseCase,
           ),
         ],
         child: const MaterialApp(home: HomePage()),
