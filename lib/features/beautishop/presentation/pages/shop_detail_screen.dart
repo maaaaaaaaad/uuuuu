@@ -14,6 +14,7 @@ import 'package:jellomark/features/beautishop/presentation/widgets/shop_descript
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_map_widget.dart';
 import 'package:jellomark/features/favorite/presentation/widgets/favorite_button.dart';
+import 'package:jellomark/features/reservation/presentation/pages/create_reservation_page.dart';
 import 'package:jellomark/features/location/domain/entities/route.dart'
     as domain;
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
@@ -150,7 +151,7 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
           _buildBackButton(context),
           _buildFavoriteButton(context, shop),
           _buildShopInfoSheet(context, shopDetail, treatmentsAsync, routeAsync),
-          _buildBottomReservationButton(context),
+          _buildBottomReservationButton(context, shop.id, treatmentsAsync),
         ],
       ),
     );
@@ -452,7 +453,23 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
     );
   }
 
-  Widget _buildBottomReservationButton(BuildContext context) {
+  void _navigateToCreateReservation(
+      String shopId, List<ServiceMenu> treatments) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateReservationPage(
+          shopId: shopId,
+          treatments: treatments,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomReservationButton(
+    BuildContext context,
+    String shopId,
+    AsyncValue<List<ServiceMenu>> treatmentsAsync,
+  ) {
     return Positioned(
       left: 0,
       right: 0,
@@ -474,7 +491,11 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
             width: double.infinity,
             height: _bottomButtonHeight,
             child: TextButton(
-              onPressed: () {},
+              onPressed: treatmentsAsync.whenOrNull(
+                data: (treatments) => treatments.isNotEmpty
+                    ? () => _navigateToCreateReservation(shopId, treatments)
+                    : null,
+              ),
               style: TextButton.styleFrom(
                 foregroundColor: SemanticColors.button.secondaryText,
                 shape: const RoundedRectangleBorder(
