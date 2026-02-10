@@ -13,6 +13,7 @@ import 'package:jellomark/features/beautishop/data/repositories/beauty_shop_repo
 import 'package:jellomark/features/beautishop/domain/repositories/beauty_shop_repository.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops_usecase.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_shop_reviews.dart';
+import 'package:jellomark/features/beautishop/domain/usecases/get_shop_services.dart';
 import 'package:jellomark/features/category/data/datasources/category_remote_datasource.dart';
 import 'package:jellomark/features/category/data/repositories/category_repository_impl.dart';
 import 'package:jellomark/features/category/domain/repositories/category_repository.dart';
@@ -54,6 +55,27 @@ import 'package:jellomark/features/recent_shops/domain/repositories/recent_shops
 import 'package:jellomark/features/recent_shops/domain/usecases/add_recent_shop_usecase.dart';
 import 'package:jellomark/features/recent_shops/domain/usecases/clear_recent_shops_usecase.dart';
 import 'package:jellomark/features/recent_shops/domain/usecases/get_recent_shops_usecase.dart';
+import 'package:jellomark/features/reservation/data/datasources/reservation_remote_datasource.dart';
+import 'package:jellomark/features/reservation/data/repositories/reservation_repository_impl.dart';
+import 'package:jellomark/features/reservation/domain/repositories/reservation_repository.dart';
+import 'package:jellomark/features/reservation/domain/usecases/cancel_reservation_usecase.dart';
+import 'package:jellomark/features/reservation/domain/usecases/create_reservation_usecase.dart';
+import 'package:jellomark/features/reservation/domain/usecases/get_available_dates_usecase.dart';
+import 'package:jellomark/features/reservation/domain/usecases/get_available_slots_usecase.dart';
+import 'package:jellomark/features/reservation/domain/usecases/get_my_reservations_usecase.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:jellomark/core/notification/fcm_service.dart';
+import 'package:jellomark/core/notification/local_notification_service.dart';
+import 'package:jellomark/core/notification/navigator_key.dart';
+import 'package:jellomark/core/notification/notification_handler.dart';
+import 'package:jellomark/features/notification/data/datasources/device_token_remote_datasource.dart';
+import 'package:jellomark/features/notification/data/repositories/device_token_repository_impl.dart';
+import 'package:jellomark/features/notification/domain/repositories/device_token_repository.dart';
+import 'package:jellomark/features/notification/domain/usecases/register_device_token_usecase.dart';
+import 'package:jellomark/features/usage_history/data/datasources/usage_history_remote_datasource.dart';
+import 'package:jellomark/features/usage_history/data/repositories/usage_history_repository_impl.dart';
+import 'package:jellomark/features/usage_history/domain/repositories/usage_history_repository.dart';
+import 'package:jellomark/features/usage_history/domain/usecases/get_usage_history_usecase.dart';
 
 final sl = GetIt.instance;
 
@@ -124,6 +146,10 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<GetShopReviews>(
     () => GetShopReviews(repository: sl<BeautyShopRepository>()),
+  );
+
+  sl.registerLazySingleton<GetShopServices>(
+    () => GetShopServices(repository: sl<BeautyShopRepository>()),
   );
 
   sl.registerLazySingleton<CategoryRemoteDataSource>(
@@ -256,6 +282,87 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<ClearRecentShopsUseCase>(
     () => ClearRecentShopsUseCase(sl<RecentShopsRepository>()),
+  );
+
+  sl.registerLazySingleton<ReservationRemoteDataSource>(
+    () => ReservationRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  sl.registerLazySingleton<ReservationRepository>(
+    () => ReservationRepositoryImpl(
+      remoteDataSource: sl<ReservationRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<CreateReservationUseCase>(
+    () => CreateReservationUseCase(repository: sl<ReservationRepository>()),
+  );
+
+  sl.registerLazySingleton<GetMyReservationsUseCase>(
+    () => GetMyReservationsUseCase(repository: sl<ReservationRepository>()),
+  );
+
+  sl.registerLazySingleton<CancelReservationUseCase>(
+    () => CancelReservationUseCase(repository: sl<ReservationRepository>()),
+  );
+
+  sl.registerLazySingleton<GetAvailableDatesUseCase>(
+    () => GetAvailableDatesUseCase(repository: sl<ReservationRepository>()),
+  );
+
+  sl.registerLazySingleton<GetAvailableSlotsUseCase>(
+    () => GetAvailableSlotsUseCase(repository: sl<ReservationRepository>()),
+  );
+
+  sl.registerLazySingleton<UsageHistoryRemoteDataSource>(
+    () => UsageHistoryRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  sl.registerLazySingleton<UsageHistoryRepository>(
+    () => UsageHistoryRepositoryImpl(
+      remoteDataSource: sl<UsageHistoryRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetUsageHistoryUseCase>(
+    () => GetUsageHistoryUseCase(repository: sl<UsageHistoryRepository>()),
+  );
+
+  sl.registerLazySingleton<DeviceTokenRemoteDataSource>(
+    () => DeviceTokenRemoteDataSourceImpl(apiClient: sl<ApiClient>()),
+  );
+
+  sl.registerLazySingleton<DeviceTokenRepository>(
+    () => DeviceTokenRepositoryImpl(
+      remoteDataSource: sl<DeviceTokenRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<RegisterDeviceTokenUseCase>(
+    () => RegisterDeviceTokenUseCase(repository: sl<DeviceTokenRepository>()),
+  );
+
+  sl.registerLazySingleton<LocalNotificationService>(
+    () => LocalNotificationService(
+      onNotificationTap: (payload) {
+        sl<NotificationHandler>().handleNotificationResponsePayload(payload);
+      },
+    ),
+  );
+
+  sl.registerLazySingleton<NotificationHandler>(
+    () => NotificationHandler(
+      navigatorKey: navigatorKey,
+      localNotificationService: sl<LocalNotificationService>(),
+    ),
+  );
+
+  sl.registerLazySingleton<FcmService>(
+    () => FcmService(
+      messaging: FirebaseMessaging.instance,
+      deviceTokenRepository: sl<DeviceTokenRepository>(),
+      notificationHandler: sl<NotificationHandler>(),
+    ),
   );
 
   _initialized = true;
