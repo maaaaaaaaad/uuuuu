@@ -58,6 +58,15 @@ app.*.map.json
 ios/Flutter/Dev.xcconfig
 ios/Flutter/Prod.xcconfig
 
-# Android local properties
+# Android signing & local properties
 android/local.properties
 android/key.properties
+*.jks
+*.keystore
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+vendor/bundle/
