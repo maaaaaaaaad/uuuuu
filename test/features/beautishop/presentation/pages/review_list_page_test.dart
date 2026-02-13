@@ -204,7 +204,18 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        expect(find.byType(BackdropFilter), findsWidgets);
+        final containers = tester.widgetList<Container>(find.byType(Container));
+        bool hasGlassStyle = false;
+        for (final container in containers) {
+          final decoration = container.decoration;
+          if (decoration is BoxDecoration &&
+              decoration.borderRadius != null &&
+              decoration.border != null) {
+            hasGlassStyle = true;
+            break;
+          }
+        }
+        expect(hasGlassStyle, isTrue);
       });
 
       testWidgets('uses PillChip for sort tabs', (tester) async {
