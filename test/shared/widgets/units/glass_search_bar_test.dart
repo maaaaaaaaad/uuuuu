@@ -30,12 +30,22 @@ void main() {
       expect(find.text('검색'), findsOneWidget);
     });
 
-    testWidgets('has blur effect with BackdropFilter', (tester) async {
+    testWidgets('has container with border decoration', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(home: Scaffold(body: GlassSearchBar())),
       );
 
-      expect(find.byType(BackdropFilter), findsOneWidget);
+      final container = tester.widget<Container>(
+        find
+            .descendant(
+              of: find.byType(GlassSearchBar),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
+
+      final decoration = container.decoration as BoxDecoration?;
+      expect(decoration?.border, isNotNull);
     });
 
     testWidgets('has semi-transparent white background', (tester) async {
@@ -61,9 +71,17 @@ void main() {
         const MaterialApp(home: Scaffold(body: GlassSearchBar())),
       );
 
-      final clippedContainer = tester.widget<ClipRRect>(find.byType(ClipRRect));
+      final container = tester.widget<Container>(
+        find
+            .descendant(
+              of: find.byType(GlassSearchBar),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
 
-      expect(clippedContainer.borderRadius, isNotNull);
+      final decoration = container.decoration as BoxDecoration?;
+      expect(decoration?.borderRadius, isNotNull);
     });
 
     testWidgets('calls onTap when tapped', (tester) async {
