@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/full_screen_image_viewer.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 void main() {
   group('FullScreenImageViewer', () {
@@ -52,7 +53,8 @@ void main() {
       expect(find.text('1/5'), findsOneWidget);
 
       await tester.fling(find.byType(PageView), const Offset(-300, 0), 1000);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.text('2/5'), findsOneWidget);
     });
@@ -95,12 +97,14 @@ void main() {
       );
 
       await tester.tap(find.text('Open'));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(FullScreenImageViewer), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('close_button')));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(FullScreenImageViewer), findsNothing);
     });
@@ -143,12 +147,14 @@ void main() {
       );
 
       await tester.tap(find.text('Open'));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(FullScreenImageViewer), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('background_tap_area')));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(FullScreenImageViewer), findsNothing);
     });
@@ -201,7 +207,7 @@ void main() {
       expect(positioned.bottom, isNotNull);
     });
 
-    testWidgets('should have white close icon', (tester) async {
+    testWidgets('should have close icon with onDark color', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: FullScreenImageViewer(
@@ -212,7 +218,7 @@ void main() {
       );
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.close));
-      expect(icon.color, Colors.white);
+      expect(icon.color, SemanticColors.icon.onDark);
     });
 
     testWidgets('should start from initialIndex 0 by default', (tester) async {
