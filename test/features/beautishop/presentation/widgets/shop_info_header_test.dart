@@ -61,6 +61,7 @@ void main() {
               name: '블루밍 네일',
               rating: 4.8,
               reviewCount: 234,
+              address: '서울시 강남구 역삼동 123-45',
               distance: '300m',
             ),
           ),
