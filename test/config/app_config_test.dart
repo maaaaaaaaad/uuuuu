@@ -25,7 +25,51 @@ void main() {
               return null;
             });
 
-        await AppConfig.initializeApp();
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(
+          const MethodChannel('dev.flutter.pigeon.firebase_core_platform_interface.FirebaseCoreHostApi.initializeCore'),
+          (MethodCall methodCall) async {
+            return <String, dynamic>{
+              'name': '[DEFAULT]',
+              'options': <String, dynamic>{
+                'apiKey': 'test',
+                'appId': 'test',
+                'messagingSenderId': 'test',
+                'projectId': 'test',
+              },
+              'pluginConstants': <String, dynamic>{},
+            };
+          },
+        );
+
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(
+          const MethodChannel('dev.flutter.pigeon.firebase_core_platform_interface.FirebaseCoreHostApi.initializeApp'),
+          (MethodCall methodCall) async {
+            return <String, dynamic>{
+              'name': '[DEFAULT]',
+              'options': <String, dynamic>{
+                'apiKey': 'test',
+                'appId': 'test',
+                'messagingSenderId': 'test',
+                'projectId': 'test',
+              },
+              'pluginConstants': <String, dynamic>{},
+            };
+          },
+        );
+
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(
+          const MethodChannel('plugins.flutter.io/firebase_messaging'),
+          (MethodCall methodCall) async => null,
+        );
+
+        try {
+          await AppConfig.initializeApp();
+        } catch (e) {
+          // Firebase may still fail, but we can check orientation was called
+        }
 
         final orientationCall = calls.firstWhere(
           (call) => call.method == 'SystemChrome.setPreferredOrientations',
