@@ -28,35 +28,39 @@ void main() {
 
   group('JelloMarkApp', () {
     testWidgets('should force light mode only (no dark theme)', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            checkAuthStatusUseCaseProvider.overrideWithValue(mockCheckAuthStatusUseCase),
-          ],
-          child: const JelloMarkApp(),
-        ),
-      );
+      await tester.runAsync(() async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              checkAuthStatusUseCaseProvider.overrideWithValue(mockCheckAuthStatusUseCase),
+            ],
+            child: const JelloMarkApp(),
+          ),
+        );
 
-      final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+        final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
 
-      expect(materialApp.darkTheme, isNull);
-      expect(materialApp.themeMode, ThemeMode.light);
+        expect(materialApp.darkTheme, isNull);
+        expect(materialApp.themeMode, ThemeMode.light);
+      });
     });
 
     testWidgets('should have MaterialApp with correct title', (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            checkAuthStatusUseCaseProvider.overrideWithValue(mockCheckAuthStatusUseCase),
-          ],
-          child: const JelloMarkApp(),
-        ),
-      );
+      await tester.runAsync(() async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              checkAuthStatusUseCaseProvider.overrideWithValue(mockCheckAuthStatusUseCase),
+            ],
+            child: const JelloMarkApp(),
+          ),
+        );
 
-      final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+        final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
 
-      expect(materialApp.title, '젤로마크');
-      expect(materialApp.debugShowCheckedModeBanner, false);
+        expect(materialApp.title, '젤로마크');
+        expect(materialApp.debugShowCheckedModeBanner, false);
+      });
     });
   });
 }
