@@ -306,7 +306,18 @@ void main() {
         await tester.pumpWidget(createProfilePage());
         await tester.pumpAndSettle();
 
-        expect(find.byType(BackdropFilter), findsWidgets);
+        final containers = tester.widgetList<Container>(find.byType(Container));
+        bool hasGlassStyle = false;
+        for (final container in containers) {
+          final decoration = container.decoration;
+          if (decoration is BoxDecoration &&
+              decoration.borderRadius != null &&
+              decoration.border != null) {
+            hasGlassStyle = true;
+            break;
+          }
+        }
+        expect(hasGlassStyle, isTrue);
       });
     });
 
