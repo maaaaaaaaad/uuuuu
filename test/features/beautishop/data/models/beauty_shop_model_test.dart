@@ -22,7 +22,7 @@ void main() {
         '일': '휴무',
       },
       'description': '최고의 뷰티 서비스를 제공합니다.',
-      'image': 'https://example.com/image.jpg',
+      'images': ['https://example.com/image.jpg'],
       'averageRating': 4.5,
       'reviewCount': 128,
       'categories': [
@@ -60,8 +60,9 @@ void main() {
       expect(model.longitude, equals(127.0536));
     });
 
-    test('fromJson parses image as imageUrl', () {
+    test('fromJson parses image as images list', () {
       final model = BeautyShopModel.fromJson(testJson);
+      expect(model.images, equals(['https://example.com/image.jpg']));
       expect(model.imageUrl, equals('https://example.com/image.jpg'));
     });
 
@@ -91,10 +92,11 @@ void main() {
       expect(model.operatingHours, contains('월'));
     });
 
-    test('fromJson handles null image', () {
-      final jsonWithNullImage = Map<String, dynamic>.from(testJson);
-      jsonWithNullImage['image'] = null;
-      final model = BeautyShopModel.fromJson(jsonWithNullImage);
+    test('fromJson handles empty images list', () {
+      final jsonWithEmptyImages = Map<String, dynamic>.from(testJson);
+      jsonWithEmptyImages['images'] = [];
+      final model = BeautyShopModel.fromJson(jsonWithEmptyImages);
+      expect(model.images, isEmpty);
       expect(model.imageUrl, isNull);
     });
 
