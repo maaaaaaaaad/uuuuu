@@ -133,7 +133,7 @@ void main() {
           invocation,
         ) async {
           final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-          if (filter.sortBy == 'RATING' && filter.minRating == 4.0) {
+          if (filter.sortBy == 'DISTANCE') {
             return const Right(
               PagedBeautyShops(
                 items: nearbyShops,
@@ -637,12 +637,13 @@ void main() {
 
         const nearbyShopsFromApi = [
           BeautyShop(
-            id: '1',
-            name: 'Far High Rating',
+            id: '3',
+            name: 'Near High Rating',
             address: 'Address',
-            latitude: 37.5547,
-            longitude: 126.9707,
-            rating: 4.9,
+            latitude: 37.5180,
+            longitude: 127.0480,
+            rating: 4.8,
+            distance: 0.1,
           ),
           BeautyShop(
             id: '2',
@@ -651,14 +652,16 @@ void main() {
             latitude: 37.5182,
             longitude: 127.0483,
             rating: 4.0,
+            distance: 0.15,
           ),
           BeautyShop(
-            id: '3',
-            name: 'Near High Rating',
+            id: '1',
+            name: 'Far High Rating',
             address: 'Address',
-            latitude: 37.5180,
-            longitude: 127.0480,
-            rating: 4.8,
+            latitude: 37.5547,
+            longitude: 126.9707,
+            rating: 4.9,
+            distance: 5.2,
           ),
         ];
 
@@ -670,7 +673,7 @@ void main() {
           invocation,
         ) async {
           final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-          if (filter.sortBy == 'RATING' && filter.minRating == 4.0) {
+          if (filter.sortBy == 'DISTANCE') {
             return const Right(
               PagedBeautyShops(
                 items: nearbyShopsFromApi,
@@ -737,7 +740,7 @@ void main() {
           invocation,
         ) async {
           final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-          if (filter.sortBy == 'RATING' && filter.minRating == 4.0) {
+          if (filter.sortBy == 'DISTANCE') {
             return const Right(
               PagedBeautyShops(
                 items: nearbyShopsFromApi,
