@@ -77,7 +77,7 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
     return shopAsync.when(
       data: (shop) => shop,
       loading: () => widget.shop,
-      error: (_, __) => widget.shop,
+      error: (_, _) => widget.shop,
     );
   }
 
