@@ -91,7 +91,7 @@ void main() {
       expect(find.byIcon(Icons.person_outline), findsOneWidget);
     });
 
-    testWidgets('should apply BackdropFilter for glass effect', (tester) async {
+    testWidgets('should have navigation background color', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -104,7 +104,16 @@ void main() {
         ),
       );
 
-      expect(find.byType(BackdropFilter), findsOneWidget);
+      final containers = tester.widgetList<Container>(
+        find.descendant(
+          of: find.byType(GlassBottomNavBar),
+          matching: find.byType(Container),
+        ),
+      );
+      final hasNavContainer = containers.any(
+        (c) => c.decoration is BoxDecoration && (c.decoration as BoxDecoration).boxShadow != null,
+      );
+      expect(hasNavContainer, isTrue);
     });
 
     testWidgets('should have top rounded corners only for edge-to-edge style', (tester) async {
@@ -120,14 +129,21 @@ void main() {
         ),
       );
 
-      final clipRRect = tester.widget<ClipRRect>(find.byType(ClipRRect));
-      expect(
-        clipRRect.borderRadius,
-        const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+      final containers = tester.widgetList<Container>(
+        find.descendant(
+          of: find.byType(GlassBottomNavBar),
+          matching: find.byType(Container),
         ),
       );
+      final hasRoundedCorners = containers.any((c) {
+        if (c.decoration is! BoxDecoration) return false;
+        final decoration = c.decoration as BoxDecoration;
+        return decoration.borderRadius == const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        );
+      });
+      expect(hasRoundedCorners, isTrue);
     });
 
     testWidgets('should display label for selected item only', (tester) async {
