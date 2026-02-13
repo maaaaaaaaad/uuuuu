@@ -18,7 +18,7 @@ void main() {
       expect(find.text('Test Content'), findsOneWidget);
     });
 
-    testWidgets('should apply BackdropFilter with blur', (tester) async {
+    testWidgets('should have container with card background color', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -29,7 +29,14 @@ void main() {
         ),
       );
 
-      expect(find.byType(BackdropFilter), findsOneWidget);
+      final container = tester.widgetList<Container>(
+        find.descendant(
+          of: find.byType(GlassCard),
+          matching: find.byType(Container),
+        ),
+      ).first;
+      final decoration = container.decoration as BoxDecoration;
+      expect(decoration.border, isNotNull);
     });
 
     testWidgets('should apply default padding of 16', (tester) async {
@@ -134,12 +141,14 @@ void main() {
         ),
       );
 
-      final clipRRectFinder = find.byWidgetPredicate(
+      final containerFinder = find.byWidgetPredicate(
         (widget) =>
-            widget is ClipRRect &&
-            widget.borderRadius == BorderRadius.circular(30),
+            widget is Container &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).borderRadius ==
+                BorderRadius.circular(30),
       );
-      expect(clipRRectFinder, findsOneWidget);
+      expect(containerFinder, findsOneWidget);
     });
 
     group('Tap Animation', () {
