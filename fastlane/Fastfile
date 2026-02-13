@@ -27,10 +27,11 @@ platform :ios do
       export_method: "ad-hoc",
       output_directory: "build/ios",
       output_name: "Runner.ipa",
+      xcargs: "-allowProvisioningUpdates",
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: {
-          "com.jello.jellomark" => ENV["IOS_PROVISIONING_PROFILE_NAME"] || "match AdHoc com.jello.jellomark"
+          "com.jello.jellomark" => "com.jello.jellomark AdHoc"
         }
       }
     )
