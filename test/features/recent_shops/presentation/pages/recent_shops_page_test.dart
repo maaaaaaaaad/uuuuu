@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:jellomark/features/recent_shops/domain/entities/recent_shop.dart';
 import 'package:jellomark/features/recent_shops/domain/usecases/add_recent_shop_usecase.dart';
 import 'package:jellomark/features/recent_shops/domain/usecases/clear_recent_shops_usecase.dart';
@@ -48,6 +49,7 @@ void main() {
         addRecentShopUseCaseProvider.overrideWithValue(mockAddRecentShopUseCase),
         clearRecentShopsUseCaseProvider
             .overrideWithValue(mockClearRecentShopsUseCase),
+        currentLocationProvider.overrideWith((ref) async => null),
       ],
       child: const MaterialApp(
         home: RecentShopsPage(),
