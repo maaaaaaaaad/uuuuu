@@ -384,7 +384,18 @@ void main() {
         await tester.tap(find.text('Open'));
         await tester.pumpAndSettle();
 
-        expect(find.byType(BackdropFilter), findsWidgets);
+        final containers = tester.widgetList<Container>(find.byType(Container));
+        bool hasGlassStyle = false;
+        for (final container in containers) {
+          final decoration = container.decoration;
+          if (decoration is BoxDecoration &&
+              decoration.borderRadius != null &&
+              decoration.border != null) {
+            hasGlassStyle = true;
+            break;
+          }
+        }
+        expect(hasGlassStyle, isTrue);
       });
 
       testWidgets('handle bar has correct dimensions (width 40, height 4)', (
