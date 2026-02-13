@@ -87,7 +87,7 @@ void main() {
       invocation,
     ) async {
       final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-      if (filter.sortBy == 'RATING' && filter.minRating == 4.0) {
+      if (filter.sortBy == 'DISTANCE') {
         return const Right(
           PagedBeautyShops(
             items: nearbyShops,
@@ -130,6 +130,10 @@ void main() {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
+      final scrollView = find.byKey(const Key('home_tab_scroll_view'));
+      await tester.drag(scrollView, const Offset(0, -400));
+      await tester.pumpAndSettle();
+
       expect(find.text('추천 샵'), findsOneWidget);
       expect(find.text('Recommended Shop'), findsOneWidget);
     });
@@ -138,6 +142,10 @@ void main() {
       setupSuccessfulMocks();
 
       await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      final scrollView = find.byKey(const Key('home_tab_scroll_view'));
+      await tester.drag(scrollView, const Offset(0, -800));
       await tester.pumpAndSettle();
 
       expect(find.text('새로 입점한 샵'), findsOneWidget);
