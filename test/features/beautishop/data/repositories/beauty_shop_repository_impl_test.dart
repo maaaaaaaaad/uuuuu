@@ -263,14 +263,15 @@ void main() {
         when(
           () => mockRemoteDataSource.getBeautyShops(
             page: 0,
-            size: 10,
+            size: 100,
             keyword: null,
-            sortBy: null,
-            sortOrder: null,
+            sortBy: 'DISTANCE',
+            sortOrder: 'ASC',
             categoryId: null,
             latitude: 37.5065,
             longitude: 127.0536,
             minRating: null,
+            radiusKm: null,
           ),
         ).thenAnswer((_) async => pagedModel);
 
