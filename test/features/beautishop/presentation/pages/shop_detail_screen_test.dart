@@ -1,17 +1,27 @@
 import 'dart:io';
 
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/beautishop/data/models/beauty_shop_model.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
+import 'package:jellomark/features/beautishop/presentation/providers/shop_provider.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/full_screen_image_viewer.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbnail_grid.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
+import 'package:jellomark/features/recent_shops/domain/entities/recent_shop.dart';
+import 'package:jellomark/features/recent_shops/domain/repositories/recent_shops_repository.dart';
+import 'package:jellomark/features/recent_shops/domain/usecases/add_recent_shop_usecase.dart';
+import 'package:jellomark/features/recent_shops/domain/usecases/clear_recent_shops_usecase.dart';
+import 'package:jellomark/features/recent_shops/domain/usecases/get_recent_shops_usecase.dart';
+import 'package:jellomark/features/recent_shops/presentation/providers/recent_shops_provider.dart';
 import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
-import 'package:jellomark/shared/theme/app_colors.dart';
+import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/glass_card.dart';
 
 import '../../../../helpers/mock_http_client.dart';
@@ -43,6 +53,7 @@ void main() {
     }) {
       return ProviderScope(
         overrides: [
+          shopByIdProvider(shop.id).overrideWith((ref) async => shop),
           shopTreatmentsProvider(shop.id).overrideWith((ref) {
             if (errorMessage != null) {
               throw Exception(errorMessage);
@@ -52,6 +63,10 @@ void main() {
           shopReviewsNotifierProvider(
             shop.id,
           ).overrideWith((ref) => _MockShopReviewsNotifier()),
+          currentLocationProvider.overrideWith((ref) async => null),
+          recentShopsNotifierProvider.overrideWith(
+            (ref) => _MockRecentShopsNotifier(),
+          ),
         ],
         child: MaterialApp(home: ShopDetailScreen(shop: shop)),
       );
@@ -92,17 +107,27 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            shopByIdProvider(testShop.id).overrideWith((ref) async => testShop),
             shopTreatmentsProvider(testShop.id).overrideWith((ref) async {
-              await Future<void>.value();
+              await Future.delayed(const Duration(milliseconds: 100));
               return const <ServiceMenu>[];
             }),
             shopReviewsNotifierProvider(
               testShop.id,
             ).overrideWith((ref) => _MockShopReviewsNotifier()),
+            currentLocationProvider.overrideWith((ref) async => null),
+            recentShopsNotifierProvider.overrideWith(
+              (ref) => _MockRecentShopsNotifier(),
+            ),
           ],
           child: MaterialApp(home: ShopDetailScreen(shop: testShop)),
         ),
       );
+      await tester.pump();
+
+      await tester.tap(find.text('시술'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
@@ -130,7 +155,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('시술 메뉴'), findsOneWidget);
+      expect(find.text('시술'), findsOneWidget);
+
+      await tester.tap(find.text('시술'));
+      await tester.pumpAndSettle();
+
       expect(find.text('50,000원'), findsOneWidget);
       expect(find.text('70,000원'), findsOneWidget);
     });
@@ -143,7 +172,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('시술 메뉴'), findsNothing);
+      await tester.tap(find.text('시술'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('등록된 시술이 없습니다'), findsOneWidget);
     });
 
     testWidgets('should display error message when loading fails', (
@@ -157,6 +189,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      await tester.tap(find.text('시술'));
+      await tester.pumpAndSettle();
+
       expect(find.text('시술 정보를 불러올 수 없습니다'), findsOneWidget);
     });
 
@@ -166,10 +201,15 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            shopByIdProvider('shop-1').overrideWith((ref) async => testShop),
             shopTreatmentsProvider('shop-1').overrideWith((ref) async => []),
             shopReviewsNotifierProvider(
               'shop-1',
             ).overrideWith((ref) => _MockShopReviewsNotifier()),
+            currentLocationProvider.overrideWith((ref) async => null),
+            recentShopsNotifierProvider.overrideWith(
+              (ref) => _MockRecentShopsNotifier(),
+            ),
           ],
           child: MaterialApp(
             home: Builder(
@@ -214,7 +254,7 @@ void main() {
         await tester.pumpWidget(createShopDetailScreen(shop: testShop));
         await tester.pumpAndSettle();
 
-        expect(find.byType(BackdropFilter), findsWidgets);
+        expect(find.byType(DraggableScrollableSheet), findsOneWidget);
       });
 
       testWidgets('uses GlassCard for info sections', (tester) async {
@@ -228,22 +268,34 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              shopByIdProvider(testShop.id).overrideWith(
+                (ref) async => testShop,
+              ),
               shopTreatmentsProvider(testShop.id).overrideWith((ref) async {
-                await Future<void>.value();
+                await Future.delayed(const Duration(milliseconds: 100));
                 return const <ServiceMenu>[];
               }),
               shopReviewsNotifierProvider(
                 testShop.id,
               ).overrideWith((ref) => _MockShopReviewsNotifier()),
+              currentLocationProvider.overrideWith((ref) async => null),
+              recentShopsNotifierProvider.overrideWith(
+                (ref) => _MockRecentShopsNotifier(),
+              ),
             ],
             child: MaterialApp(home: ShopDetailScreen(shop: testShop)),
           ),
         );
+        await tester.pump();
+
+        await tester.tap(find.text('시술'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
 
         final indicator = tester.widget<CircularProgressIndicator>(
           find.byType(CircularProgressIndicator),
         );
-        expect(indicator.color, AppColors.mint);
+        expect(indicator.color, SemanticColors.indicator.loading);
 
         await tester.pumpAndSettle();
       });
@@ -306,7 +358,7 @@ void main() {
         );
 
         await tester.pumpWidget(createShopDetailScreen(shop: shopWithImage));
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         expect(find.byType(ImageThumbnailGrid), findsOneWidget);
       });
@@ -340,7 +392,7 @@ void main() {
         );
 
         await tester.pumpWidget(createShopDetailScreen(shop: shopWithImage));
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final glassCards = tester.widgetList<GlassCard>(find.byType(GlassCard));
         bool hasImageGridInGlassCard = false;
@@ -372,12 +424,12 @@ void main() {
         );
 
         await tester.pumpWidget(createShopDetailScreen(shop: shopWithImage));
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         final imageGrid = tester.widget<ImageThumbnailGrid>(
           find.byType(ImageThumbnailGrid),
         );
-        expect(imageGrid.imageSize, 60);
+        expect(imageGrid.imageSize, 100);
       });
 
       testWidgets('should navigate to FullScreenImageViewer on thumbnail tap', (
@@ -401,20 +453,29 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
+              shopByIdProvider(shopWithImage.id).overrideWith(
+                (ref) async => shopWithImage,
+              ),
               shopTreatmentsProvider(
                 shopWithImage.id,
               ).overrideWith((ref) async => []),
               shopReviewsNotifierProvider(
                 shopWithImage.id,
               ).overrideWith((ref) => _MockShopReviewsNotifier()),
+              currentLocationProvider.overrideWith((ref) async => null),
+              recentShopsNotifierProvider.overrideWith(
+                (ref) => _MockRecentShopsNotifier(),
+              ),
             ],
             child: MaterialApp(home: ShopDetailScreen(shop: shopWithImage)),
           ),
         );
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
 
         await tester.tap(find.byKey(const Key('thumbnail_0')));
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
 
         expect(find.byType(FullScreenImageViewer), findsOneWidget);
       });
@@ -433,6 +494,72 @@ class _MockShopReviewsNotifier extends ShopReviewsNotifier {
 
   @override
   Future<void> loadMore() async {}
+}
+
+class _MockRecentShopsNotifier extends RecentShopsNotifier {
+  _MockRecentShopsNotifier()
+      : super(
+          getRecentShopsUseCase: _MockGetRecentShopsUseCase(),
+          addRecentShopUseCase: _MockAddRecentShopUseCase(),
+          clearRecentShopsUseCase: _MockClearRecentShopsUseCase(),
+          getCurrentLocation: () async => null,
+        );
+
+  @override
+  RecentShopsState get state => const RecentShopsState();
+
+  @override
+  Future<void> loadRecentShops() async {}
+
+  @override
+  Future<void> addRecentShop(RecentShop shop) async {}
+
+  @override
+  Future<void> clearRecentShops() async {}
+}
+
+class _MockGetRecentShopsUseCase extends GetRecentShopsUseCase {
+  _MockGetRecentShopsUseCase() : super(_MockRecentShopsRepository());
+
+  @override
+  Future<Either<Failure, List<RecentShop>>> call() async {
+    return const Right([]);
+  }
+}
+
+class _MockAddRecentShopUseCase extends AddRecentShopUseCase {
+  _MockAddRecentShopUseCase() : super(_MockRecentShopsRepository());
+
+  @override
+  Future<Either<Failure, void>> call(RecentShop shop) async {
+    return const Right(null);
+  }
+}
+
+class _MockClearRecentShopsUseCase extends ClearRecentShopsUseCase {
+  _MockClearRecentShopsUseCase() : super(_MockRecentShopsRepository());
+
+  @override
+  Future<Either<Failure, void>> call() async {
+    return const Right(null);
+  }
+}
+
+class _MockRecentShopsRepository implements RecentShopsRepository {
+  @override
+  Future<Either<Failure, void>> addRecentShop(RecentShop shop) async {
+    return const Right(null);
+  }
+
+  @override
+  Future<Either<Failure, List<RecentShop>>> getRecentShops() async {
+    return const Right([]);
+  }
+
+  @override
+  Future<Either<Failure, void>> clearRecentShops() async {
+    return const Right(null);
+  }
 }
 
 class _MockRef implements Ref {
