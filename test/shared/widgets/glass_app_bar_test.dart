@@ -126,7 +126,7 @@ void main() {
       expect(find.byIcon(Icons.favorite), findsOneWidget);
     });
 
-    testWidgets('should apply BackdropFilter when not transparent', (tester) async {
+    testWidgets('should apply glass decoration when not transparent', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -136,10 +136,19 @@ void main() {
         ),
       );
 
-      expect(find.byType(BackdropFilter), findsOneWidget);
+      final containers = tester.widgetList<Container>(
+        find.descendant(
+          of: find.byType(GlassAppBar),
+          matching: find.byType(Container),
+        ),
+      );
+      final hasDecoratedContainer = containers.any(
+        (c) => c.decoration is BoxDecoration && (c.decoration as BoxDecoration).border != null,
+      );
+      expect(hasDecoratedContainer, isTrue);
     });
 
-    testWidgets('should not apply BackdropFilter when transparent', (tester) async {
+    testWidgets('should not apply glass decoration when transparent', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -149,7 +158,18 @@ void main() {
         ),
       );
 
-      expect(find.byType(BackdropFilter), findsNothing);
+      final containers = tester.widgetList<Container>(
+        find.descendant(
+          of: find.byType(GlassAppBar),
+          matching: find.byType(Container),
+        ),
+      );
+      final hasGlassDecoration = containers.any((c) {
+        if (c.decoration is! BoxDecoration) return false;
+        final d = c.decoration as BoxDecoration;
+        return d.border != null && d.shape != BoxShape.circle;
+      });
+      expect(hasGlassDecoration, isFalse);
     });
   });
 }
