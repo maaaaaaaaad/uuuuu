@@ -4,13 +4,11 @@ FIREBASE_APP_ID_ANDROID = "1:662621136369:android:a2220fcdbabb7c28079050"
 FIREBASE_APP_ID_IOS = "1:662621136369:ios:90753c3b7e3d242b079050"
 
 platform :android do
-  desc "Build and distribute Android app via Firebase App Distribution"
+  desc "Distribute Android app via Firebase App Distribution"
   lane :distribute do
-    sh("cd ../.. && flutter build apk --release --dart-define=KAKAO_NATIVE_APP_KEY=#{ENV['KAKAO_NATIVE_APP_KEY']} --dart-define=API_BASE_URL=#{ENV['API_BASE_URL']}")
-
     firebase_app_distribution(
       app: FIREBASE_APP_ID_ANDROID,
-      apk_path: "../build/app/outputs/flutter-apk/app-release.apk",
+      apk_path: "build/app/outputs/flutter-apk/app-release.apk",
       service_credentials_file: ENV["FIREBASE_SERVICE_ACCOUNT_KEY_PATH"],
       groups: "testers"
     )
@@ -18,11 +16,9 @@ platform :android do
 end
 
 platform :ios do
-  desc "Build and distribute iOS app via Firebase App Distribution"
+  desc "Distribute iOS app via Firebase App Distribution"
   lane :distribute do
     setup_ci if ENV["CI"]
-
-    sh("cd ../.. && flutter build ios --release --no-codesign --dart-define=KAKAO_NATIVE_APP_KEY=#{ENV['KAKAO_NATIVE_APP_KEY']} --dart-define=API_BASE_URL=#{ENV['API_BASE_URL']}")
 
     build_app(
       workspace: "ios/Runner.xcworkspace",
