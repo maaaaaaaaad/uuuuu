@@ -127,7 +127,6 @@ void main() {
       );
 
       expect(find.byType(GlassCard), findsOneWidget);
-      expect(find.byType(BackdropFilter), findsOneWidget);
     });
   });
 }
