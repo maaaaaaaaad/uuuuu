@@ -74,11 +74,27 @@ void main() {
       () => mockGetCategoriesUseCase(),
     ).thenAnswer((_) async => Right(testCategories));
 
-    when(() => mockGetFilteredShopsUseCase(any())).thenAnswer(
-      (_) async => Right(
-        PagedBeautyShops(items: testShops, hasNext: false, totalElements: 2),
-      ),
-    );
+    when(() => mockGetFilteredShopsUseCase(any())).thenAnswer((
+      invocation,
+    ) async {
+      final filter = invocation.positionalArguments[0] as BeautyShopFilter;
+      if (filter.sortBy == 'DISTANCE') {
+        return Right(
+          PagedBeautyShops(items: testShops, hasNext: false, totalElements: 2),
+        );
+      } else if (filter.sortBy == 'RATING') {
+        return Right(
+          PagedBeautyShops(items: testShops, hasNext: false, totalElements: 2),
+        );
+      } else if (filter.sortBy == 'CREATED_AT') {
+        return Right(
+          PagedBeautyShops(items: testShops, hasNext: false, totalElements: 2),
+        );
+      }
+      return const Right(
+        PagedBeautyShops(items: [], hasNext: false, totalElements: 0),
+      );
+    });
   }
 
   Widget buildTestWidget({
@@ -152,8 +168,17 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('내 주변 인기 샵'), findsOneWidget);
+      final scrollView = find.byKey(const Key('home_tab_scroll_view'));
+      expect(scrollView, findsOneWidget);
+
+      await tester.drag(scrollView, const Offset(0, -400));
+      await tester.pumpAndSettle();
+
       expect(find.text('추천 샵'), findsOneWidget);
+
+      await tester.drag(scrollView, const Offset(0, -400));
+      await tester.pumpAndSettle();
+
       expect(find.text('새로 입점한 샵'), findsOneWidget);
     });
 
