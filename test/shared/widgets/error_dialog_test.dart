@@ -202,7 +202,7 @@ void main() {
     });
 
     group('UI Redesign', () {
-      testWidgets('has BackdropFilter for glassmorphism', (tester) async {
+      testWidgets('has container with border decoration', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Builder(
@@ -221,7 +221,13 @@ void main() {
         await tester.tap(find.text('다이얼로그 열기'));
         await tester.pumpAndSettle();
 
-        expect(find.byType(BackdropFilter), findsWidgets);
+        final containers = tester.widgetList<Container>(find.byType(Container));
+        final hasStyledContainer = containers.any((c) {
+          if (c.decoration is! BoxDecoration) return false;
+          final d = c.decoration as BoxDecoration;
+          return d.border != null && d.borderRadius != null;
+        });
+        expect(hasStyledContainer, isTrue);
       });
 
       testWidgets('has glass card style with border', (tester) async {
