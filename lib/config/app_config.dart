@@ -29,10 +29,15 @@ class AppConfig {
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Seoul'));
 
-    await Firebase.initializeApp();
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    try {
+      await Firebase.initializeApp()
+          .timeout(const Duration(seconds: 10));
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    } catch (_) {}
 
-    KakaoSdk.init(nativeAppKey: EnvConfig.kakaoNativeAppKey);
+    try {
+      KakaoSdk.init(nativeAppKey: EnvConfig.kakaoNativeAppKey);
+    } catch (_) {}
 
     try {
       await FlutterNaverMap()
@@ -40,9 +45,11 @@ class AppConfig {
           .timeout(const Duration(seconds: 5));
     } catch (_) {}
 
-
     await initDependencies();
 
-    await sl<LocalNotificationService>().initialize();
+    try {
+      await sl<LocalNotificationService>().initialize()
+          .timeout(const Duration(seconds: 5));
+    } catch (_) {}
   }
 }
