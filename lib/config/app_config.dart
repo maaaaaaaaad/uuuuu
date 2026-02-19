@@ -34,7 +34,12 @@ class AppConfig {
 
     KakaoSdk.init(nativeAppKey: EnvConfig.kakaoNativeAppKey);
 
-    await FlutterNaverMap().init(clientId: EnvConfig.naverMapClientId);
+    try {
+      await FlutterNaverMap()
+          .init(clientId: EnvConfig.naverMapClientId)
+          .timeout(const Duration(seconds: 5));
+    } catch (_) {}
+
 
     await initDependencies();
 
