@@ -12,6 +12,13 @@ import 'package:jellomark/features/auth/presentation/pages/splash_page.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
 
+class _ThrowingAuthRepository extends MockAuthRepository {
+  @override
+  Future<TokenPair?> getStoredTokens() async {
+    throw Exception('Secure storage error');
+  }
+}
+
 class MockAuthRepository implements AuthRepository {
   TokenPair? storedTokens;
   Member? memberResult;
@@ -126,6 +133,32 @@ void main() {
       mockRepository.refreshFailure = const AuthFailure('Refresh failed');
 
       await tester.pumpWidget(createSplashPage());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Login'), findsOneWidget);
+    });
+
+    testWidgets('should navigate to login when auth check throws exception', (
+      tester,
+    ) async {
+      final throwingRepo = _ThrowingAuthRepository();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            checkAuthStatusUseCaseProvider.overrideWithValue(
+              CheckAuthStatusUseCase(authRepository: throwingRepo),
+            ),
+          ],
+          child: MaterialApp(
+            home: const SplashPage(),
+            routes: {
+              '/login': (context) => const Scaffold(body: Text('Login')),
+              '/home': (context) => const Scaffold(body: Text('Home')),
+            },
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Login'), findsOneWidget);
