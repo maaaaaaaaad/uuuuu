@@ -39,15 +39,20 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   }
 
   Future<void> _checkAuthStatus() async {
-    final checkAuthStatus = ref.read(checkAuthStatusUseCaseProvider);
-    final result = await checkAuthStatus();
+    try {
+      final checkAuthStatus = ref.read(checkAuthStatusUseCaseProvider);
+      final result = await checkAuthStatus();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    result.fold(
-      (_) => Navigator.of(context).pushReplacementNamed('/login'),
-      (_) => Navigator.of(context).pushReplacementNamed('/home'),
-    );
+      result.fold(
+        (_) => Navigator.of(context).pushReplacementNamed('/login'),
+        (_) => Navigator.of(context).pushReplacementNamed('/home'),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
   }
 
   @override
