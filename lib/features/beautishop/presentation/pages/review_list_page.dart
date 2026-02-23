@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_shop_reviews.dart';
 import 'package:jellomark/features/beautishop/presentation/providers/review_list_provider.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/review_card.dart';
-import 'package:jellomark/features/beautishop/presentation/widgets/write_review_bottom_sheet.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/widgets/pill_chip.dart';
@@ -46,18 +45,6 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
         _scrollController.position.maxScrollExtent - 200) {
       ref.read(reviewListNotifierProvider(widget.shopId).notifier).loadMore();
     }
-  }
-
-  void _showWriteReviewBottomSheet(BuildContext context) {
-    WriteReviewBottomSheet.show(
-      context: context,
-      shopName: widget.shopName,
-      onSubmit: ({int? rating, String? content}) {
-        return ref
-            .read(reviewListNotifierProvider(widget.shopId).notifier)
-            .createReview(rating: rating, content: content);
-      },
-    );
   }
 
   @override
@@ -105,32 +92,6 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
               ),
             ],
           ),
-        ),
-      ),
-      floatingActionButton: _buildGradientFab(context),
-    );
-  }
-
-  Widget _buildGradientFab(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showWriteReviewBottomSheet(context),
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          gradient: AppGradients.mintGradient,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: SemanticColors.overlay.shadowMedium,
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Icon(
-          Icons.edit_rounded,
-          color: SemanticColors.icon.onDark,
         ),
       ),
     );
@@ -233,33 +194,12 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
                 color: SemanticColors.text.secondary,
               ),
             ),
-            const SizedBox(height: 24),
-            GestureDetector(
-              onTap: () => _showWriteReviewBottomSheet(context),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  gradient: AppGradients.mintGradient,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: SemanticColors.overlay.shadowMedium,
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Text(
-                  '첫 리뷰 작성하기',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: SemanticColors.text.onDark,
-                  ),
-                ),
+            const SizedBox(height: 8),
+            Text(
+              '시술 완료 후 리뷰를 작성할 수 있습니다',
+              style: TextStyle(
+                fontSize: 13,
+                color: SemanticColors.text.secondary,
               ),
             ),
           ],
