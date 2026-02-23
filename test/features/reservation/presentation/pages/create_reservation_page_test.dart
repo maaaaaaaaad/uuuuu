@@ -103,16 +103,28 @@ void main() {
       expect(find.text('날짜 선택'), findsOneWidget);
     });
 
-    testWidgets('should display memo field', (tester) async {
+    testWidgets('should not display memo field before time selection',
+        (tester) async {
       await tester.pumpWidget(createPage());
 
-      expect(find.text('메모 (선택사항)'), findsOneWidget);
+      expect(find.text('메모 (선택사항)'), findsNothing);
     });
 
-    testWidgets('should display submit button', (tester) async {
+    testWidgets('should not display submit button before time selection',
+        (tester) async {
       await tester.pumpWidget(createPage());
 
-      expect(find.widgetWithText(ElevatedButton, '예약하기'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, '예약하기'), findsNothing);
+    });
+
+    testWidgets('should display guidance text when no treatment selected',
+        (tester) async {
+      await tester.pumpWidget(createPage());
+
+      expect(
+        find.text('시술을 선택하면 날짜와 시간을 선택할 수 있습니다'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('should display treatment options in dropdown',
@@ -126,22 +138,28 @@ void main() {
       expect(find.text('속눈썹 - 50,000원'), findsWidgets);
     });
 
-    testWidgets('should display memo text field with max length',
+    testWidgets('should hide guidance text after treatment selection',
         (tester) async {
+      when(() => mockDatesUseCase(any(), any(), any()))
+          .thenAnswer((_) async => const Right([]));
+
       await tester.pumpWidget(createPage());
 
-      final textField = tester.widget<TextField>(find.byType(TextField));
-      expect(textField.maxLength, 200);
-    });
-
-    testWidgets('submit button should be disabled initially',
-        (tester) async {
-      await tester.pumpWidget(createPage());
-
-      final button = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, '예약하기'),
+      expect(
+        find.text('시술을 선택하면 날짜와 시간을 선택할 수 있습니다'),
+        findsOneWidget,
       );
-      expect(button.onPressed, isNull);
+
+      await tester.tap(find.byType(DropdownButtonFormField<ServiceMenu>));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('젤네일 - 30,000원').last);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('시술을 선택하면 날짜와 시간을 선택할 수 있습니다'),
+        findsNothing,
+      );
     });
   });
 }
