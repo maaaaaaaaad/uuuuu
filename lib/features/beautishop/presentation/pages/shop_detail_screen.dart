@@ -14,7 +14,9 @@ import 'package:jellomark/features/beautishop/presentation/widgets/shop_descript
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_map_widget.dart';
 import 'package:jellomark/features/favorite/presentation/widgets/favorite_button.dart';
+import 'package:jellomark/features/notification/presentation/widgets/notification_permission_dialog.dart';
 import 'package:jellomark/features/reservation/presentation/pages/create_reservation_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:jellomark/features/location/domain/entities/route.dart'
     as domain;
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
@@ -453,8 +455,20 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
     );
   }
 
-  void _navigateToCreateReservation(
-      String shopId, List<ServiceMenu> treatments) {
+  Future<void> _navigateToCreateReservation(
+      String shopId, List<ServiceMenu> treatments) async {
+    final settings =
+        await FirebaseMessaging.instance.getNotificationSettings();
+    final status = settings.authorizationStatus;
+
+    if (status != AuthorizationStatus.authorized &&
+        status != AuthorizationStatus.provisional) {
+      if (!mounted) return;
+      await NotificationPermissionDialog.show(context: context);
+      return;
+    }
+
+    if (!mounted) return;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => CreateReservationPage(
