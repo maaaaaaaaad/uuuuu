@@ -257,30 +257,6 @@ void main() {
         expect(indicator.color, AppColors.mint);
       });
 
-      testWidgets('FAB has gradient decoration', (tester) async {
-        mockGetShopReviews.mockResult = const PagedShopReviews(
-          items: [],
-          hasNext: false,
-          totalElements: 0,
-        );
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
-
-        final containers = tester.widgetList<Container>(find.byType(Container));
-        bool hasGradientFab = false;
-        for (final container in containers) {
-          final decoration = container.decoration;
-          if (decoration is BoxDecoration &&
-              decoration.gradient != null &&
-              decoration.shape == BoxShape.circle) {
-            hasGradientFab = true;
-            break;
-          }
-        }
-        expect(hasGradientFab, isTrue);
-      });
-
       testWidgets('empty state has mint colored icon', (tester) async {
         mockGetShopReviews.mockResult = const PagedShopReviews(
           items: [],
@@ -297,7 +273,7 @@ void main() {
         expect(icon.color, AppColors.mint);
       });
 
-      testWidgets('empty state has write review inducement button', (
+      testWidgets('empty state shows guidance text instead of write button', (
         tester,
       ) async {
         mockGetShopReviews.mockResult = const PagedShopReviews(
@@ -309,34 +285,8 @@ void main() {
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
-        expect(find.text('첫 리뷰 작성하기'), findsOneWidget);
-      });
-
-      testWidgets('empty state button has gradient decoration', (
-        tester,
-      ) async {
-        mockGetShopReviews.mockResult = const PagedShopReviews(
-          items: [],
-          hasNext: false,
-          totalElements: 0,
-        );
-
-        await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
-
-        final containers = tester.widgetList<Container>(find.byType(Container));
-        bool hasGradientButton = false;
-        for (final container in containers) {
-          final decoration = container.decoration;
-          if (decoration is BoxDecoration && decoration.gradient != null) {
-            final child = container.child;
-            if (child != null) {
-              hasGradientButton = true;
-              break;
-            }
-          }
-        }
-        expect(hasGradientButton, isTrue);
+        expect(find.text('첫 리뷰 작성하기'), findsNothing);
+        expect(find.text('시술 완료 후 리뷰를 작성할 수 있습니다'), findsOneWidget);
       });
     });
   });
