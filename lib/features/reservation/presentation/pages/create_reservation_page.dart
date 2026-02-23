@@ -188,6 +188,10 @@ class _CreateReservationPageState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildTreatmentDropdown(),
+                  if (_selectedTreatment == null) ...[
+                    const SizedBox(height: 32),
+                    _buildGuidanceText('시술을 선택하면 날짜와 시간을 선택할 수 있습니다'),
+                  ],
                   if (_selectedTreatment != null) ...[
                     const SizedBox(height: 24),
                     _buildSectionLabel('날짜 선택'),
@@ -216,11 +220,11 @@ class _CreateReservationPageState
                       date: _selectedDate!,
                       time: _selectedTime!,
                     ),
+                    const SizedBox(height: 20),
+                    _buildMemoField(),
+                    const SizedBox(height: 32),
+                    _buildSubmitButton(createState),
                   ],
-                  const SizedBox(height: 20),
-                  _buildMemoField(),
-                  const SizedBox(height: 32),
-                  _buildSubmitButton(createState),
                 ],
               ),
             ),
@@ -308,6 +312,18 @@ class _CreateReservationPageState
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGuidanceText(String text) {
+    return Center(
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 14,
+          color: SemanticColors.text.secondary,
+        ),
       ),
     );
   }
