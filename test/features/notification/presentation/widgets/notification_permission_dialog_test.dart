@@ -39,11 +39,11 @@ void main() {
       );
     });
 
-    testWidgets('should display cancel and settings buttons', (tester) async {
+    testWidgets('should display cancel and confirm buttons', (tester) async {
       await showDialogInTest(tester);
 
       expect(find.text('취소'), findsOneWidget);
-      expect(find.text('설정으로 이동'), findsOneWidget);
+      expect(find.text('확인'), findsOneWidget);
     });
 
     testWidgets('cancel button should close dialog', (tester) async {
