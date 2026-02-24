@@ -125,7 +125,7 @@ class _NotificationPermissionContent extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                '설정으로 이동',
+                '확인',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
