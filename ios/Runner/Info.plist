@@ -71,6 +71,10 @@
 			<key>NSAllowsArbitraryLoads</key>
 			<true/>
 		</dict>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>remote-notification</string>
+		</array>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>주변 뷰티샵을 찾고 경로를 안내받기 위해 위치 정보가 필요합니다.</string>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
