@@ -457,18 +457,20 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
 
   Future<void> _navigateToCreateReservation(
       String shopId, List<ServiceMenu> treatments) async {
+    bool hasPermission = false;
     try {
       final settings =
           await FirebaseMessaging.instance.getNotificationSettings();
       final status = settings.authorizationStatus;
-
-      if (status != AuthorizationStatus.authorized &&
-          status != AuthorizationStatus.provisional) {
-        if (!mounted) return;
-        await NotificationPermissionDialog.show(context: context);
-        return;
-      }
+      hasPermission = status == AuthorizationStatus.authorized ||
+          status == AuthorizationStatus.provisional;
     } catch (_) {}
+
+    if (!hasPermission) {
+      if (!mounted) return;
+      await NotificationPermissionDialog.show(context: context);
+      return;
+    }
 
     if (!mounted) return;
     Navigator.of(context).push(
