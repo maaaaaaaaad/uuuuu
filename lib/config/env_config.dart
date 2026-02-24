@@ -6,7 +6,7 @@ class EnvConfig {
 
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.219.107:8080',
+    defaultValue: 'http://192.168.219.106:8080',
   );
 
   static const String kakaoNativeAppKey = String.fromEnvironment(
