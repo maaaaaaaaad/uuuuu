@@ -459,11 +459,16 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
       String shopId, List<ServiceMenu> treatments) async {
     bool hasPermission = false;
     try {
-      final settings =
-          await FirebaseMessaging.instance.getNotificationSettings();
-      final status = settings.authorizationStatus;
-      hasPermission = status == AuthorizationStatus.authorized ||
-          status == AuthorizationStatus.provisional;
+      final messaging = FirebaseMessaging.instance;
+      var settings = await messaging.getNotificationSettings();
+
+      if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
+        settings = await messaging.requestPermission();
+      }
+
+      hasPermission =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional;
     } catch (_) {}
 
     if (!hasPermission) {
