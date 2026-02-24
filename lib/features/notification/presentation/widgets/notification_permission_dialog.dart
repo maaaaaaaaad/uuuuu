@@ -23,7 +23,7 @@ class _NotificationPermissionContent extends StatelessWidget {
       backgroundColor: SemanticColors.special.transparent,
       child: Container(
         decoration: BoxDecoration(
-          color: SemanticColors.background.card,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: SemanticColors.border.glass,
