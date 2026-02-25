@@ -7,6 +7,7 @@ import 'package:jellomark/features/favorite/presentation/providers/favorites_pro
 import 'package:jellomark/features/review/domain/entities/review.dart';
 import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
 import 'package:jellomark/features/review/presentation/widgets/edit_review_bottom_sheet.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/glass_card.dart';
@@ -150,7 +151,7 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
     final state = ref.watch(myReviewsNotifierProvider);
 
     return Scaffold(
-      backgroundColor: SemanticColors.special.transparent,
+      backgroundColor: AppColors.backgroundMedium,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('내가 쓴 리뷰'),
