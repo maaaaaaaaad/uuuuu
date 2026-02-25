@@ -321,6 +321,43 @@ void main() {
       });
     });
 
+    group('Reservation Menu', () {
+      testWidgets('should display reservation menu item', (tester) async {
+        mockAuthRepository.memberResult = const Member(
+          id: '1',
+          nickname: '테스트유저123',
+          displayName: '테스트유저',
+          socialProvider: 'KAKAO',
+          socialId: 'test-kakao-id',
+        );
+
+        await tester.pumpWidget(createProfilePage());
+        await tester.pumpAndSettle();
+
+        expect(find.text('예약 현황'), findsOneWidget);
+        expect(find.byIcon(Icons.event_note_outlined), findsOneWidget);
+      });
+
+      testWidgets('reservation menu should appear before my reviews',
+          (tester) async {
+        mockAuthRepository.memberResult = const Member(
+          id: '1',
+          nickname: '테스트유저123',
+          displayName: '테스트유저',
+          socialProvider: 'KAKAO',
+          socialId: 'test-kakao-id',
+        );
+
+        await tester.pumpWidget(createProfilePage());
+        await tester.pumpAndSettle();
+
+        final reservationY = tester.getCenter(find.text('예약 현황')).dy;
+        final reviewY = tester.getCenter(find.text('내가 쓴 리뷰')).dy;
+
+        expect(reservationY, lessThan(reviewY));
+      });
+    });
+
     group('Location Setting Toggle', () {
       testWidgets('should display location setting toggle', (tester) async {
         mockAuthRepository.memberResult = const Member(
