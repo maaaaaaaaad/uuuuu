@@ -4,6 +4,7 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
 import 'package:jellomark/features/recent_shops/domain/entities/recent_shop.dart';
 import 'package:jellomark/features/recent_shops/presentation/providers/recent_shops_provider.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/glass_card.dart';
@@ -99,7 +100,7 @@ class _RecentShopsPageState extends ConsumerState<RecentShopsPage> {
     final state = ref.watch(recentShopsNotifierProvider);
 
     return Scaffold(
-      backgroundColor: SemanticColors.special.transparent,
+      backgroundColor: AppColors.backgroundMedium,
       extendBodyBehindAppBar: true,
       body: Container(
         decoration: const BoxDecoration(
