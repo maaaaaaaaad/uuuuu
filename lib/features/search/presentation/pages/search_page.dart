@@ -5,6 +5,7 @@ import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_scr
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
 import 'package:jellomark/features/search/presentation/providers/search_provider.dart';
 import 'package:jellomark/features/search/presentation/widgets/shop_filter_bottom_sheet.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/pill_chip.dart';
@@ -118,7 +119,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     return GestureDetector(
       onTap: _dismissKeyboard,
       child: Scaffold(
-        backgroundColor: SemanticColors.special.transparent,
+        backgroundColor: AppColors.backgroundMedium,
         extendBodyBehindAppBar: true,
         body: Container(
           decoration: const BoxDecoration(
