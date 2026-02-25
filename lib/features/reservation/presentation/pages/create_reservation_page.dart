@@ -168,7 +168,6 @@ class _CreateReservationPageState
     );
 
     return Scaffold(
-      backgroundColor: SemanticColors.special.transparent,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('예약하기'),
