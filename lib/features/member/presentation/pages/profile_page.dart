@@ -4,6 +4,7 @@ import 'package:jellomark/features/auth/presentation/providers/auth_providers.da
 import 'package:jellomark/features/location/presentation/widgets/location_setting_toggle.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/features/recent_shops/presentation/pages/recent_shops_page.dart';
+import 'package:jellomark/features/reservation/presentation/pages/my_reservations_page.dart';
 import 'package:jellomark/features/review/presentation/pages/my_reviews_page.dart';
 import 'package:jellomark/features/usage_history/presentation/pages/usage_history_page.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -160,6 +161,21 @@ class ProfilePage extends ConsumerWidget {
                     ),
                     child: Column(
                       children: [
+                        _buildMenuItem(
+                          icon: Icons.event_note_outlined,
+                          title: '예약 현황',
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const MyReservationsPage(),
+                              ),
+                            );
+                          },
+                        ),
+                        Divider(
+                          height: 1,
+                          color: SemanticColors.border.glass,
+                        ),
                         _buildMenuItem(
                           icon: Icons.rate_review_outlined,
                           title: '내가 쓴 리뷰',
