@@ -7,6 +7,7 @@ import 'package:jellomark/features/reservation/presentation/providers/reservatio
 import 'package:jellomark/features/reservation/presentation/widgets/reservation_calendar.dart';
 import 'package:jellomark/features/reservation/presentation/pages/my_reservations_page.dart';
 import 'package:jellomark/features/reservation/presentation/widgets/time_slot_grid.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -169,6 +170,7 @@ class _CreateReservationPageState
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: AppColors.backgroundMedium,
       appBar: AppBar(
         title: const Text('예약하기'),
         centerTitle: true,
@@ -176,16 +178,17 @@ class _CreateReservationPageState
         backgroundColor: SemanticColors.special.transparent,
         foregroundColor: SemanticColors.text.primary,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppGradients.softWhiteGradient,
-        ),
-        child: SafeArea(
-          child: GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
+      body: SizedBox.expand(
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            gradient: AppGradients.softWhiteGradient,
+          ),
+          child: SafeArea(
+            child: GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildTreatmentDropdown(),
@@ -220,6 +223,7 @@ class _CreateReservationPageState
             ),
           ),
         ),
+      ),
       ),
     );
   }
