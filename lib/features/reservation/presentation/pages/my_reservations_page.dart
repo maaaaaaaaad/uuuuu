@@ -4,6 +4,7 @@ import 'package:jellomark/features/reservation/domain/entities/reservation_statu
 import 'package:jellomark/features/reservation/presentation/pages/reservation_detail_page.dart';
 import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:jellomark/features/reservation/presentation/widgets/reservation_card.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -57,7 +58,7 @@ class _MyReservationsPageState extends ConsumerState<MyReservationsPage> {
     final state = ref.watch(myReservationsNotifierProvider);
 
     return Scaffold(
-      backgroundColor: SemanticColors.special.transparent,
+      backgroundColor: AppColors.backgroundMedium,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('내 예약'),
