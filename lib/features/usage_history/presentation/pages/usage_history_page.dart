@@ -5,6 +5,7 @@ import 'package:jellomark/features/beautishop/domain/usecases/get_shop_services.
 import 'package:jellomark/features/reservation/presentation/pages/create_reservation_page.dart';
 import 'package:jellomark/features/usage_history/presentation/providers/usage_history_provider.dart';
 import 'package:jellomark/features/usage_history/presentation/widgets/usage_history_card.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -65,7 +66,7 @@ class _UsageHistoryPageState extends ConsumerState<UsageHistoryPage> {
     final state = ref.watch(usageHistoryNotifierProvider);
 
     return Scaffold(
-      backgroundColor: SemanticColors.special.transparent,
+      backgroundColor: AppColors.backgroundMedium,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('이용기록'),
