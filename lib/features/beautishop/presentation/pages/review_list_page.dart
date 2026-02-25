@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_shop_reviews.dart';
 import 'package:jellomark/features/beautishop/presentation/providers/review_list_provider.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/review_card.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/widgets/pill_chip.dart';
@@ -78,7 +79,7 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
         backgroundColor: SemanticColors.background.appBar,
         foregroundColor: SemanticColors.text.primary,
       ),
-      backgroundColor: SemanticColors.special.transparent,
+      backgroundColor: AppColors.backgroundMedium,
       body: Container(
         decoration: const BoxDecoration(
           gradient: AppGradients.softWhiteGradient,
