@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/reservation/domain/entities/reservation.dart';
 import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:jellomark/features/reservation/presentation/widgets/reservation_status_badge.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -17,7 +18,7 @@ class ReservationDetailPage extends ConsumerWidget {
     final reservation = _findReservation(state);
 
     return Scaffold(
-      backgroundColor: SemanticColors.special.transparent,
+      backgroundColor: AppColors.backgroundMedium,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('예약 상세'),
@@ -26,14 +27,16 @@ class ReservationDetailPage extends ConsumerWidget {
         backgroundColor: SemanticColors.special.transparent,
         foregroundColor: SemanticColors.text.primary,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppGradients.softWhiteGradient,
-        ),
-        child: SafeArea(
-          child: reservation == null
-              ? _buildNotFound()
-              : _buildDetail(context, ref, reservation),
+      body: SizedBox.expand(
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            gradient: AppGradients.softWhiteGradient,
+          ),
+          child: SafeArea(
+            child: reservation == null
+                ? _buildNotFound()
+                : _buildDetail(context, ref, reservation),
+          ),
         ),
       ),
     );
