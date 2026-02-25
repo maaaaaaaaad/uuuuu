@@ -5,7 +5,7 @@ import 'package:jellomark/features/reservation/domain/entities/create_reservatio
 import 'package:jellomark/features/reservation/presentation/providers/available_slots_provider.dart';
 import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:jellomark/features/reservation/presentation/widgets/reservation_calendar.dart';
-import 'package:jellomark/features/reservation/presentation/widgets/reservation_summary_card.dart';
+import 'package:jellomark/features/reservation/presentation/pages/my_reservations_page.dart';
 import 'package:jellomark/features/reservation/presentation/widgets/time_slot_grid.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -155,7 +155,9 @@ class _CreateReservationPageState
       createReservationNotifierProvider,
       (previous, next) {
         if (next.isSuccess) {
-          Navigator.of(context).pop(true);
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const MyReservationsPage()),
+          );
         }
         if (next.error != null && previous?.error != next.error) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -188,20 +190,19 @@ class _CreateReservationPageState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildTreatmentDropdown(),
-                  if (_selectedTreatment == null) ...[
-                    const SizedBox(height: 32),
-                    _buildGuidanceText('시술을 선택하면 날짜와 시간을 선택할 수 있습니다'),
-                  ],
-                  if (_selectedTreatment != null) ...[
-                    const SizedBox(height: 24),
-                    _buildSectionLabel('날짜 선택'),
-                    const SizedBox(height: 8),
+                  const SizedBox(height: 24),
+                  _buildSectionLabel('날짜 선택'),
+                  const SizedBox(height: 8),
+                  if (_selectedTreatment == null)
+                    _buildGuidanceText('시술을 먼저 선택해주세요')
+                  else
                     _buildCalendarSection(datesState),
-                  ],
-                  if (_selectedDate != null) ...[
-                    const SizedBox(height: 24),
-                    _buildSectionLabel('시간 선택'),
-                    const SizedBox(height: 8),
+                  const SizedBox(height: 24),
+                  _buildSectionLabel('시간 선택'),
+                  const SizedBox(height: 8),
+                  if (_selectedDate == null)
+                    _buildGuidanceText('날짜를 먼저 선택해주세요')
+                  else ...[
                     TimeSlotGrid(
                       slots: slotsState.slots,
                       selectedTime: _selectedTime,
@@ -211,20 +212,10 @@ class _CreateReservationPageState
                     if (slotsState.error != null)
                       _buildErrorMessage(slotsState.error!),
                   ],
-                  if (_selectedTime != null) ...[
-                    const SizedBox(height: 24),
-                    ReservationSummaryCard(
-                      treatmentName: _selectedTreatment!.name,
-                      treatmentPrice: _selectedTreatment!.price,
-                      durationMinutes: _selectedTreatment!.durationMinutes,
-                      date: _selectedDate!,
-                      time: _selectedTime!,
-                    ),
-                    const SizedBox(height: 20),
-                    _buildMemoField(),
-                    const SizedBox(height: 32),
-                    _buildSubmitButton(createState),
-                  ],
+                  const SizedBox(height: 24),
+                  _buildMemoField(),
+                  const SizedBox(height: 32),
+                  _buildSubmitButton(createState),
                 ],
               ),
             ),
