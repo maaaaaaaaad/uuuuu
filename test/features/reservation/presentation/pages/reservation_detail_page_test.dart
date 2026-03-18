@@ -2,11 +2,14 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/reservation/domain/entities/reservation.dart';
 import 'package:jellomark/features/reservation/domain/entities/reservation_status.dart';
 import 'package:jellomark/features/reservation/domain/usecases/cancel_reservation_usecase.dart';
 import 'package:jellomark/features/reservation/domain/usecases/get_my_reservations_usecase.dart';
+import 'package:jellomark/features/reservation/domain/usecases/get_reservation_usecase.dart';
 import 'package:jellomark/features/reservation/presentation/pages/reservation_detail_page.dart';
+import 'package:jellomark/features/reservation/presentation/providers/reservation_detail_provider.dart';
 import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:jellomark/features/reservation/presentation/widgets/reservation_status_badge.dart';
 import 'package:mocktail/mocktail.dart';
@@ -17,13 +20,18 @@ class MockGetMyReservationsUseCase extends Mock
 class MockCancelReservationUseCase extends Mock
     implements CancelReservationUseCase {}
 
+class MockGetReservationUseCase extends Mock
+    implements GetReservationUseCase {}
+
 void main() {
   late MockGetMyReservationsUseCase mockGetUseCase;
   late MockCancelReservationUseCase mockCancelUseCase;
+  late MockGetReservationUseCase mockGetReservationUseCase;
 
   setUp(() {
     mockGetUseCase = MockGetMyReservationsUseCase();
     mockCancelUseCase = MockCancelReservationUseCase();
+    mockGetReservationUseCase = MockGetReservationUseCase();
   });
 
   final tReservation = Reservation(
@@ -60,15 +68,67 @@ void main() {
     updatedAt: DateTime(2025, 6, 10),
   );
 
+  final tCompletedReservation = Reservation(
+    id: 'res-3',
+    shopId: 'shop-1',
+    memberId: 'member-1',
+    treatmentId: 'treatment-1',
+    shopName: '젤로네일',
+    treatmentName: '젤네일',
+    treatmentPrice: 30000,
+    treatmentDuration: 60,
+    reservationDate: '2025-06-15',
+    startTime: '14:00',
+    endTime: '15:00',
+    status: ReservationStatus.completed,
+    createdAt: DateTime(2025, 6, 10),
+    updatedAt: DateTime(2025, 6, 10),
+  );
+
   Future<void> pumpDetailPage(
     WidgetTester tester,
     String reservationId,
-    List<Reservation> reservations,
+    List<Reservation> cachedReservations,
   ) async {
     when(() => mockGetUseCase())
-        .thenAnswer((_) async => Right(reservations));
+        .thenAnswer((_) async => Right(cachedReservations));
 
-    late ProviderContainer container;
+    final container = ProviderContainer(
+      overrides: [
+        getMyReservationsUseCaseProvider.overrideWithValue(mockGetUseCase),
+        cancelReservationUseCaseProvider
+            .overrideWithValue(mockCancelUseCase),
+        getReservationUseCaseProvider
+            .overrideWithValue(mockGetReservationUseCase),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await container
+        .read(myReservationsNotifierProvider.notifier)
+        .loadReservations();
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          home: ReservationDetailPage(reservationId: reservationId),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> pumpDetailPageFromApi(
+    WidgetTester tester,
+    String reservationId,
+    Reservation reservation,
+  ) async {
+    when(() => mockGetUseCase())
+        .thenAnswer((_) async => const Right([]));
+    when(() => mockGetReservationUseCase(reservationId))
+        .thenAnswer((_) async => Right(reservation));
 
     await tester.pumpWidget(
       ProviderScope(
@@ -76,21 +136,15 @@ void main() {
           getMyReservationsUseCaseProvider.overrideWithValue(mockGetUseCase),
           cancelReservationUseCaseProvider
               .overrideWithValue(mockCancelUseCase),
+          getReservationUseCaseProvider
+              .overrideWithValue(mockGetReservationUseCase),
         ],
-        child: Builder(
-          builder: (context) {
-            container = ProviderScope.containerOf(context);
-            return MaterialApp(
-              home: ReservationDetailPage(reservationId: reservationId),
-            );
-          },
+        child: MaterialApp(
+          home: ReservationDetailPage(reservationId: reservationId),
         ),
       ),
     );
 
-    await container
-        .read(myReservationsNotifierProvider.notifier)
-        .loadReservations();
     await tester.pumpAndSettle();
   }
 
@@ -178,11 +232,54 @@ void main() {
       expect(find.text('취소하기'), findsOneWidget);
     });
 
-    testWidgets('should display not found when reservation does not exist',
+    testWidgets('should display error when API fails and not in cache',
         (tester) async {
-      await pumpDetailPage(tester, 'non-existent', [tReservation]);
+      when(() => mockGetUseCase())
+          .thenAnswer((_) async => const Right([]));
+      when(() => mockGetReservationUseCase('non-existent'))
+          .thenAnswer((_) async => const Left(ServerFailure('서버 오류')));
 
-      expect(find.text('예약을 찾을 수 없습니다'), findsOneWidget);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            getMyReservationsUseCaseProvider.overrideWithValue(mockGetUseCase),
+            cancelReservationUseCaseProvider
+                .overrideWithValue(mockCancelUseCase),
+            getReservationUseCaseProvider
+                .overrideWithValue(mockGetReservationUseCase),
+          ],
+          child: const MaterialApp(
+            home: ReservationDetailPage(reservationId: 'non-existent'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('서버 오류'), findsOneWidget);
+    });
+
+    testWidgets('should display review button for completed reservation',
+        (tester) async {
+      await pumpDetailPage(tester, 'res-3', [tCompletedReservation]);
+
+      expect(find.text('리뷰 작성하기'), findsOneWidget);
+    });
+
+    testWidgets('should not display review button for pending reservation',
+        (tester) async {
+      await pumpDetailPage(tester, 'res-1', [tReservation]);
+
+      expect(find.text('리뷰 작성하기'), findsNothing);
+    });
+
+    testWidgets('should fetch from API when reservation is not in cache',
+        (tester) async {
+      await pumpDetailPageFromApi(tester, 'res-3', tCompletedReservation);
+
+      expect(find.text('젤네일'), findsOneWidget);
+      expect(find.text('젤로네일'), findsOneWidget);
+      verify(() => mockGetReservationUseCase('res-3')).called(1);
     });
   });
 }
