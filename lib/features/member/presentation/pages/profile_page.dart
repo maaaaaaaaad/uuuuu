@@ -5,6 +5,8 @@ import 'package:jellomark/features/location/presentation/widgets/location_settin
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/features/recent_shops/presentation/pages/recent_shops_page.dart';
 import 'package:jellomark/features/reservation/presentation/pages/my_reservations_page.dart';
+import 'package:jellomark/features/reservation/presentation/pages/pending_reviews_page.dart';
+import 'package:jellomark/features/reservation/presentation/providers/pending_review_provider.dart';
 import 'package:jellomark/features/review/presentation/pages/my_reviews_page.dart';
 import 'package:jellomark/features/usage_history/presentation/pages/usage_history_page.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -36,6 +38,48 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
+  Widget _buildMenuItemWithBadge({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    required int badgeCount,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: SemanticColors.icon.primary),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          color: SemanticColors.text.primary,
+        ),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (badgeCount > 0)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: SemanticColors.state.error,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$badgeCount',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: SemanticColors.text.onDark,
+                ),
+              ),
+            ),
+          const SizedBox(width: 4),
+          Icon(Icons.chevron_right, color: SemanticColors.icon.secondary),
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
+
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
     final logoutUseCase = ref.read(logoutUseCaseProvider);
     await logoutUseCase();
@@ -48,6 +92,7 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final memberAsync = ref.watch(currentMemberProvider);
+    final pendingCount = ref.watch(pendingReviewCountProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -183,6 +228,22 @@ class ProfilePage extends ConsumerWidget {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => const MyReviewsPage(),
+                              ),
+                            );
+                          },
+                        ),
+                        Divider(
+                          height: 1,
+                          color: SemanticColors.border.glass,
+                        ),
+                        _buildMenuItemWithBadge(
+                          icon: Icons.pending_actions_outlined,
+                          title: '리뷰 작성 대기',
+                          badgeCount: pendingCount,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const PendingReviewsPage(),
                               ),
                             );
                           },
