@@ -173,6 +173,41 @@ void main() {
     });
   });
 
+  group('getReservation', () {
+    const tReservationId = 'res-1';
+
+    test('should return Reservation when data source call is successful',
+        () async {
+      when(() => mockDataSource.getReservation(tReservationId))
+          .thenAnswer((_) async => tReservationModel);
+
+      final result = await repository.getReservation(tReservationId);
+
+      expect(result, isA<Right<Failure, Reservation>>());
+      result.fold(
+        (failure) => fail('Should not return failure'),
+        (reservation) {
+          expect(reservation.id, 'res-1');
+          expect(reservation.shopName, '젤로네일');
+        },
+      );
+    });
+
+    test('should return ServerFailure when data source throws DioException',
+        () async {
+      when(() => mockDataSource.getReservation(tReservationId)).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(path: ''),
+          message: 'Server error',
+        ),
+      );
+
+      final result = await repository.getReservation(tReservationId);
+
+      expect(result, isA<Left<Failure, Reservation>>());
+    });
+  });
+
   group('getAvailableDates', () {
     const tShopId = 'shop-1';
     const tTreatmentId = 'treatment-1';
@@ -260,6 +295,40 @@ void main() {
           await repository.getAvailableSlots(tShopId, tTreatmentId, tDate);
 
       expect(result, isA<Left<Failure, AvailableSlotsResult>>());
+    });
+  });
+
+  group('getPendingReviewReservations', () {
+    test(
+        'should return list of Reservation when data source call is successful',
+        () async {
+      when(() => mockDataSource.getPendingReviewReservations())
+          .thenAnswer((_) async => [tReservationModel]);
+
+      final result = await repository.getPendingReviewReservations();
+
+      expect(result, isA<Right<Failure, List<Reservation>>>());
+      result.fold(
+        (failure) => fail('Should not return failure'),
+        (reservations) {
+          expect(reservations.length, 1);
+          expect(reservations.first.id, 'res-1');
+        },
+      );
+    });
+
+    test('should return ServerFailure when data source throws DioException',
+        () async {
+      when(() => mockDataSource.getPendingReviewReservations()).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(path: ''),
+          message: 'Server error',
+        ),
+      );
+
+      final result = await repository.getPendingReviewReservations();
+
+      expect(result, isA<Left<Failure, List<Reservation>>>());
     });
   });
 }
