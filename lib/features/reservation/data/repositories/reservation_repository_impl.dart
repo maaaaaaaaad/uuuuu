@@ -69,4 +69,26 @@ class ReservationRepositoryImpl implements ReservationRepository {
       return Left(ServerFailure(e.message ?? 'Server error'));
     }
   }
+
+  @override
+  Future<Either<Failure, Reservation>> getReservation(
+      String reservationId) async {
+    try {
+      final result = await remoteDataSource.getReservation(reservationId);
+      return Right(result.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Server error'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Reservation>>>
+      getPendingReviewReservations() async {
+    try {
+      final result = await remoteDataSource.getPendingReviewReservations();
+      return Right(result.map((m) => m.toEntity()).toList());
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Server error'));
+    }
+  }
 }
