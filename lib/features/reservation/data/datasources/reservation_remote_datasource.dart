@@ -12,6 +12,8 @@ abstract class ReservationRemoteDataSource {
       String shopId, String treatmentId, String yearMonth);
   Future<AvailableSlotsResultModel> getAvailableSlots(
       String shopId, String treatmentId, String date);
+  Future<ReservationModel> getReservation(String reservationId);
+  Future<List<ReservationModel>> getPendingReviewReservations();
 }
 
 class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
@@ -76,5 +78,22 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
 
     return AvailableSlotsResultModel.fromJson(
         response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<ReservationModel> getReservation(String reservationId) async {
+    final response = await _apiClient.get('/api/reservations/$reservationId');
+
+    return ReservationModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<List<ReservationModel>> getPendingReviewReservations() async {
+    final response =
+        await _apiClient.get('/api/reservations/me/pending-review');
+
+    return (response.data as List<dynamic>)
+        .map((e) => ReservationModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }
