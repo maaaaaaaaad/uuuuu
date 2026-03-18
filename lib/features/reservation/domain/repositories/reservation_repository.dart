@@ -14,4 +14,6 @@ abstract class ReservationRepository {
       String shopId, String treatmentId, String yearMonth);
   Future<Either<Failure, AvailableSlotsResult>> getAvailableSlots(
       String shopId, String treatmentId, String date);
+  Future<Either<Failure, Reservation>> getReservation(String reservationId);
+  Future<Either<Failure, List<Reservation>>> getPendingReviewReservations();
 }
