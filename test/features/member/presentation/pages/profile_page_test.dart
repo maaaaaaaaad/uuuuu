@@ -15,6 +15,7 @@ import 'package:jellomark/features/member/domain/entities/member.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
 import 'package:jellomark/features/member/presentation/pages/profile_page.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
+import 'package:jellomark/features/reservation/presentation/providers/pending_review_provider.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/widgets/gradient_card.dart';
 import 'package:mocktail/mocktail.dart';
@@ -94,6 +95,7 @@ void main() {
           locationRepositoryForSettingProvider.overrideWithValue(
             mockLocationRepository,
           ),
+          pendingReviewCountProvider.overrideWithValue(0),
         ],
         child: MaterialApp(
           home: const ProfilePage(),
@@ -258,6 +260,7 @@ void main() {
               getCurrentMemberUseCaseProvider.overrideWithValue(
                 _CompleterMockGetCurrentMember(),
               ),
+              pendingReviewCountProvider.overrideWithValue(0),
             ],
             child: MaterialApp(
               home: const ProfilePage(),
