@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jellomark/core/di/injection_container.dart';
 import 'package:jellomark/features/reservation/domain/entities/reservation.dart';
+import 'package:jellomark/features/reservation/domain/entities/reservation_status.dart';
+import 'package:jellomark/features/reservation/presentation/providers/reservation_detail_provider.dart';
 import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:jellomark/features/reservation/presentation/widgets/reservation_status_badge.dart';
+import 'package:jellomark/features/review/domain/usecases/create_review_usecase.dart';
+import 'package:jellomark/features/review/presentation/widgets/edit_review_bottom_sheet.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -14,8 +19,7 @@ class ReservationDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(myReservationsNotifierProvider);
-    final reservation = _findReservation(state);
+    final state = ref.watch(reservationDetailNotifierProvider(reservationId));
 
     return Scaffold(
       backgroundColor: AppColors.backgroundMedium,
@@ -33,18 +37,52 @@ class ReservationDetailPage extends ConsumerWidget {
             gradient: AppGradients.softWhiteGradient,
           ),
           child: SafeArea(
-            child: reservation == null
-                ? _buildNotFound()
-                : _buildDetail(context, ref, reservation),
+            child: _buildBody(context, ref, state),
           ),
         ),
       ),
     );
   }
 
-  Reservation? _findReservation(MyReservationsState state) {
-    final matches = state.reservations.where((r) => r.id == reservationId);
-    return matches.isEmpty ? null : matches.first;
+  Widget _buildBody(
+      BuildContext context, WidgetRef ref, ReservationDetailState state) {
+    if (state.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.error != null) {
+      return _buildError(state.error!);
+    }
+
+    if (state.reservation == null) {
+      return _buildNotFound();
+    }
+
+    return _buildDetail(context, ref, state.reservation!);
+  }
+
+  Widget _buildError(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 48,
+            color: SemanticColors.state.error,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: 16,
+              color: SemanticColors.text.secondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildNotFound() {
@@ -88,6 +126,10 @@ class ReservationDetailPage extends ConsumerWidget {
               reservation.rejectionReason!.isNotEmpty) ...[
             const SizedBox(height: 24),
             _buildRejectionSection(reservation),
+          ],
+          if (reservation.status == ReservationStatus.completed) ...[
+            const SizedBox(height: 32),
+            _buildReviewButton(context, ref, reservation),
           ],
           if (reservation.status.isCancellable) ...[
             const SizedBox(height: 32),
@@ -297,6 +339,28 @@ class ReservationDetailPage extends ConsumerWidget {
     );
   }
 
+  Widget _buildReviewButton(
+      BuildContext context, WidgetRef ref, Reservation reservation) {
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
+      child: ElevatedButton(
+        onPressed: () => _showReviewSheet(context, ref, reservation),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: SemanticColors.button.primary,
+          foregroundColor: SemanticColors.button.primaryText,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: const Text(
+          '리뷰 작성하기',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+
   Widget _buildCancelButton(
       BuildContext context, WidgetRef ref, Reservation reservation) {
     return SizedBox(
@@ -317,6 +381,32 @@ class ReservationDetailPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _showReviewSheet(
+      BuildContext context, WidgetRef ref, Reservation reservation) async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => EditReviewBottomSheet(
+        onSubmit: ({int? rating, String? content}) async {
+          final createReviewUseCase = sl<CreateReviewUseCase>();
+          final result = await createReviewUseCase(
+            shopId: reservation.shopId,
+            rating: rating,
+            content: content,
+          );
+          return result.isRight();
+        },
+      ),
+    );
+
+    if (result == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('리뷰가 등록되었습니다')),
+      );
+    }
   }
 
   Future<void> _showCancelDialog(
