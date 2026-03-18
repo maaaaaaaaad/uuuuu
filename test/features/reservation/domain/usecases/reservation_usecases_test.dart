@@ -12,6 +12,7 @@ import 'package:jellomark/features/reservation/domain/usecases/create_reservatio
 import 'package:jellomark/features/reservation/domain/usecases/get_available_dates_usecase.dart';
 import 'package:jellomark/features/reservation/domain/usecases/get_available_slots_usecase.dart';
 import 'package:jellomark/features/reservation/domain/usecases/get_my_reservations_usecase.dart';
+import 'package:jellomark/features/reservation/domain/usecases/get_pending_review_reservations_usecase.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockReservationRepository extends Mock implements ReservationRepository {}
@@ -220,6 +221,36 @@ void main() {
       final result = await useCase(tShopId, tTreatmentId, tDate);
 
       expect(result, isA<Left<Failure, AvailableSlotsResult>>());
+    });
+  });
+
+  group('GetPendingReviewReservationsUseCase', () {
+    late GetPendingReviewReservationsUseCase useCase;
+
+    setUp(() {
+      useCase =
+          GetPendingReviewReservationsUseCase(repository: mockRepository);
+    });
+
+    test(
+        'should return list of Reservation when repository call is successful',
+        () async {
+      when(() => mockRepository.getPendingReviewReservations())
+          .thenAnswer((_) async => Right([tReservation]));
+
+      final result = await useCase();
+
+      expect(result, isA<Right<Failure, List<Reservation>>>());
+      verify(() => mockRepository.getPendingReviewReservations()).called(1);
+    });
+
+    test('should return Failure when repository fails', () async {
+      when(() => mockRepository.getPendingReviewReservations())
+          .thenAnswer((_) async => const Left(ServerFailure('Error')));
+
+      final result = await useCase();
+
+      expect(result, isA<Left<Failure, List<Reservation>>>());
     });
   });
 }
