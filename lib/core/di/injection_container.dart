@@ -63,6 +63,8 @@ import 'package:jellomark/features/reservation/domain/usecases/create_reservatio
 import 'package:jellomark/features/reservation/domain/usecases/get_available_dates_usecase.dart';
 import 'package:jellomark/features/reservation/domain/usecases/get_available_slots_usecase.dart';
 import 'package:jellomark/features/reservation/domain/usecases/get_my_reservations_usecase.dart';
+import 'package:jellomark/features/reservation/domain/usecases/get_pending_review_reservations_usecase.dart';
+import 'package:jellomark/features/reservation/domain/usecases/get_reservation_usecase.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:jellomark/core/notification/fcm_service.dart';
 import 'package:jellomark/core/notification/local_notification_service.dart';
@@ -312,6 +314,15 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<GetAvailableSlotsUseCase>(
     () => GetAvailableSlotsUseCase(repository: sl<ReservationRepository>()),
+  );
+
+  sl.registerLazySingleton<GetReservationUseCase>(
+    () => GetReservationUseCase(repository: sl<ReservationRepository>()),
+  );
+
+  sl.registerLazySingleton<GetPendingReviewReservationsUseCase>(
+    () => GetPendingReviewReservationsUseCase(
+        repository: sl<ReservationRepository>()),
   );
 
   sl.registerLazySingleton<UsageHistoryRemoteDataSource>(
