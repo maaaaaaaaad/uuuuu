@@ -165,6 +165,29 @@ void main() {
     });
   });
 
+  group('getReservation', () {
+    const tReservationId = 'res-1';
+
+    test('should return ReservationModel when API call is successful', () async {
+      when(() => mockApiClient.get('/api/reservations/$tReservationId'))
+          .thenAnswer(
+        (_) async => Response(
+          data: tReservationJson,
+          statusCode: 200,
+          requestOptions: RequestOptions(path: ''),
+        ),
+      );
+
+      final result = await dataSource.getReservation(tReservationId);
+
+      expect(result, isA<ReservationModel>());
+      expect(result.id, 'res-1');
+      expect(result.status, 'PENDING');
+      verify(() => mockApiClient.get('/api/reservations/$tReservationId'))
+          .called(1);
+    });
+  });
+
   group('getAvailableSlots', () {
     const tShopId = 'shop-1';
     const tTreatmentId = 'treatment-1';
@@ -201,6 +224,43 @@ void main() {
       expect(result.date, '2025-06-15');
       expect(result.slots.length, 2);
       expect(result.slots[0].available, true);
+    });
+  });
+
+  group('getPendingReviewReservations', () {
+    test('should return list of ReservationModel when API call is successful',
+        () async {
+      when(() => mockApiClient.get('/api/reservations/me/pending-review'))
+          .thenAnswer(
+        (_) async => Response(
+          data: [tReservationJson],
+          statusCode: 200,
+          requestOptions: RequestOptions(path: ''),
+        ),
+      );
+
+      final result = await dataSource.getPendingReviewReservations();
+
+      expect(result, isA<List<ReservationModel>>());
+      expect(result.length, 1);
+      expect(result.first.id, 'res-1');
+      verify(() => mockApiClient.get('/api/reservations/me/pending-review'))
+          .called(1);
+    });
+
+    test('should return empty list when no pending reviews', () async {
+      when(() => mockApiClient.get('/api/reservations/me/pending-review'))
+          .thenAnswer(
+        (_) async => Response(
+          data: <dynamic>[],
+          statusCode: 200,
+          requestOptions: RequestOptions(path: ''),
+        ),
+      );
+
+      final result = await dataSource.getPendingReviewReservations();
+
+      expect(result, isEmpty);
     });
   });
 }
