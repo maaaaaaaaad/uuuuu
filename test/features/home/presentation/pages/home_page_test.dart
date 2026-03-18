@@ -18,6 +18,7 @@ import 'package:jellomark/features/member/domain/entities/member.dart';
 import 'package:jellomark/features/member/domain/usecases/get_current_member.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/features/reservation/domain/usecases/get_my_reservations_usecase.dart';
+import 'package:jellomark/features/reservation/presentation/providers/pending_review_provider.dart';
 import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:jellomark/features/search/domain/usecases/manage_search_history_usecase.dart';
 import 'package:jellomark/features/search/presentation/providers/search_provider.dart';
@@ -164,6 +165,7 @@ void main() {
           getMyReservationsUseCaseProvider.overrideWithValue(
             mockGetMyReservationsUseCase,
           ),
+          pendingReviewCountProvider.overrideWithValue(0),
         ],
         child: const MaterialApp(home: HomePage()),
       );
