@@ -38,7 +38,6 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: SemanticColors.special.transparent,
       builder: (sheetContext) => EditReviewBottomSheet(
         initialRating: review.rating,
         initialContent: review.content,
