@@ -196,6 +196,71 @@ void main() {
     });
   });
 
+  group('filteredReservations sorting', () {
+    test('should sort by status priority when filter is null: confirmed → pending → completed → cancelled', () async {
+      final cancelled = Reservation(
+        id: 'res-cancelled',
+        shopId: 'shop-1',
+        memberId: 'member-1',
+        treatmentId: 'treatment-1',
+        reservationDate: '2025-06-10',
+        startTime: '10:00',
+        endTime: '11:00',
+        status: ReservationStatus.cancelled,
+        createdAt: DateTime(2025, 6, 10),
+        updatedAt: DateTime(2025, 6, 10),
+      );
+      final completed = Reservation(
+        id: 'res-completed',
+        shopId: 'shop-1',
+        memberId: 'member-1',
+        treatmentId: 'treatment-1',
+        reservationDate: '2025-06-12',
+        startTime: '10:00',
+        endTime: '11:00',
+        status: ReservationStatus.completed,
+        createdAt: DateTime(2025, 6, 10),
+        updatedAt: DateTime(2025, 6, 10),
+      );
+
+      when(() => mockGetUseCase()).thenAnswer(
+        (_) async => Right([cancelled, tReservation, completed, tConfirmedReservation]),
+      );
+
+      final container = createContainer();
+      addTearDown(container.dispose);
+
+      final notifier = container.read(myReservationsNotifierProvider.notifier);
+      await notifier.loadReservations();
+
+      final state = container.read(myReservationsNotifierProvider);
+      final statuses = state.filteredReservations.map((r) => r.status).toList();
+
+      expect(statuses, [
+        ReservationStatus.confirmed,
+        ReservationStatus.pending,
+        ReservationStatus.completed,
+        ReservationStatus.cancelled,
+      ]);
+    });
+
+    test('should not sort when specific filter is applied', () async {
+      when(() => mockGetUseCase())
+          .thenAnswer((_) async => Right([tReservation, tConfirmedReservation]));
+
+      final container = createContainer();
+      addTearDown(container.dispose);
+
+      final notifier = container.read(myReservationsNotifierProvider.notifier);
+      await notifier.loadReservations();
+      notifier.filterByStatus(ReservationStatus.pending);
+
+      final state = container.read(myReservationsNotifierProvider);
+      expect(state.filteredReservations.length, 1);
+      expect(state.filteredReservations.first.status, ReservationStatus.pending);
+    });
+  });
+
   group('CreateReservationNotifier', () {
     const tParams = CreateReservationParams(
       shopId: 'shop-1',
