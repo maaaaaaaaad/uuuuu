@@ -29,7 +29,6 @@ class _PendingReviewsPageState extends ConsumerState<PendingReviewsPage> {
     final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: SemanticColors.special.transparent,
       builder: (_) => EditReviewBottomSheet(
         onSubmit: ({int? rating, String? content}) async {
           final useCase = ref.read(createReviewUseCaseProvider);
