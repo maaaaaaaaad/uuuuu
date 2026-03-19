@@ -388,7 +388,6 @@ class ReservationDetailPage extends ConsumerWidget {
     final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => EditReviewBottomSheet(
         onSubmit: ({int? rating, String? content}) async {
           final createReviewUseCase = sl<CreateReviewUseCase>();
