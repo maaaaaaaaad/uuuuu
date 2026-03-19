@@ -35,9 +35,24 @@ class MyReservationsState {
     this.filterStatus,
   });
 
-  List<Reservation> get filteredReservations => filterStatus == null
-      ? reservations
-      : reservations.where((r) => r.status == filterStatus).toList();
+  static const _statusPriority = {
+    ReservationStatus.confirmed: 0,
+    ReservationStatus.pending: 1,
+    ReservationStatus.completed: 2,
+    ReservationStatus.cancelled: 3,
+    ReservationStatus.rejected: 4,
+    ReservationStatus.noShow: 5,
+  };
+
+  List<Reservation> get filteredReservations {
+    if (filterStatus != null) {
+      return reservations.where((r) => r.status == filterStatus).toList();
+    }
+    return List.of(reservations)
+      ..sort((a, b) =>
+          (_statusPriority[a.status] ?? 99)
+              .compareTo(_statusPriority[b.status] ?? 99));
+  }
 
   MyReservationsState copyWith({
     List<Reservation>? reservations,
