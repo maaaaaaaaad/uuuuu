@@ -77,7 +77,6 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => ShopFilterBottomSheet(
         categories: homeState.categories,
         selectedCategoryId: state.categoryId,
