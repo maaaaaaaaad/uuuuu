@@ -19,7 +19,6 @@ class WriteReviewBottomSheet extends StatefulWidget {
     return showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: SemanticColors.special.transparent,
       builder: (context) =>
           WriteReviewBottomSheet(shopName: shopName, onSubmit: onSubmit),
     );
