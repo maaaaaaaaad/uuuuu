@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:jellomark/core/notification/local_notification_service.dart';
+import 'package:jellomark/features/reservation/presentation/pages/pending_reviews_page.dart';
 import 'package:jellomark/features/reservation/presentation/pages/reservation_detail_page.dart';
 
 class NotificationHandler {
@@ -48,7 +49,13 @@ class NotificationHandler {
     final type = data['type'] as String?;
     final reservationId = data['reservationId'] as String?;
 
-    if (shouldNavigateToDetail(type) && reservationId != null) {
+    if (type == 'RESERVATION_COMPLETED') {
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (_) => const PendingReviewsPage(),
+        ),
+      );
+    } else if (shouldNavigateToDetail(type) && reservationId != null) {
       navigatorKey.currentState?.push(
         MaterialPageRoute(
           builder: (_) => ReservationDetailPage(reservationId: reservationId),
