@@ -11,6 +11,7 @@ import 'package:jellomark/shared/widgets/sections/category_section.dart';
 import 'package:jellomark/shared/widgets/sections/search_section.dart';
 import 'package:jellomark/shared/widgets/sections/shop_section.dart';
 import 'package:jellomark/shared/widgets/units/section_header.dart';
+import 'package:jellomark/features/reservation/presentation/widgets/upcoming_reservation_banner.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
 
 class HomeTab extends ConsumerStatefulWidget {
@@ -110,6 +111,10 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                       locationText: '현재 위치',
                       onSearchTap: widget.onSearchTap,
                     ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                  const SliverToBoxAdapter(
+                    child: UpcomingReservationBanner(),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 20)),
                   const SliverToBoxAdapter(child: HeroCarousel()),
