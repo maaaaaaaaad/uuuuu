@@ -70,14 +70,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
   Widget build(BuildContext context) {
     final homeState = ref.watch(homeNotifierProvider);
 
-    if (homeState.isLoading && homeState.recommendedShops.isEmpty) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: SemanticColors.indicator.loading,
-        ),
-      );
-    }
-
     final categories = homeState.categories
         .map(
           (c) => CategoryData(
@@ -94,6 +86,15 @@ class _HomeTabState extends ConsumerState<HomeTab> {
           Column(
             children: [
               const UpcomingReservationBanner(),
+              if (homeState.isLoading && homeState.recommendedShops.isEmpty)
+                Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: SemanticColors.indicator.loading,
+                    ),
+                  ),
+                )
+              else
               Expanded(
                 child: RefreshIndicator(
                   color: SemanticColors.indicator.loading,
