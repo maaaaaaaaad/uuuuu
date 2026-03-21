@@ -12,6 +12,8 @@ class ReviewModel extends Equatable {
   final List<String> images;
   final String createdAt;
   final String updatedAt;
+  final String? ownerReplyContent;
+  final String? ownerReplyCreatedAt;
 
   const ReviewModel({
     required this.id,
@@ -24,6 +26,8 @@ class ReviewModel extends Equatable {
     required this.images,
     required this.createdAt,
     required this.updatedAt,
+    this.ownerReplyContent,
+    this.ownerReplyCreatedAt,
   });
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
@@ -41,6 +45,8 @@ class ReviewModel extends Equatable {
           [],
       createdAt: json['createdAt'] as String,
       updatedAt: json['updatedAt'] as String,
+      ownerReplyContent: json['ownerReplyContent'] as String?,
+      ownerReplyCreatedAt: json['ownerReplyCreatedAt'] as String?,
     );
   }
 
@@ -56,6 +62,8 @@ class ReviewModel extends Equatable {
       'images': images,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
+      'ownerReplyContent': ownerReplyContent,
+      'ownerReplyCreatedAt': ownerReplyCreatedAt,
     };
   }
 
@@ -71,6 +79,10 @@ class ReviewModel extends Equatable {
       images: images,
       createdAt: DateTime.parse(createdAt),
       updatedAt: DateTime.parse(updatedAt),
+      ownerReplyContent: ownerReplyContent,
+      ownerReplyCreatedAt: ownerReplyCreatedAt != null
+          ? DateTime.parse(ownerReplyCreatedAt!)
+          : null,
     );
   }
 
@@ -86,5 +98,7 @@ class ReviewModel extends Equatable {
         images,
         createdAt,
         updatedAt,
+        ownerReplyContent,
+        ownerReplyCreatedAt,
       ];
 }
