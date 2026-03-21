@@ -9,6 +9,8 @@ class ShopReview extends Equatable {
   final List<String> images;
   final String? authorProfileImage;
   final String? serviceName;
+  final String? ownerReplyContent;
+  final DateTime? ownerReplyCreatedAt;
 
   const ShopReview({
     required this.id,
@@ -19,6 +21,8 @@ class ShopReview extends Equatable {
     this.images = const [],
     this.authorProfileImage,
     this.serviceName,
+    this.ownerReplyContent,
+    this.ownerReplyCreatedAt,
   });
 
   bool get hasRating => rating != null;
@@ -26,6 +30,8 @@ class ShopReview extends Equatable {
   bool get isRatingOnly => hasRating && !hasContent;
 
   bool get hasImages => images.isNotEmpty;
+  bool get hasOwnerReply =>
+      ownerReplyContent != null && ownerReplyContent!.isNotEmpty;
 
   String get formattedDate {
     final now = DateTime.now();
@@ -56,5 +62,7 @@ class ShopReview extends Equatable {
         images,
         authorProfileImage,
         serviceName,
+        ownerReplyContent,
+        ownerReplyCreatedAt,
       ];
 }
