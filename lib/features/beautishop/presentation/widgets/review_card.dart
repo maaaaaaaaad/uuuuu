@@ -117,8 +117,55 @@ class ReviewCard extends StatelessWidget {
                 ),
               ),
             ],
+            if (review.hasOwnerReply) ...[
+              const SizedBox(height: 12),
+              _buildOwnerReply(review.ownerReplyContent!),
+            ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildOwnerReply(String content) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: SemanticColors.background.chip,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.store,
+                size: 14,
+                color: SemanticColors.icon.accent,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '사장님 답글',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: SemanticColors.icon.accent,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.5,
+              color: SemanticColors.text.primary,
+            ),
+          ),
+        ],
       ),
     );
   }
