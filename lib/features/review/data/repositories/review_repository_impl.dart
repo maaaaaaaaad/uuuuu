@@ -25,7 +25,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Server error'));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -41,7 +41,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Server error'));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -61,7 +61,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Server error'));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -83,7 +83,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Server error'));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -99,7 +99,18 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return const Right(null);
     } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Server error'));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
+  }
+
+  String _extractErrorMessage(DioException e) {
+    final data = e.response?.data;
+    if (data is Map<String, dynamic>) {
+      return data['detail'] as String? ??
+          data['message'] as String? ??
+          e.message ??
+          'Server error';
+    }
+    return e.message ?? 'Server error';
   }
 }
