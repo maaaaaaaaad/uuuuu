@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/core/di/injection_container.dart';
-import 'package:jellomark/features/beautishop/domain/usecases/get_shop_services.dart';
+import 'package:jellomark/features/treatment/domain/usecases/get_shop_treatments_usecase.dart';
 import 'package:jellomark/features/reservation/presentation/pages/create_reservation_page.dart';
 import 'package:jellomark/features/usage_history/presentation/providers/usage_history_provider.dart';
 import 'package:jellomark/features/usage_history/presentation/widgets/usage_history_card.dart';
@@ -9,8 +9,8 @@ import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
-final getShopServicesUseCaseProvider = Provider<GetShopServices>((ref) {
-  return sl<GetShopServices>();
+final getShopTreatmentsUseCaseProvider = Provider<GetShopTreatmentsUseCase>((ref) {
+  return sl<GetShopTreatmentsUseCase>();
 });
 
 class UsageHistoryPage extends ConsumerStatefulWidget {
@@ -30,7 +30,7 @@ class _UsageHistoryPageState extends ConsumerState<UsageHistoryPage> {
   }
 
   Future<void> _handleRebook(String shopId) async {
-    final useCase = ref.read(getShopServicesUseCaseProvider);
+    final useCase = ref.read(getShopTreatmentsUseCaseProvider);
     final result = await useCase(shopId: shopId);
 
     if (!mounted) return;
