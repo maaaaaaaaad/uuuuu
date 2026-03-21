@@ -91,139 +91,141 @@ class _HomeTabState extends ConsumerState<HomeTab> {
     return SafeArea(
       child: Stack(
         children: [
-          RefreshIndicator(
-            color: SemanticColors.indicator.loading,
-            onRefresh: () => ref.read(homeNotifierProvider.notifier).refresh(),
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                _onScrollNotification(notification);
-                return false;
-              },
-              child: CustomScrollView(
-                key: const Key('home_tab_scroll_view'),
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                cacheExtent: 500,
-                slivers: [
-                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                  SliverToBoxAdapter(
-                    child: SearchSection(
-                      locationText: '현재 위치',
-                      onSearchTap: widget.onSearchTap,
-                    ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                  const SliverToBoxAdapter(
-                    child: UpcomingReservationBanner(),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                  const SliverToBoxAdapter(child: HeroCarousel()),
-                  const SliverToBoxAdapter(child: SizedBox(height: 20)),
-                  if (categories.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: CategorySection(categories: categories),
-                    ),
-                  if (categories.isNotEmpty)
-                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                  if (homeState.nearbyShops.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: HorizontalShopSection(
-                        title: '내 주변 인기 샵',
-                        shops: homeState.nearbyShops,
-                        showMore: true,
-                        onShopTap: (id) =>
-                            _navigateToShopDetail(id, homeState.nearbyShops),
-                      ),
-                    ),
-                  if (homeState.nearbyShops.isNotEmpty)
-                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                  SliverToBoxAdapter(
-                    child: SectionHeader(
-                      title: '추천 샵',
-                      showMore: homeState.hasMoreRecommended,
-                      onMoreTap: _navigateToRecommendedShops,
-                    ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final shop =
-                              homeState.displayedRecommendedShops[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: ShopCard(
-                              shop: shop,
-                              width: double.infinity,
-                              onTap: () => _navigateToShopDetail(
-                                shop.id,
-                                homeState.recommendedShops,
-                              ),
-                            ),
-                          );
-                        },
-                        childCount: homeState.displayedRecommendedShops.length,
-                        addAutomaticKeepAlives: false,
-                        addRepaintBoundaries: true,
-                      ),
-                    ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                  const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        '새로 입점한 샵',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final shop = homeState.newShops[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: ShopCard(
-                              shop: shop,
-                              width: double.infinity,
-                              onTap: () => _navigateToShopDetail(
-                                shop.id,
-                                homeState.newShops,
-                              ),
-                            ),
-                          );
-                        },
-                        childCount: homeState.newShops.length,
-                        addAutomaticKeepAlives: false,
-                        addRepaintBoundaries: true,
-                      ),
-                    ),
-                  ),
-                  if (homeState.isLoadingMoreNewShops)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            key: const Key('new_shops_loading_indicator'),
-                            color: SemanticColors.indicator.loading,
+          Column(
+            children: [
+              const UpcomingReservationBanner(),
+              Expanded(
+                child: RefreshIndicator(
+                  color: SemanticColors.indicator.loading,
+                  onRefresh: () => ref.read(homeNotifierProvider.notifier).refresh(),
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      _onScrollNotification(notification);
+                      return false;
+                    },
+                    child: CustomScrollView(
+                      key: const Key('home_tab_scroll_view'),
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      cacheExtent: 500,
+                      slivers: [
+                        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                        SliverToBoxAdapter(
+                          child: SearchSection(
+                            locationText: '현재 위치',
+                            onSearchTap: widget.onSearchTap,
                           ),
                         ),
-                      ),
+                        const SliverToBoxAdapter(child: HeroCarousel()),
+                        const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                        if (categories.isNotEmpty)
+                          SliverToBoxAdapter(
+                            child: CategorySection(categories: categories),
+                          ),
+                        if (categories.isNotEmpty)
+                          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                        if (homeState.nearbyShops.isNotEmpty)
+                          SliverToBoxAdapter(
+                            child: HorizontalShopSection(
+                              title: '내 주변 인기 샵',
+                              shops: homeState.nearbyShops,
+                              showMore: true,
+                              onShopTap: (id) =>
+                                  _navigateToShopDetail(id, homeState.nearbyShops),
+                            ),
+                          ),
+                        if (homeState.nearbyShops.isNotEmpty)
+                          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                        SliverToBoxAdapter(
+                          child: SectionHeader(
+                            title: '추천 샵',
+                            showMore: homeState.hasMoreRecommended,
+                            onMoreTap: _navigateToRecommendedShops,
+                          ),
+                        ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                final shop =
+                                    homeState.displayedRecommendedShops[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: ShopCard(
+                                    shop: shop,
+                                    width: double.infinity,
+                                    onTap: () => _navigateToShopDetail(
+                                      shop.id,
+                                      homeState.recommendedShops,
+                                    ),
+                                  ),
+                                );
+                              },
+                              childCount: homeState.displayedRecommendedShops.length,
+                              addAutomaticKeepAlives: false,
+                              addRepaintBoundaries: true,
+                            ),
+                          ),
+                        ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                        const SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              '새로 입점한 샵',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                final shop = homeState.newShops[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: ShopCard(
+                                    shop: shop,
+                                    width: double.infinity,
+                                    onTap: () => _navigateToShopDetail(
+                                      shop.id,
+                                      homeState.newShops,
+                                    ),
+                                  ),
+                                );
+                              },
+                              childCount: homeState.newShops.length,
+                              addAutomaticKeepAlives: false,
+                              addRepaintBoundaries: true,
+                            ),
+                          ),
+                        ),
+                        if (homeState.isLoadingMoreNewShops)
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  key: const Key('new_shops_loading_indicator'),
+                                  color: SemanticColors.indicator.loading,
+                                ),
+                              ),
+                            ),
+                          ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                      ],
                     ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
-                ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
           if (_showFloatingSearchIcon)
             Positioned(
