@@ -45,10 +45,8 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
   bool get _canSubmit {
     if (_isSubmitting) return false;
     final content = _contentController.text.trim();
-    if (content.isNotEmpty) {
-      return content.length >= _minContentLength;
-    }
-    return _selectedRating != null;
+    final hasValidContent = content.length >= _minContentLength;
+    return _selectedRating != null || hasValidContent;
   }
 
   int get _remainingCharacters {
@@ -62,20 +60,34 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
 
     setState(() => _isSubmitting = true);
 
-    final content = _contentController.text.trim();
-    final success = await widget.onSubmit(
-      rating: _selectedRating,
-      content: content.isNotEmpty ? content : null,
-    );
+    try {
+      final content = _contentController.text.trim();
+      final validContent =
+          content.length >= _minContentLength ? content : null;
+      final success = await widget.onSubmit(
+        rating: _selectedRating,
+        content: validContent,
+      );
 
-    if (mounted) {
-      if (success) {
-        Navigator.of(context).pop(true);
-      } else {
+      if (mounted) {
+        if (success) {
+          Navigator.of(context).pop(true);
+        } else {
+          setState(() => _isSubmitting = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('리뷰 작성에 실패했습니다. 다시 시도해주세요.'),
+              backgroundColor: SemanticColors.state.error,
+            ),
+          );
+        }
+      }
+    } catch (_) {
+      if (mounted) {
         setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('리뷰 작성에 실패했습니다. 다시 시도해주세요.'),
+            content: const Text('리뷰 작성 중 오류가 발생했습니다.'),
             backgroundColor: SemanticColors.state.error,
           ),
         );
