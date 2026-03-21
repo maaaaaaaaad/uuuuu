@@ -473,35 +473,43 @@ class ReservationDetailPage extends ConsumerWidget {
 
   Future<void> _handleRebook(
       BuildContext context, WidgetRef ref, Reservation reservation) async {
-    final useCase = sl<GetShopServices>();
-    final result = await useCase(shopId: reservation.shopId);
+    try {
+      final useCase = sl<GetShopServices>();
+      final result = await useCase(shopId: reservation.shopId);
 
-    if (!context.mounted) return;
+      if (!context.mounted) return;
 
-    result.fold(
-      (failure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message)),
-        );
-      },
-      (treatments) {
-        if (treatments.isEmpty) {
+      result.fold(
+        (failure) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('해당 샵의 시술 정보를 찾을 수 없습니다')),
+            SnackBar(content: Text(failure.message)),
           );
-          return;
-        }
+        },
+        (treatments) {
+          if (treatments.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('해당 샵의 시술 정보를 찾을 수 없습니다')),
+            );
+            return;
+          }
 
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => CreateReservationPage(
-              shopId: reservation.shopId,
-              treatments: treatments,
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => CreateReservationPage(
+                shopId: reservation.shopId,
+                treatments: treatments,
+              ),
             ),
-          ),
+          );
+        },
+      );
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('시술 정보를 불러오는 중 오류가 발생했습니다')),
         );
-      },
-    );
+      }
+    }
   }
 
   String _formatPrice(int price) {
