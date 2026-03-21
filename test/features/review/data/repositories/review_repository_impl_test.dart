@@ -143,6 +143,110 @@ void main() {
 
       expect(result, isA<Left<Failure, Review>>());
     });
+
+    test(
+        'should extract detail from ProblemDetail response on DioException',
+        () async {
+      when(() => mockDataSource.createReview(
+            shopId: tShopId,
+            rating: tRating,
+            content: tContent,
+            images: null,
+          )).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(path: ''),
+          response: Response(
+            requestOptions: RequestOptions(path: ''),
+            statusCode: 409,
+            data: {
+              'type': 'about:blank',
+              'title': 'Conflict',
+              'status': 409,
+              'detail': '이미 리뷰를 작성하셨습니다',
+            },
+          ),
+          message: 'Http status error [409]',
+        ),
+      );
+
+      final result = await repository.createReview(
+        shopId: tShopId,
+        rating: tRating,
+        content: tContent,
+      );
+
+      result.fold(
+        (failure) => expect(failure.message, '이미 리뷰를 작성하셨습니다'),
+        (_) => fail('Should not return success'),
+      );
+    });
+
+    test(
+        'should extract message from ErrorResponse on DioException',
+        () async {
+      when(() => mockDataSource.createReview(
+            shopId: tShopId,
+            rating: tRating,
+            content: tContent,
+            images: null,
+          )).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(path: ''),
+          response: Response(
+            requestOptions: RequestOptions(path: ''),
+            statusCode: 500,
+            data: {
+              'code': 'INTERNAL_SERVER_ERROR',
+              'message': 'Unexpected server error',
+            },
+          ),
+          message: 'Http status error [500]',
+        ),
+      );
+
+      final result = await repository.createReview(
+        shopId: tShopId,
+        rating: tRating,
+        content: tContent,
+      );
+
+      result.fold(
+        (failure) => expect(failure.message, 'Unexpected server error'),
+        (_) => fail('Should not return success'),
+      );
+    });
+
+    test(
+        'should fallback to Dio message when response data is not a Map',
+        () async {
+      when(() => mockDataSource.createReview(
+            shopId: tShopId,
+            rating: tRating,
+            content: tContent,
+            images: null,
+          )).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(path: ''),
+          response: Response(
+            requestOptions: RequestOptions(path: ''),
+            statusCode: 500,
+            data: 'plain text error',
+          ),
+          message: 'Connection refused',
+        ),
+      );
+
+      final result = await repository.createReview(
+        shopId: tShopId,
+        rating: tRating,
+        content: tContent,
+      );
+
+      result.fold(
+        (failure) => expect(failure.message, 'Connection refused'),
+        (_) => fail('Should not return success'),
+      );
+    });
   });
 
   group('updateReview', () {
