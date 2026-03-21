@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
-import 'package:jellomark/features/beautishop/domain/usecases/get_shop_services.dart';
+import 'package:jellomark/features/treatment/domain/usecases/get_shop_treatments_usecase.dart';
 import 'package:jellomark/features/usage_history/domain/entities/usage_history.dart';
 import 'package:jellomark/features/usage_history/domain/usecases/get_usage_history_usecase.dart';
 import 'package:jellomark/features/usage_history/presentation/pages/usage_history_page.dart';
@@ -14,15 +14,15 @@ import 'package:mocktail/mocktail.dart';
 class MockGetUsageHistoryUseCase extends Mock
     implements GetUsageHistoryUseCase {}
 
-class MockGetShopServices extends Mock implements GetShopServices {}
+class MockGetShopTreatmentsUseCase extends Mock implements GetShopTreatmentsUseCase {}
 
 void main() {
   late MockGetUsageHistoryUseCase mockGetUsageHistory;
-  late MockGetShopServices mockGetShopServices;
+  late MockGetShopTreatmentsUseCase mockGetShopTreatments;
 
   setUp(() {
     mockGetUsageHistory = MockGetUsageHistoryUseCase();
-    mockGetShopServices = MockGetShopServices();
+    mockGetShopTreatments = MockGetShopTreatmentsUseCase();
   });
 
   final tUsageHistory = UsageHistory(
@@ -42,7 +42,7 @@ void main() {
     return ProviderScope(
       overrides: [
         getUsageHistoryUseCaseProvider.overrideWithValue(mockGetUsageHistory),
-        getShopServicesUseCaseProvider.overrideWithValue(mockGetShopServices),
+        getShopTreatmentsUseCaseProvider.overrideWithValue(mockGetShopTreatments),
       ],
       child: const MaterialApp(
         home: UsageHistoryPage(),
@@ -131,7 +131,7 @@ void main() {
     testWidgets('should show snackbar when rebook fails', (tester) async {
       when(() => mockGetUsageHistory())
           .thenAnswer((_) async => Right([tUsageHistory]));
-      when(() => mockGetShopServices(shopId: 'shop-1'))
+      when(() => mockGetShopTreatments(shopId: 'shop-1'))
           .thenAnswer((_) async => const Left(ServerFailure('네트워크 오류')));
 
       await tester.pumpWidget(createPage());
@@ -147,7 +147,7 @@ void main() {
         (tester) async {
       when(() => mockGetUsageHistory())
           .thenAnswer((_) async => Right([tUsageHistory]));
-      when(() => mockGetShopServices(shopId: 'shop-1'))
+      when(() => mockGetShopTreatments(shopId: 'shop-1'))
           .thenAnswer((_) async => const Right(<ServiceMenu>[]));
 
       await tester.pumpWidget(createPage());
