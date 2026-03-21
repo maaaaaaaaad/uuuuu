@@ -11,6 +11,8 @@ class Review extends Equatable {
   final List<String> images;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? ownerReplyContent;
+  final DateTime? ownerReplyCreatedAt;
 
   const Review({
     required this.id,
@@ -23,9 +25,13 @@ class Review extends Equatable {
     this.images = const [],
     required this.createdAt,
     required this.updatedAt,
+    this.ownerReplyContent,
+    this.ownerReplyCreatedAt,
   });
 
   bool get hasImages => images.isNotEmpty;
+  bool get hasOwnerReply =>
+      ownerReplyContent != null && ownerReplyContent!.isNotEmpty;
 
   bool get isEdited => updatedAt.isAfter(createdAt.add(const Duration(seconds: 1)));
 
@@ -59,5 +65,7 @@ class Review extends Equatable {
         images,
         createdAt,
         updatedAt,
+        ownerReplyContent,
+        ownerReplyCreatedAt,
       ];
 }
