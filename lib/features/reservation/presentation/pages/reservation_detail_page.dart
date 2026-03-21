@@ -6,8 +6,10 @@ import 'package:jellomark/features/reservation/domain/entities/reservation_statu
 import 'package:jellomark/features/reservation/presentation/providers/reservation_detail_provider.dart';
 import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:jellomark/features/reservation/presentation/widgets/reservation_status_badge.dart';
+import 'package:jellomark/features/beautishop/domain/usecases/get_shop_services.dart';
+import 'package:jellomark/features/beautishop/presentation/widgets/write_review_bottom_sheet.dart';
+import 'package:jellomark/features/reservation/presentation/pages/create_reservation_page.dart';
 import 'package:jellomark/features/review/domain/usecases/create_review_usecase.dart';
-import 'package:jellomark/features/review/presentation/widgets/edit_review_bottom_sheet.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -130,6 +132,10 @@ class ReservationDetailPage extends ConsumerWidget {
           if (reservation.status == ReservationStatus.completed) ...[
             const SizedBox(height: 32),
             _buildReviewButton(context, ref, reservation),
+          ],
+          if (reservation.status.isRebookable) ...[
+            const SizedBox(height: 12),
+            _buildRebookButton(context, ref, reservation),
           ],
           if (reservation.status.isCancellable) ...[
             const SizedBox(height: 32),
@@ -385,20 +391,18 @@ class ReservationDetailPage extends ConsumerWidget {
 
   Future<void> _showReviewSheet(
       BuildContext context, WidgetRef ref, Reservation reservation) async {
-    final result = await showModalBottomSheet<bool>(
+    final result = await WriteReviewBottomSheet.show(
       context: context,
-      isScrollControlled: true,
-      builder: (context) => EditReviewBottomSheet(
-        onSubmit: ({int? rating, String? content}) async {
-          final createReviewUseCase = sl<CreateReviewUseCase>();
-          final result = await createReviewUseCase(
-            shopId: reservation.shopId,
-            rating: rating,
-            content: content,
-          );
-          return result.isRight();
-        },
-      ),
+      shopName: reservation.shopName ?? '',
+      onSubmit: ({int? rating, String? content}) async {
+        final createReviewUseCase = sl<CreateReviewUseCase>();
+        final result = await createReviewUseCase(
+          shopId: reservation.shopId,
+          rating: rating,
+          content: content,
+        );
+        return result.isRight();
+      },
     );
 
     if (result == true && context.mounted) {
@@ -439,6 +443,65 @@ class ReservationDetailPage extends ConsumerWidget {
         Navigator.of(context).pop(true);
       }
     }
+  }
+
+  Widget _buildRebookButton(
+      BuildContext context, WidgetRef ref, Reservation reservation) {
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
+      child: OutlinedButton.icon(
+        onPressed: () => _handleRebook(context, ref, reservation),
+        icon: Icon(Icons.replay, size: 18, color: SemanticColors.icon.accent),
+        label: Text(
+          '또 예약하기',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: SemanticColors.icon.accent,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: SemanticColors.icon.accent),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleRebook(
+      BuildContext context, WidgetRef ref, Reservation reservation) async {
+    final useCase = sl<GetShopServices>();
+    final result = await useCase(shopId: reservation.shopId);
+
+    if (!context.mounted) return;
+
+    result.fold(
+      (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failure.message)),
+        );
+      },
+      (treatments) {
+        if (treatments.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('해당 샵의 시술 정보를 찾을 수 없습니다')),
+          );
+          return;
+        }
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => CreateReservationPage(
+              shopId: reservation.shopId,
+              treatments: treatments,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   String _formatPrice(int price) {
