@@ -31,4 +31,7 @@ enum ReservationStatus {
       };
 
   bool get isCancellable => this == pending || this == confirmed;
+
+  bool get isRebookable =>
+      this == completed || this == rejected || this == cancelled;
 }
