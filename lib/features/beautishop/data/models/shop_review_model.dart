@@ -10,12 +10,16 @@ class ShopReviewModel extends ShopReview {
     super.images = const [],
     super.authorProfileImage,
     super.serviceName,
+    super.ownerReplyContent,
+    super.ownerReplyCreatedAt,
   });
 
   factory ShopReviewModel.fromJson(Map<String, dynamic> json) {
     final imagesJson = json['images'] as List<dynamic>?;
     final images =
         imagesJson?.map((e) => e.toString()).toList() ?? const <String>[];
+
+    final replyCreatedAtStr = json['ownerReplyCreatedAt'] as String?;
 
     return ShopReviewModel(
       id: json['id'] as String,
@@ -26,6 +30,9 @@ class ShopReviewModel extends ShopReview {
       images: images,
       authorProfileImage: json['authorProfileImage'] as String?,
       serviceName: json['serviceName'] as String?,
+      ownerReplyContent: json['ownerReplyContent'] as String?,
+      ownerReplyCreatedAt:
+          replyCreatedAtStr != null ? DateTime.parse(replyCreatedAtStr) : null,
     );
   }
 }
