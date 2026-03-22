@@ -50,13 +50,14 @@ void main() {
       );
     });
 
-    test('should return ServerFailure when data source throws DioException',
+    test('should return AuthFailure when data source throws 401 DioException',
         () async {
       when(() => mockDataSource.getMyUsageHistory()).thenThrow(
         DioException(
+          type: DioExceptionType.badResponse,
           requestOptions: RequestOptions(),
           response: Response(
-            data: {'message': '인증 오류'},
+            data: {'code': 'INVALID_TOKEN'},
             statusCode: 401,
             requestOptions: RequestOptions(),
           ),
@@ -68,14 +69,14 @@ void main() {
       expect(result.isLeft(), true);
       result.fold(
         (failure) {
-          expect(failure, isA<ServerFailure>());
-          expect(failure.message, '인증 오류');
+          expect(failure, isA<AuthFailure>());
+          expect(failure.message, '인증이 만료되었습니다. 다시 로그인해주세요');
         },
         (_) => fail('Expected Left'),
       );
     });
 
-    test('should return default error message when response has no message',
+    test('should return ServerFailure with fallback when response has no code',
         () async {
       when(() => mockDataSource.getMyUsageHistory()).thenThrow(
         DioException(requestOptions: RequestOptions()),
@@ -84,7 +85,7 @@ void main() {
       final result = await repository.getMyUsageHistory();
 
       result.fold(
-        (failure) => expect(failure.message, '서버 오류가 발생했습니다'),
+        (failure) => expect(failure.message, '이용 내역을 불러올 수 없습니다'),
         (_) => fail('Expected Left'),
       );
     });
