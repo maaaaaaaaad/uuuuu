@@ -125,11 +125,12 @@ void main() {
           ),
         ).thenThrow(
           DioException(
+            type: DioExceptionType.badResponse,
             requestOptions: RequestOptions(),
             response: Response(
               requestOptions: RequestOptions(),
               statusCode: 500,
-              data: {'error': 'Internal Server Error'},
+              data: {'code': 'INTERNAL_SERVER_ERROR'},
             ),
           ),
         );
@@ -143,7 +144,7 @@ void main() {
 
         expect(result, isA<Left<Failure, Route>>());
         final failure = (result as Left).value as ServerFailure;
-        expect(failure.message, contains('Internal Server Error'));
+        expect(failure.message, '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요');
       });
 
       test('returns NetworkFailure on connection error', () async {
