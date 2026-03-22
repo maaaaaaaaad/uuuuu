@@ -10,12 +10,14 @@ class CreateReviewUseCase {
 
   Future<Either<Failure, Review>> call({
     required String shopId,
+    String? reservationId,
     int? rating,
     String? content,
     List<String>? images,
   }) {
     return repository.createReview(
       shopId: shopId,
+      reservationId: reservationId,
       rating: rating,
       content: content,
       images: images,
