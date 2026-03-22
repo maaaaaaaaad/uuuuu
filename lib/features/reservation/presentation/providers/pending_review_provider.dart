@@ -50,9 +50,9 @@ class PendingReviewNotifier extends StateNotifier<PendingReviewState> {
     );
   }
 
-  void removeByShopId(String shopId) {
+  void removeByReservationId(String reservationId) {
     final updated =
-        state.reservations.where((r) => r.shopId != shopId).toList();
+        state.reservations.where((r) => r.id != reservationId).toList();
     state = PendingReviewState(reservations: updated);
   }
 
