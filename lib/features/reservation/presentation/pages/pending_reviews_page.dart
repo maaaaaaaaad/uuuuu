@@ -34,6 +34,7 @@ class _PendingReviewsPageState extends ConsumerState<PendingReviewsPage> {
             final useCase = ref.read(createReviewUseCaseProvider);
             final result = await useCase(
               shopId: reservation.shopId,
+              reservationId: reservation.id,
               rating: rating,
               content: content,
             );
@@ -49,7 +50,7 @@ class _PendingReviewsPageState extends ConsumerState<PendingReviewsPage> {
     if (result == true && mounted) {
       ref
           .read(pendingReviewNotifierProvider.notifier)
-          .removeByShopId(reservation.shopId);
+          .removeByReservationId(reservation.id);
     }
   }
 
