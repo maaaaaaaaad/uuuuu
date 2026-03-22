@@ -402,7 +402,10 @@ class ReservationDetailPage extends ConsumerWidget {
               rating: rating,
               content: content,
             );
-            return result.isRight();
+            return result.fold(
+              (failure) => failure.message,
+              (_) => null,
+            );
           },
         ),
       ),
