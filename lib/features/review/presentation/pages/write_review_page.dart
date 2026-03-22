@@ -5,7 +5,7 @@ import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class WriteReviewPage extends StatefulWidget {
   final String shopName;
-  final Future<bool> Function({int? rating, String? content}) onSubmit;
+  final Future<String?> Function({int? rating, String? content}) onSubmit;
 
   const WriteReviewPage({
     super.key,
@@ -53,19 +53,19 @@ class _WriteReviewPageState extends State<WriteReviewPage> {
       final content = _contentController.text.trim();
       final validContent =
           content.length >= _minContentLength ? content : null;
-      final success = await widget.onSubmit(
+      final errorMessage = await widget.onSubmit(
         rating: _selectedRating,
         content: validContent,
       );
 
       if (mounted) {
-        if (success) {
+        if (errorMessage == null) {
           Navigator.of(context).pop(true);
         } else {
           setState(() => _isSubmitting = false);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('리뷰 작성에 실패했습니다. 다시 시도해주세요.'),
+              content: Text(errorMessage),
               backgroundColor: SemanticColors.state.error,
             ),
           );
