@@ -7,7 +7,7 @@ import 'package:jellomark/features/reservation/presentation/providers/reservatio
 import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
 import 'package:jellomark/features/reservation/presentation/widgets/reservation_status_badge.dart';
 import 'package:jellomark/features/treatment/domain/usecases/get_shop_treatments_usecase.dart';
-import 'package:jellomark/features/beautishop/presentation/widgets/write_review_bottom_sheet.dart';
+import 'package:jellomark/features/review/presentation/pages/write_review_page.dart';
 import 'package:jellomark/features/reservation/presentation/pages/create_reservation_page.dart';
 import 'package:jellomark/features/review/domain/usecases/create_review_usecase.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
@@ -391,32 +391,27 @@ class ReservationDetailPage extends ConsumerWidget {
 
   Future<void> _showReviewSheet(
       BuildContext context, WidgetRef ref, Reservation reservation) async {
-    try {
-      final result = await WriteReviewBottomSheet.show(
-        context: context,
-        shopName: reservation.shopName ?? '',
-        onSubmit: ({int? rating, String? content}) async {
-          final createReviewUseCase = sl<CreateReviewUseCase>();
-          final result = await createReviewUseCase(
-            shopId: reservation.shopId,
-            rating: rating,
-            content: content,
-          );
-          return result.isRight();
-        },
-      );
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => WriteReviewPage(
+          shopName: reservation.shopName ?? '',
+          onSubmit: ({int? rating, String? content}) async {
+            final createReviewUseCase = sl<CreateReviewUseCase>();
+            final result = await createReviewUseCase(
+              shopId: reservation.shopId,
+              rating: rating,
+              content: content,
+            );
+            return result.isRight();
+          },
+        ),
+      ),
+    );
 
-      if (result == true && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('리뷰가 등록되었습니다')),
-        );
-      }
-    } catch (_) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('리뷰 작성 화면을 열 수 없습니다')),
-        );
-      }
+    if (result == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('리뷰가 등록되었습니다')),
+      );
     }
   }
 
