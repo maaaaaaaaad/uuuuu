@@ -92,7 +92,7 @@ void main() {
       expect(state.error, '서버 오류');
     });
 
-    test('should remove reservations by shopId', () async {
+    test('should remove reservation by reservationId', () async {
       when(() => mockUseCase())
           .thenAnswer((_) async => Right([tReservation1, tReservation2]));
 
@@ -102,11 +102,11 @@ void main() {
       final notifier =
           container.read(pendingReviewNotifierProvider.notifier);
       await notifier.loadPendingReviews();
-      notifier.removeByShopId('shop-1');
+      notifier.removeByReservationId(tReservation1.id);
 
       final state = container.read(pendingReviewNotifierProvider);
       expect(state.reservations.length, 1);
-      expect(state.reservations.first.shopId, 'shop-2');
+      expect(state.reservations.first.id, tReservation2.id);
     });
 
     test('should refresh by reloading', () async {
