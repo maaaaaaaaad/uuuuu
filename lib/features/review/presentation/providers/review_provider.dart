@@ -115,6 +115,7 @@ class ShopReviewsNotifier extends StateNotifier<ShopReviewsState> {
   }
 
   Future<bool> createReview({
+    String? reservationId,
     int? rating,
     String? content,
     List<String>? images,
@@ -122,6 +123,7 @@ class ShopReviewsNotifier extends StateNotifier<ShopReviewsState> {
     final useCase = _ref.read(createReviewUseCaseProvider);
     final result = await useCase(
       shopId: shopId,
+      reservationId: reservationId,
       rating: rating,
       content: content,
       images: images,
