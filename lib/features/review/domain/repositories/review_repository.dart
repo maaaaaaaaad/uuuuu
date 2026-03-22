@@ -17,6 +17,7 @@ abstract class ReviewRepository {
 
   Future<Either<Failure, Review>> createReview({
     required String shopId,
+    String? reservationId,
     int? rating,
     String? content,
     List<String>? images,
