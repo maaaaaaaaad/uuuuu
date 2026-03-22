@@ -37,7 +37,10 @@ class _PendingReviewsPageState extends ConsumerState<PendingReviewsPage> {
               rating: rating,
               content: content,
             );
-            return result.fold((_) => false, (_) => true);
+            return result.fold(
+              (failure) => failure.message,
+              (_) => null,
+            );
           },
         ),
       ),
