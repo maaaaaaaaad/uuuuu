@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:jellomark/core/error/failure.dart';
+import 'package:jellomark/core/network/api_error_handler.dart';
 import 'package:jellomark/features/beautishop/data/datasources/beauty_shop_remote_datasource.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/domain/entities/paged_beauty_shops.dart';
@@ -52,7 +52,9 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
         ),
       );
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '샵 목록을 불러올 수 없습니다'),
+      );
     }
   }
 
@@ -62,7 +64,9 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
       final shopModel = await _remoteDataSource.getBeautyShopById(shopId);
       return Right(shopModel);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '샵 정보를 불러올 수 없습니다'),
+      );
     }
   }
 
@@ -84,7 +88,9 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
       );
       return Right(pagedModel.items);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '주변 샵을 불러올 수 없습니다'),
+      );
     }
   }
 
@@ -99,7 +105,9 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
       );
       return Right(pagedModel.items);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '추천 샵을 불러올 수 없습니다'),
+      );
     }
   }
 
@@ -112,7 +120,9 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
       );
       return Right(pagedModel.items);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '할인 샵을 불러올 수 없습니다'),
+      );
     }
   }
 
@@ -127,7 +137,9 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
       );
       return Right(pagedModel.items);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '신규 샵을 불러올 수 없습니다'),
+      );
     }
   }
 
@@ -159,22 +171,11 @@ class BeautyShopRepositoryImpl implements BeautyShopRepository {
       );
       return Right(pagedModel);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '리뷰를 불러올 수 없습니다'),
+      );
     } catch (e) {
       return Left(ServerFailure('데이터 파싱 오류: ${e.toString()}'));
     }
-  }
-
-  String _getErrorMessage(DioException e) {
-    debugPrint('[BeautyShopRepository] DioException: ${e.type}');
-    debugPrint('[BeautyShopRepository] Status: ${e.response?.statusCode}');
-    debugPrint('[BeautyShopRepository] Data: ${e.response?.data}');
-    if (e.response?.data is Map) {
-      final data = e.response?.data as Map;
-      return data['message']?.toString() ??
-          data['error']?.toString() ??
-          '알 수 없는 오류';
-    }
-    return e.message ?? '알 수 없는 오류';
   }
 }
