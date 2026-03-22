@@ -39,6 +39,7 @@ class MockCreateReviewUseCase extends CreateReviewUseCase {
   @override
   Future<Either<Failure, Review>> call({
     required String shopId,
+    String? reservationId,
     int? rating,
     String? content,
     List<String>? images,
