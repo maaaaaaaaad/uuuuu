@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/reservation/domain/entities/reservation.dart';
 import 'package:jellomark/features/reservation/presentation/providers/pending_review_provider.dart';
 import 'package:jellomark/features/review/presentation/providers/review_provider.dart';
-import 'package:jellomark/features/beautishop/presentation/widgets/write_review_bottom_sheet.dart';
+import 'package:jellomark/features/review/presentation/pages/write_review_page.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -26,18 +26,21 @@ class _PendingReviewsPageState extends ConsumerState<PendingReviewsPage> {
   }
 
   Future<void> _writeReview(Reservation reservation) async {
-    final result = await WriteReviewBottomSheet.show(
-      context: context,
-      shopName: reservation.shopName ?? '',
-      onSubmit: ({int? rating, String? content}) async {
-        final useCase = ref.read(createReviewUseCaseProvider);
-        final result = await useCase(
-          shopId: reservation.shopId,
-          rating: rating,
-          content: content,
-        );
-        return result.fold((_) => false, (_) => true);
-      },
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => WriteReviewPage(
+          shopName: reservation.shopName ?? '',
+          onSubmit: ({int? rating, String? content}) async {
+            final useCase = ref.read(createReviewUseCaseProvider);
+            final result = await useCase(
+              shopId: reservation.shopId,
+              rating: rating,
+              content: content,
+            );
+            return result.fold((_) => false, (_) => true);
+          },
+        ),
+      ),
     );
 
     if (result == true && mounted) {
