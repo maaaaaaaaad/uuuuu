@@ -145,7 +145,7 @@ void main() {
     });
 
     test(
-        'should extract detail from ProblemDetail response on DioException',
+        'should return ValidationFailure with mapped message for duplicate review',
         () async {
       when(() => mockDataSource.createReview(
             shopId: tShopId,
@@ -154,18 +154,13 @@ void main() {
             images: null,
           )).thenThrow(
         DioException(
+          type: DioExceptionType.badResponse,
           requestOptions: RequestOptions(path: ''),
           response: Response(
             requestOptions: RequestOptions(path: ''),
             statusCode: 409,
-            data: {
-              'type': 'about:blank',
-              'title': 'Conflict',
-              'status': 409,
-              'detail': '이미 리뷰를 작성하셨습니다',
-            },
+            data: {'code': 'DUPLICATE_REVIEW'},
           ),
-          message: 'Http status error [409]',
         ),
       );
 
@@ -176,13 +171,16 @@ void main() {
       );
 
       result.fold(
-        (failure) => expect(failure.message, '이미 리뷰를 작성하셨습니다'),
+        (failure) {
+          expect(failure, isA<ValidationFailure>());
+          expect(failure.message, '이미 리뷰를 작성했습니다');
+        },
         (_) => fail('Should not return success'),
       );
     });
 
     test(
-        'should extract message from ErrorResponse on DioException',
+        'should return ServerFailure with mapped message for known error code',
         () async {
       when(() => mockDataSource.createReview(
             shopId: tShopId,
@@ -191,16 +189,13 @@ void main() {
             images: null,
           )).thenThrow(
         DioException(
+          type: DioExceptionType.badResponse,
           requestOptions: RequestOptions(path: ''),
           response: Response(
             requestOptions: RequestOptions(path: ''),
             statusCode: 500,
-            data: {
-              'code': 'INTERNAL_SERVER_ERROR',
-              'message': 'Unexpected server error',
-            },
+            data: {'code': 'INTERNAL_SERVER_ERROR'},
           ),
-          message: 'Http status error [500]',
         ),
       );
 
@@ -211,13 +206,16 @@ void main() {
       );
 
       result.fold(
-        (failure) => expect(failure.message, 'Unexpected server error'),
+        (failure) {
+          expect(failure, isA<ServerFailure>());
+          expect(failure.message, '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요');
+        },
         (_) => fail('Should not return success'),
       );
     });
 
     test(
-        'should fallback to Dio message when response data is not a Map',
+        'should use fallback message when response data is not a Map',
         () async {
       when(() => mockDataSource.createReview(
             shopId: tShopId,
@@ -226,13 +224,13 @@ void main() {
             images: null,
           )).thenThrow(
         DioException(
+          type: DioExceptionType.badResponse,
           requestOptions: RequestOptions(path: ''),
           response: Response(
             requestOptions: RequestOptions(path: ''),
             statusCode: 500,
             data: 'plain text error',
           ),
-          message: 'Connection refused',
         ),
       );
 
@@ -243,7 +241,10 @@ void main() {
       );
 
       result.fold(
-        (failure) => expect(failure.message, 'Connection refused'),
+        (failure) {
+          expect(failure, isA<ServerFailure>());
+          expect(failure.message, '리뷰 작성에 실패했습니다');
+        },
         (_) => fail('Should not return success'),
       );
     });
