@@ -399,6 +399,7 @@ class ReservationDetailPage extends ConsumerWidget {
             final createReviewUseCase = sl<CreateReviewUseCase>();
             final result = await createReviewUseCase(
               shopId: reservation.shopId,
+              reservationId: reservation.id,
               rating: rating,
               content: content,
             );
