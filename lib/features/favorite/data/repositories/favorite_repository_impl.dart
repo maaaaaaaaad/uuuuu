@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:jellomark/core/error/failure.dart';
+import 'package:jellomark/core/network/api_error_handler.dart';
 import 'package:jellomark/features/favorite/data/datasources/favorite_remote_datasource.dart';
 import 'package:jellomark/features/favorite/domain/entities/favorite_shop.dart';
 import 'package:jellomark/features/favorite/domain/entities/paged_favorites.dart';
@@ -18,7 +19,9 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
       final result = await _remoteDataSource.addFavorite(shopId);
       return Right(result);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '즐겨찾기 추가에 실패했습니다'),
+      );
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -30,7 +33,9 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
       await _remoteDataSource.removeFavorite(shopId);
       return const Right(null);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '즐겨찾기 해제에 실패했습니다'),
+      );
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -45,7 +50,9 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
       final result = await _remoteDataSource.getFavorites(page: page, size: size);
       return Right(result);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '즐겨찾기 목록을 불러올 수 없습니다'),
+      );
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -57,26 +64,11 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
       final result = await _remoteDataSource.checkFavorite(shopId);
       return Right(result);
     } on DioException catch (e) {
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '즐겨찾기 확인에 실패했습니다'),
+      );
     } catch (e) {
       return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  String _getErrorMessage(DioException e) {
-    if (e.response?.data is Map<String, dynamic>) {
-      final data = e.response!.data as Map<String, dynamic>;
-      return data['message'] as String? ?? '서버 오류가 발생했습니다';
-    }
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.receiveTimeout:
-      case DioExceptionType.sendTimeout:
-        return '네트워크 연결 시간이 초과되었습니다';
-      case DioExceptionType.connectionError:
-        return '네트워크 연결에 실패했습니다';
-      default:
-        return '서버 오류가 발생했습니다';
     }
   }
 }
