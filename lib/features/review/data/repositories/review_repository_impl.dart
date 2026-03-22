@@ -48,6 +48,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<Failure, Review>> createReview({
     required String shopId,
+    String? reservationId,
     int? rating,
     String? content,
     List<String>? images,
@@ -55,6 +56,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
     try {
       final result = await remoteDataSource.createReview(
         shopId: shopId,
+        reservationId: reservationId,
         rating: rating,
         content: content,
         images: images,
