@@ -5,12 +5,12 @@ import 'package:jellomark/features/review/presentation/pages/write_review_page.d
 void main() {
   Widget createPage({
     String shopName = '테스트샵',
-    Future<bool> Function({int? rating, String? content})? onSubmit,
+    Future<String?> Function({int? rating, String? content})? onSubmit,
   }) {
     return MaterialApp(
       home: WriteReviewPage(
         shopName: shopName,
-        onSubmit: onSubmit ?? ({int? rating, String? content}) async => true,
+        onSubmit: onSubmit ?? ({int? rating, String? content}) async => null,
       ),
     );
   }
@@ -97,7 +97,7 @@ void main() {
       await tester.pumpWidget(createPage(
         onSubmit: ({int? rating, String? content}) async {
           submittedRating = rating;
-          return true;
+          return null;
         },
       ));
 
@@ -112,7 +112,7 @@ void main() {
 
     testWidgets('should navigate back on success', (tester) async {
       await tester.pumpWidget(createPage(
-        onSubmit: ({int? rating, String? content}) async => true,
+        onSubmit: ({int? rating, String? content}) async => null,
       ));
 
       await tester.tap(find.byIcon(Icons.star_outline_rounded).first);
@@ -124,7 +124,8 @@ void main() {
 
     testWidgets('should show error snackbar on failure', (tester) async {
       await tester.pumpWidget(createPage(
-        onSubmit: ({int? rating, String? content}) async => false,
+        onSubmit: ({int? rating, String? content}) async =>
+            '리뷰 작성에 실패했습니다. 다시 시도해주세요.',
       ));
 
       await tester.tap(find.byIcon(Icons.star_outline_rounded).first);
