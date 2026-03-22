@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:jellomark/core/error/failure.dart';
+import 'package:jellomark/core/network/api_error_handler.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
@@ -32,7 +33,9 @@ class AuthRepositoryImpl implements AuthRepository {
       await _localDataSource.saveTokens(tokenPair);
       return Right(tokenPair);
     } on DioException catch (e) {
-      return Left(AuthFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '로그인에 실패했습니다'),
+      );
     }
   }
 
@@ -43,7 +46,9 @@ class AuthRepositoryImpl implements AuthRepository {
       await _localDataSource.saveTokens(tokenPair);
       return Right(tokenPair);
     } on DioException catch (e) {
-      return Left(AuthFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '토큰 갱신에 실패했습니다'),
+      );
     }
   }
 
@@ -53,10 +58,9 @@ class AuthRepositoryImpl implements AuthRepository {
       final member = await _remoteDataSource.getCurrentMember();
       return Right(member);
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        return const Left(AuthFailure('인증이 만료되었습니다'));
-      }
-      return Left(ServerFailure(_getErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '회원 정보를 불러올 수 없습니다'),
+      );
     }
   }
 
@@ -90,12 +94,5 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> clearStoredTokens() async {
     await _localDataSource.clearTokens();
-  }
-
-  String _getErrorMessage(DioException e) {
-    if (e.response?.data is Map) {
-      return (e.response?.data as Map)['error']?.toString() ?? '알 수 없는 오류';
-    }
-    return e.message ?? '알 수 없는 오류';
   }
 }
