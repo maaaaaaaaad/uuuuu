@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:jellomark/core/error/failure.dart';
+import 'package:jellomark/core/network/api_error_handler.dart';
 import 'package:jellomark/features/location/data/datasources/directions_remote_data_source.dart';
 import 'package:jellomark/features/location/domain/entities/route.dart';
 import 'package:jellomark/features/location/domain/repositories/directions_repository.dart';
@@ -36,19 +37,9 @@ class DirectionsRepositoryImpl implements DirectionsRepository {
 
       return Right(route);
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionError ||
-          e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout ||
-          e.type == DioExceptionType.sendTimeout) {
-        return const Left(NetworkFailure('네트워크 연결을 확인해주세요'));
-      }
-
-      final data = e.response?.data;
-      if (data is Map<String, dynamic> && data.containsKey('error')) {
-        return Left(ServerFailure(data['error'].toString()));
-      }
-
-      return Left(ServerFailure(e.message ?? '서버 오류가 발생했습니다'));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '경로를 불러올 수 없습니다'),
+      );
     }
   }
 }
