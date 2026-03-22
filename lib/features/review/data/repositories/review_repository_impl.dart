@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:jellomark/core/error/failure.dart';
+import 'package:jellomark/core/network/api_error_handler.dart';
 import 'package:jellomark/features/review/data/datasources/review_remote_datasource.dart';
 import 'package:jellomark/features/review/domain/entities/paged_reviews.dart';
 import 'package:jellomark/features/review/domain/entities/review.dart';
@@ -25,7 +26,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ServerFailure(_extractErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '리뷰를 불러올 수 없습니다'),
+      );
     }
   }
 
@@ -41,7 +44,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ServerFailure(_extractErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '내 리뷰를 불러올 수 없습니다'),
+      );
     }
   }
 
@@ -63,7 +68,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ServerFailure(_extractErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '리뷰 작성에 실패했습니다'),
+      );
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -87,7 +94,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ServerFailure(_extractErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '리뷰 수정에 실패했습니다'),
+      );
     }
   }
 
@@ -103,18 +112,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
       );
       return const Right(null);
     } on DioException catch (e) {
-      return Left(ServerFailure(_extractErrorMessage(e)));
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '리뷰 삭제에 실패했습니다'),
+      );
     }
-  }
-
-  String _extractErrorMessage(DioException e) {
-    final data = e.response?.data;
-    if (data is Map<String, dynamic>) {
-      return data['detail'] as String? ??
-          data['message'] as String? ??
-          e.message ??
-          'Server error';
-    }
-    return e.message ?? 'Server error';
   }
 }
