@@ -16,6 +16,7 @@ abstract class ReviewRemoteDataSource {
 
   Future<ReviewModel> createReview({
     required String shopId,
+    String? reservationId,
     int? rating,
     String? content,
     List<String>? images,
@@ -71,11 +72,13 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   @override
   Future<ReviewModel> createReview({
     required String shopId,
+    String? reservationId,
     int? rating,
     String? content,
     List<String>? images,
   }) async {
     final data = <String, dynamic>{};
+    if (reservationId != null) data['reservationId'] = reservationId;
     if (rating != null) data['rating'] = rating;
     if (content != null) data['content'] = content;
     if (images != null) data['images'] = images;
