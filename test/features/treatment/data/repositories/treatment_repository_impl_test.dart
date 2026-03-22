@@ -64,11 +64,12 @@ void main() {
       test('returns ServerFailure on DioException', () async {
         when(() => mockDataSource.getShopTreatments(any())).thenThrow(
           DioException(
+            type: DioExceptionType.badResponse,
             requestOptions: RequestOptions(),
             response: Response(
               requestOptions: RequestOptions(),
               statusCode: 500,
-              data: {'error': 'Internal Server Error'},
+              data: {'code': 'INTERNAL_SERVER_ERROR'},
             ),
           ),
         );
@@ -79,7 +80,7 @@ void main() {
 
         expect(result, isA<Left<Failure, List<ServiceMenu>>>());
         final failure = (result as Left).value as ServerFailure;
-        expect(failure.message, contains('Internal Server Error'));
+        expect(failure.message, '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요');
       });
     });
 
@@ -101,11 +102,12 @@ void main() {
       test('returns ServerFailure on 404 DioException', () async {
         when(() => mockDataSource.getTreatmentById(any())).thenThrow(
           DioException(
+            type: DioExceptionType.badResponse,
             requestOptions: RequestOptions(),
             response: Response(
               requestOptions: RequestOptions(),
               statusCode: 404,
-              data: {'error': 'Treatment not found'},
+              data: {'code': 'TREATMENT_NOT_FOUND'},
             ),
           ),
         );
@@ -114,7 +116,7 @@ void main() {
 
         expect(result, isA<Left<Failure, ServiceMenu>>());
         final failure = (result as Left).value as ServerFailure;
-        expect(failure.message, contains('Treatment not found'));
+        expect(failure.message, '시술 정보를 찾을 수 없습니다');
       });
     });
   });
