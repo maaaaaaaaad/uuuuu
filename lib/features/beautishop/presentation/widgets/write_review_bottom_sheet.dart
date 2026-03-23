@@ -46,8 +46,8 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
   bool get _canSubmit {
     if (_isSubmitting) return false;
     final content = _contentController.text.trim();
-    final hasValidContent = content.length >= _minContentLength;
-    return _selectedRating != null || hasValidContent;
+    if (content.isNotEmpty && content.length < _minContentLength) return false;
+    return _selectedRating != null || content.length >= _minContentLength;
   }
 
   int get _remainingCharacters {
