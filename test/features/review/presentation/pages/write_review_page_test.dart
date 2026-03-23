@@ -137,6 +137,37 @@ void main() {
       expect(find.text('리뷰 작성에 실패했습니다. 다시 시도해주세요.'), findsOneWidget);
     });
 
+    testWidgets(
+        'should disable submit button when rating selected but content is under 10 chars',
+        (tester) async {
+      await tester.pumpWidget(createPage());
+
+      await tester.tap(find.byIcon(Icons.star_outline_rounded).first);
+      await tester.pump();
+
+      await tester.enterText(find.byType(TextField), '짧은 글');
+      await tester.pump();
+
+      final button = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, '작성 완료'),
+      );
+      expect(button.onPressed, isNull);
+    });
+
+    testWidgets(
+        'should enable submit button when rating selected and content is empty',
+        (tester) async {
+      await tester.pumpWidget(createPage());
+
+      await tester.tap(find.byIcon(Icons.star_outline_rounded).first);
+      await tester.pump();
+
+      final button = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, '작성 완료'),
+      );
+      expect(button.onPressed, isNotNull);
+    });
+
     testWidgets('should deselect rating when same star tapped again',
         (tester) async {
       await tester.pumpWidget(createPage());
