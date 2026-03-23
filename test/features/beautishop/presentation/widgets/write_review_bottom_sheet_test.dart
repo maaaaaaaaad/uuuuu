@@ -311,6 +311,31 @@ void main() {
     );
 
     testWidgets(
+      'should disable submit button when rating selected but content is under 10 chars',
+      (tester) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            onSubmit: ({int? rating, String? content}) async => true,
+          ),
+        );
+
+        await tester.tap(find.text('Open'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.star_outline_rounded).first);
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextField), '짧은 글');
+        await tester.pumpAndSettle();
+
+        final submitButton = tester.widget<ElevatedButton>(
+          find.widgetWithText(ElevatedButton, '작성 완료'),
+        );
+        expect(submitButton.onPressed, isNull);
+      },
+    );
+
+    testWidgets(
       'should enable submit with rating only (no content validation)',
       (tester) async {
         await tester.pumpWidget(
