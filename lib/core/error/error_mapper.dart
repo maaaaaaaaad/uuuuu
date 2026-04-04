@@ -70,6 +70,16 @@ class ErrorMapper {
     'DUPLICATE_FAVORITE': '이미 즐겨찾기에 추가된 샵입니다',
     'FAVORITE_NOT_FOUND': '즐겨찾기 정보를 찾을 수 없습니다',
 
+    'INVALID_VERIFICATION_CODE': '인증코드가 올바르지 않습니다',
+    'VERIFICATION_CODE_EXPIRED': '인증코드가 만료되었습니다. 다시 요청해주세요',
+    'VERIFICATION_CODE_NOT_FOUND': '인증코드를 먼저 요청해주세요',
+    'INVALID_VERIFICATION_TOKEN': '이메일 인증이 필요합니다',
+    'VERIFICATION_RATE_LIMIT': '인증코드 요청이 너무 많습니다. 잠시 후 다시 시도해주세요',
+
+    'INVALID_IMAGE_FORMAT': '지원하지 않는 이미지 형식입니다 (JPG, PNG만 가능)',
+    'IMAGE_TOO_LARGE': '이미지 크기가 너무 큽니다 (최대 5MB)',
+    'IMAGE_UPLOAD_FAILED': '이미지 업로드에 실패했습니다',
+
     'INTERNAL_SERVER_ERROR': '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요',
   };
 
