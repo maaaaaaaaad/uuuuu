@@ -6,7 +6,7 @@ class EnvConfig {
 
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://43.202.235.23',
+    defaultValue: 'http://api.jellomark.com',
   );
 
   static const String kakaoNativeAppKey = String.fromEnvironment(
