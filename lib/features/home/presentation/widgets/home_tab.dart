@@ -117,6 +117,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                             onSearchTap: widget.onSearchTap,
                           ),
                         ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 16)),
                         const SliverToBoxAdapter(child: HeroCarousel()),
                         const SliverToBoxAdapter(child: SizedBox(height: 20)),
                         if (categories.isNotEmpty)
