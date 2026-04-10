@@ -19,6 +19,7 @@ class NotificationHandler {
     'RESERVATION_REJECTED',
     'RESERVATION_COMPLETED',
     'RESERVATION_NO_SHOW',
+    'RESERVATION_REMINDER',
   };
 
   static const _reminderCancelTypes = {
