@@ -328,9 +328,12 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
               _buildAnimatedTreatmentCard(treatmentsAsync),
               if (shopDetail.description.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                GlassCard(
-                  padding: EdgeInsets.zero,
-                  child: ShopDescription(description: shopDetail.description),
+                SizedBox(
+                  width: double.infinity,
+                  child: GlassCard(
+                    padding: EdgeInsets.zero,
+                    child: ShopDescription(description: shopDetail.description),
+                  ),
                 ),
               ],
               if (shopDetail.operatingHoursMap != null &&
