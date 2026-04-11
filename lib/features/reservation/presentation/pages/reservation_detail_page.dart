@@ -489,7 +489,7 @@ class ReservationDetailPage extends ConsumerWidget {
       result.fold(
         (failure) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(failure.message)),
+            const SnackBar(content: Text('삭제된 샵입니다. 더 이상 예약할 수 없습니다.')),
           );
         },
         (treatments) {
