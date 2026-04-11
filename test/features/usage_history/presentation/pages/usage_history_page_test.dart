@@ -140,7 +140,7 @@ void main() {
       await tester.tap(find.text('또 예약하기'));
       await tester.pumpAndSettle();
 
-      expect(find.text('네트워크 오류'), findsOneWidget);
+      expect(find.text('삭제된 샵입니다. 더 이상 예약할 수 없습니다.'), findsOneWidget);
     });
 
     testWidgets('should show snackbar when no treatments found',
