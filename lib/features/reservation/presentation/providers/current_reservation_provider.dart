@@ -103,11 +103,12 @@ class CurrentReservationNotifier extends StateNotifier<CurrentReservationState> 
   }
 }
 
-final currentReservationNotifierProvider = StateNotifierProvider<
+final currentReservationNotifierProvider = StateNotifierProvider.autoDispose<
     CurrentReservationNotifier, CurrentReservationState>(
   (ref) {
     final notifier = CurrentReservationNotifier(ref);
     Future.microtask(() => notifier.load());
+    ref.keepAlive();
     return notifier;
   },
 );
