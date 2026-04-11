@@ -115,6 +115,35 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final shopAsync = ref.watch(shopByIdProvider(widget.shop.id));
+
+    if (shopAsync is AsyncError) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('샵 정보'),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.store_outlined, size: 64, color: Colors.grey),
+              SizedBox(height: 16),
+              Text(
+                '삭제된 샵입니다',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                '이 샵은 사장님에 의해 삭제되었습니다.',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final shop = _getEffectiveShop(shopAsync);
 
     if (shopAsync is AsyncData) {
