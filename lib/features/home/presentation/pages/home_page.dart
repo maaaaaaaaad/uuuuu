@@ -194,9 +194,16 @@ class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      body: Container(
+    return PopScope(
+      canPop: _currentIndex == 0,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) {
+          setState(() => _currentIndex = 0);
+        }
+      },
+      child: Scaffold(
+        extendBody: true,
+        body: Container(
         decoration: const BoxDecoration(
           gradient: AppGradients.softWhiteGradient,
         ),
@@ -211,10 +218,11 @@ class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver
           child: _buildTab(_currentIndex),
         ),
       ),
-      bottomNavigationBar: GlassBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: _navItems,
+        bottomNavigationBar: GlassBottomNavBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+          items: _navItems,
+        ),
       ),
     );
   }
