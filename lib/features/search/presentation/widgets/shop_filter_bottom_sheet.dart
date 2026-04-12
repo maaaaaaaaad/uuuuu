@@ -75,8 +75,10 @@ class _ShopFilterBottomSheetState extends State<ShopFilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomPadding),
       decoration: BoxDecoration(
         color: SemanticColors.background.card,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
