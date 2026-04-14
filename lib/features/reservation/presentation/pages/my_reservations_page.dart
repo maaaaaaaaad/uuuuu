@@ -75,6 +75,8 @@ class _MyReservationsPageState extends ConsumerState<MyReservationsPage> {
           child: Column(
             children: [
               _buildFilterChips(state),
+              if (state.availableSortOrders.isNotEmpty)
+                _buildSortRow(state),
               Expanded(child: _buildContent(state)),
             ],
           ),
@@ -119,6 +121,36 @@ class _MyReservationsPageState extends ConsumerState<MyReservationsPage> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSortRow(MyReservationsState state) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: state.availableSortOrders.map((order) {
+          final isSelected = state.sortOrder == order;
+          return Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: GestureDetector(
+              onTap: () => ref
+                  .read(myReservationsNotifierProvider.notifier)
+                  .changeSortOrder(order),
+              child: Text(
+                order.label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  color: isSelected
+                      ? SemanticColors.text.primary
+                      : SemanticColors.text.secondary,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
