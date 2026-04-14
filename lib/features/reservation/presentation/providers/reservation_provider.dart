@@ -22,17 +22,31 @@ final cancelReservationUseCaseProvider =
   return sl<CancelReservationUseCase>();
 });
 
+enum ReservationSortOrder {
+  newest,
+  oldest,
+  upcomingFirst;
+
+  String get label => switch (this) {
+        newest => '최신순',
+        oldest => '오래된순',
+        upcomingFirst => '예약 날짜순',
+      };
+}
+
 class MyReservationsState {
   final List<Reservation> reservations;
   final bool isLoading;
   final String? error;
   final ReservationStatus? filterStatus;
+  final ReservationSortOrder sortOrder;
 
   const MyReservationsState({
     this.reservations = const [],
     this.isLoading = false,
     this.error,
     this.filterStatus,
+    this.sortOrder = ReservationSortOrder.newest,
   });
 
   static const _statusPriority = {
@@ -44,14 +58,43 @@ class MyReservationsState {
     ReservationStatus.noShow: 5,
   };
 
-  List<Reservation> get filteredReservations {
-    if (filterStatus != null) {
-      return reservations.where((r) => r.status == filterStatus).toList();
+  List<ReservationSortOrder> get availableSortOrders {
+    if (filterStatus == null) return [];
+    if (filterStatus == ReservationStatus.confirmed) {
+      return [ReservationSortOrder.upcomingFirst, ReservationSortOrder.newest];
     }
-    return List.of(reservations)
-      ..sort((a, b) =>
-          (_statusPriority[a.status] ?? 99)
-              .compareTo(_statusPriority[b.status] ?? 99));
+    return [ReservationSortOrder.newest, ReservationSortOrder.oldest];
+  }
+
+  static ReservationSortOrder defaultSortFor(ReservationStatus? status) {
+    if (status == ReservationStatus.confirmed) {
+      return ReservationSortOrder.upcomingFirst;
+    }
+    return ReservationSortOrder.newest;
+  }
+
+  List<Reservation> get filteredReservations {
+    if (filterStatus == null) {
+      return List.of(reservations)
+        ..sort((a, b) =>
+            (_statusPriority[a.status] ?? 99)
+                .compareTo(_statusPriority[b.status] ?? 99));
+    }
+
+    final filtered = reservations.where((r) => r.status == filterStatus).toList();
+    switch (sortOrder) {
+      case ReservationSortOrder.newest:
+        filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      case ReservationSortOrder.oldest:
+        filtered.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      case ReservationSortOrder.upcomingFirst:
+        filtered.sort((a, b) {
+          final dateCompare = a.reservationDate.compareTo(b.reservationDate);
+          if (dateCompare != 0) return dateCompare;
+          return a.startTime.compareTo(b.startTime);
+        });
+    }
+    return filtered;
   }
 
   MyReservationsState copyWith({
@@ -59,6 +102,7 @@ class MyReservationsState {
     bool? isLoading,
     String? error,
     ReservationStatus? filterStatus,
+    ReservationSortOrder? sortOrder,
     bool clearFilter = false,
   }) {
     return MyReservationsState(
@@ -66,6 +110,7 @@ class MyReservationsState {
       isLoading: isLoading ?? this.isLoading,
       error: error,
       filterStatus: clearFilter ? null : (filterStatus ?? this.filterStatus),
+      sortOrder: sortOrder ?? this.sortOrder,
     );
   }
 }
@@ -98,8 +143,15 @@ class MyReservationsNotifier extends StateNotifier<MyReservationsState> {
     if (status == null) {
       state = state.copyWith(clearFilter: true);
     } else {
-      state = state.copyWith(filterStatus: status);
+      state = state.copyWith(
+        filterStatus: status,
+        sortOrder: MyReservationsState.defaultSortFor(status),
+      );
     }
+  }
+
+  void changeSortOrder(ReservationSortOrder sortOrder) {
+    state = state.copyWith(sortOrder: sortOrder);
   }
 
   Future<void> cancelReservation(String id) async {
