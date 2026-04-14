@@ -9,6 +9,7 @@ import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart
 import 'package:jellomark/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jellomark/features/beautishop/data/datasources/beauty_shop_remote_datasource.dart';
+import 'package:jellomark/features/external_shop/data/datasources/external_shop_remote_datasource.dart';
 import 'package:jellomark/features/beautishop/data/repositories/beauty_shop_repository_impl.dart';
 import 'package:jellomark/features/beautishop/domain/repositories/beauty_shop_repository.dart';
 import 'package:jellomark/features/beautishop/domain/usecases/get_filtered_shops_usecase.dart';
@@ -144,6 +145,10 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<GetFilteredShopsUseCase>(
     () => GetFilteredShopsUseCase(repository: sl<BeautyShopRepository>()),
+  );
+
+  sl.registerLazySingleton<ExternalShopRemoteDataSource>(
+    () => ExternalShopRemoteDataSource(apiClient: sl<ApiClient>()),
   );
 
   sl.registerLazySingleton<GetShopReviews>(
