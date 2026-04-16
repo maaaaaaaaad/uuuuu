@@ -22,11 +22,38 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
   final Set<String> _activeMarkerIds = {};
   double? _userLat;
   double? _userLng;
+  NOverlayImage? _externalShopIcon;
 
   @override
   void dispose() {
     _controller = null;
     super.dispose();
+  }
+
+  Future<NOverlayImage> _buildExternalShopIcon() async {
+    return await NOverlayImage.fromWidget(
+      widget: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.grey.shade500,
+          border: Border.all(color: Colors.white, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: const Icon(
+          Icons.place,
+          color: Colors.white,
+          size: 14,
+        ),
+      ),
+      size: const Size(28, 28),
+      context: context,
+    );
   }
 
   @override
@@ -208,6 +235,8 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     await controller.addOverlay(userMarker);
     _activeMarkerIds.add('user_marker');
 
+    _externalShopIcon ??= await _buildExternalShopIcon();
+
     for (final externalShop in state.externalShops) {
       final markerId = 'external_${externalShop.id}';
       final displayName = externalShop.name.length > 10
@@ -217,13 +246,14 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
       final marker = NMarker(
         id: markerId,
         position: NLatLng(externalShop.latitude, externalShop.longitude),
-        iconTintColor: Colors.grey,
+        icon: _externalShopIcon,
+        size: const Size(28, 28),
         caption: NOverlayCaption(
           text: displayName,
           textSize: 10,
           color: Colors.grey.shade700,
           haloColor: Colors.white,
-          minZoom: 14,
+          minZoom: 13,
         ),
       );
 
