@@ -5,6 +5,7 @@ import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbnail_grid.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
+import 'package:jellomark/features/external_shop/domain/entities/external_shop.dart';
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:jellomark/features/nearby_shops/presentation/providers/nearby_shops_map_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -36,6 +37,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     ref.listen<NearbyShopsMapState>(nearbyShopsMapProvider, (previous, next) {
       if (_controller != null && _userLat != null && _userLng != null) {
         if (previous?.shops != next.shops ||
+            previous?.externalShops != next.externalShops ||
             previous?.favoriteShopIds != next.favoriteShopIds) {
           _updateMarkers(next, _userLat!, _userLng!);
         }
@@ -140,6 +142,8 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
           ),
         if (state.selectedShop != null)
           _buildBottomSheet(state.selectedShop!),
+        if (state.selectedExternalShop != null)
+          _buildExternalShopBottomSheet(state.selectedExternalShop!),
       ],
     );
   }
@@ -203,6 +207,33 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     );
     await controller.addOverlay(userMarker);
     _activeMarkerIds.add('user_marker');
+
+    for (final externalShop in state.externalShops) {
+      final markerId = 'external_${externalShop.id}';
+      final displayName = externalShop.name.length > 10
+          ? '${externalShop.name.substring(0, 10)}...'
+          : externalShop.name;
+
+      final marker = NMarker(
+        id: markerId,
+        position: NLatLng(externalShop.latitude, externalShop.longitude),
+        iconTintColor: Colors.grey,
+        caption: NOverlayCaption(
+          text: displayName,
+          textSize: 10,
+          color: Colors.grey.shade700,
+          haloColor: Colors.white,
+          minZoom: 14,
+        ),
+      );
+
+      marker.setOnTapListener((marker) {
+        ref.read(nearbyShopsMapProvider.notifier).selectExternalShop(externalShop);
+      });
+
+      await controller.addOverlay(marker);
+      _activeMarkerIds.add(markerId);
+    }
 
     for (final shop in state.shops) {
       if (shop.latitude == null || shop.longitude == null) continue;
@@ -305,6 +336,123 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExternalShopBottomSheet(ExternalShop shop) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: GestureDetector(
+        onVerticalDragEnd: (details) {
+          if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+            ref.read(nearbyShopsMapProvider.notifier).clearSelection();
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 16,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildDragHandle(),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.place_outlined,
+                            size: 22,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              shop.name,
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: SemanticColors.text.primary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        shop.address,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: SemanticColors.text.secondary,
+                        ),
+                      ),
+                      if (shop.phoneNumber != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          shop.phoneNumber!,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: SemanticColors.text.secondary,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '아직 입점하지 않은 샵입니다',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: SemanticColors.text.primary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '예약 기능을 이용하실 수 없습니다',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: SemanticColors.text.secondary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
