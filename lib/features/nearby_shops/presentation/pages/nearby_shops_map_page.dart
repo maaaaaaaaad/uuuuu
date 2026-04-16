@@ -125,6 +125,25 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     return Stack(
       children: [
         _buildMap(location.latitude, location.longitude, state),
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 8,
+          right: 8,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '입점:${state.shops.length} / 외부:${state.externalShops.length}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
         if (state.isLoading)
           Positioned(
             top: MediaQuery.of(context).padding.top + 16,
@@ -248,6 +267,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
         position: NLatLng(externalShop.latitude, externalShop.longitude),
         icon: _externalShopIcon,
         size: const Size(28, 28),
+        isForceShowIcon: true,
         caption: NOverlayCaption(
           text: displayName,
           textSize: 10,
