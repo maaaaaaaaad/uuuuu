@@ -27,7 +27,8 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
   NOverlayImage? _registeredShopIcon;
   NOverlayImage? _userLocationIcon;
 
-  static const _markerSize = Size(28, 28);
+  static const _smallMarkerSize = Size(28, 28);
+  static const _largeMarkerSize = Size(34, 34);
 
   @override
   void dispose() {
@@ -35,13 +36,13 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     super.dispose();
   }
 
-  Widget _buildCircleMarker({required Decoration decoration}) {
+  Widget _buildCircleMarker({required Decoration decoration, double iconSize = 14}) {
     return Container(
       decoration: decoration,
-      child: const Icon(
+      child: Icon(
         Icons.place,
         color: Colors.white,
-        size: 14,
+        size: iconSize,
       ),
     );
   }
@@ -62,7 +63,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
           ],
         ),
       ),
-      size: _markerSize,
+      size: _smallMarkerSize,
       context: context,
     );
   }
@@ -86,8 +87,9 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             ),
           ],
         ),
+        iconSize: 17,
       ),
-      size: _markerSize,
+      size: _largeMarkerSize,
       context: context,
     );
   }
@@ -111,8 +113,9 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             ),
           ],
         ),
+        iconSize: 17,
       ),
-      size: _markerSize,
+      size: _largeMarkerSize,
       context: context,
     );
   }
@@ -297,7 +300,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
         id: markerId,
         position: NLatLng(externalShop.latitude, externalShop.longitude),
         icon: _externalShopIcon,
-        size: _markerSize,
+        size: _smallMarkerSize,
         isForceShowIcon: true,
         caption: NOverlayCaption(
           text: displayName,
@@ -330,7 +333,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
         id: markerId,
         position: NLatLng(shop.latitude!, shop.longitude!),
         icon: _registeredShopIcon,
-        size: _markerSize,
+        size: _largeMarkerSize,
         isForceShowIcon: true,
         caption: NOverlayCaption(
           text: isFavorite ? '$displayName ♥' : displayName,
@@ -354,7 +357,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
       id: 'user_marker',
       position: NLatLng(userLat, userLng),
       icon: _userLocationIcon,
-      size: _markerSize,
+      size: _largeMarkerSize,
       isForceShowIcon: true,
       caption: NOverlayCaption(
         text: '내 위치',
