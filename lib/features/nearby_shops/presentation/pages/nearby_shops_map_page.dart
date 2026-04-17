@@ -28,7 +28,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
   NOverlayImage? _userLocationIcon;
 
   static const _smallMarkerSize = Size(28, 28);
-  static const _largeMarkerSize = Size(34, 34);
+  static const _largeMarkerSize = Size(40, 40);
 
   @override
   void dispose() {
@@ -87,7 +87,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             ),
           ],
         ),
-        iconSize: 17,
+        iconSize: 20,
       ),
       size: _largeMarkerSize,
       context: context,
@@ -113,7 +113,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             ),
           ],
         ),
-        iconSize: 17,
+        iconSize: 20,
       ),
       size: _largeMarkerSize,
       context: context,
