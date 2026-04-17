@@ -8,6 +8,7 @@ import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_hea
 import 'package:jellomark/features/external_shop/domain/entities/external_shop.dart';
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:jellomark/features/nearby_shops/presentation/providers/nearby_shops_map_provider.dart';
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class NearbyShopsMapPage extends ConsumerStatefulWidget {
@@ -23,6 +24,10 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
   double? _userLat;
   double? _userLng;
   NOverlayImage? _externalShopIcon;
+  NOverlayImage? _registeredShopIcon;
+  NOverlayImage? _userLocationIcon;
+
+  static const _markerSize = Size(28, 28);
 
   @override
   void dispose() {
@@ -30,9 +35,20 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     super.dispose();
   }
 
+  Widget _buildCircleMarker({required Decoration decoration}) {
+    return Container(
+      decoration: decoration,
+      child: const Icon(
+        Icons.place,
+        color: Colors.white,
+        size: 14,
+      ),
+    );
+  }
+
   Future<NOverlayImage> _buildExternalShopIcon() async {
     return await NOverlayImage.fromWidget(
-      widget: Container(
+      widget: _buildCircleMarker(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.grey.shade500,
@@ -45,13 +61,58 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             ),
           ],
         ),
-        child: const Icon(
-          Icons.place,
-          color: Colors.white,
-          size: 14,
+      ),
+      size: _markerSize,
+      context: context,
+    );
+  }
+
+  Future<NOverlayImage> _buildRegisteredShopIcon() async {
+    return await NOverlayImage.fromWidget(
+      widget: _buildCircleMarker(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppColors.pastelPink, AppColors.accentPink],
+          ),
+          border: Border.all(color: Colors.white, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.accentPink.withValues(alpha: 0.4),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
       ),
-      size: const Size(28, 28),
+      size: _markerSize,
+      context: context,
+    );
+  }
+
+  Future<NOverlayImage> _buildUserLocationIcon() async {
+    return await NOverlayImage.fromWidget(
+      widget: _buildCircleMarker(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [AppColors.lavenderLight, AppColors.lavenderDark],
+          ),
+          border: Border.all(color: Colors.white, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.lavenderDark.withValues(alpha: 0.4),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+      ),
+      size: _markerSize,
       context: context,
     );
   }
@@ -222,20 +283,9 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     }
     _activeMarkerIds.clear();
 
-    final userMarker = NMarker(
-      id: 'user_marker',
-      position: NLatLng(userLat, userLng),
-      caption: NOverlayCaption(
-        text: '내 위치',
-        textSize: 11,
-        color: Colors.blue,
-      ),
-      iconTintColor: Colors.blue,
-    );
-    await controller.addOverlay(userMarker);
-    _activeMarkerIds.add('user_marker');
-
     _externalShopIcon ??= await _buildExternalShopIcon();
+    _registeredShopIcon ??= await _buildRegisteredShopIcon();
+    _userLocationIcon ??= await _buildUserLocationIcon();
 
     for (final externalShop in state.externalShops) {
       final markerId = 'external_${externalShop.id}';
@@ -247,7 +297,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
         id: markerId,
         position: NLatLng(externalShop.latitude, externalShop.longitude),
         icon: _externalShopIcon,
-        size: const Size(28, 28),
+        size: _markerSize,
         isForceShowIcon: true,
         caption: NOverlayCaption(
           text: displayName,
@@ -257,6 +307,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
           minZoom: 13,
         ),
       );
+      marker.setZIndex(0);
 
       marker.setOnTapListener((marker) {
         ref.read(nearbyShopsMapProvider.notifier).selectExternalShop(externalShop);
@@ -278,6 +329,9 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
       final marker = NMarker(
         id: markerId,
         position: NLatLng(shop.latitude!, shop.longitude!),
+        icon: _registeredShopIcon,
+        size: _markerSize,
+        isForceShowIcon: true,
         caption: NOverlayCaption(
           text: isFavorite ? '$displayName ♥' : displayName,
           textSize: 11,
@@ -286,6 +340,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
           minZoom: 12,
         ),
       );
+      marker.setZIndex(10);
 
       marker.setOnTapListener((marker) {
         ref.read(nearbyShopsMapProvider.notifier).selectShop(shop);
@@ -294,6 +349,23 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
       await controller.addOverlay(marker);
       _activeMarkerIds.add(markerId);
     }
+
+    final userMarker = NMarker(
+      id: 'user_marker',
+      position: NLatLng(userLat, userLng),
+      icon: _userLocationIcon,
+      size: _markerSize,
+      isForceShowIcon: true,
+      caption: NOverlayCaption(
+        text: '내 위치',
+        textSize: 11,
+        color: AppColors.lavenderDark,
+        haloColor: Colors.white,
+      ),
+    );
+    userMarker.setZIndex(20);
+    await controller.addOverlay(userMarker);
+    _activeMarkerIds.add('user_marker');
   }
 
   Widget _buildBottomSheet(BeautyShop shop) {
