@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:jellomark/features/location/domain/entities/route.dart'
     as domain;
+import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class ShopMapWidget extends StatefulWidget {
@@ -41,6 +42,67 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
   NaverMapController? _controller;
   final Set<String> _activeOverlayIds = {};
   bool _hasInitialCameraUpdate = false;
+  NOverlayImage? _shopIcon;
+  NOverlayImage? _userIcon;
+
+  static const _markerSize = Size(28, 28);
+
+  Widget _buildCircleMarker({required Decoration decoration}) {
+    return Container(
+      decoration: decoration,
+      child: const Icon(Icons.place, color: Colors.white, size: 14),
+    );
+  }
+
+  Future<NOverlayImage> _buildShopIcon() async {
+    return await NOverlayImage.fromWidget(
+      widget: _buildCircleMarker(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppColors.pastelPink, AppColors.accentPink],
+          ),
+          border: Border.all(color: Colors.white, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.accentPink.withValues(alpha: 0.4),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+      ),
+      size: _markerSize,
+      context: context,
+    );
+  }
+
+  Future<NOverlayImage> _buildUserIcon() async {
+    return await NOverlayImage.fromWidget(
+      widget: _buildCircleMarker(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [AppColors.lavenderLight, AppColors.lavenderDark],
+          ),
+          border: Border.all(color: Colors.white, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.lavenderDark.withValues(alpha: 0.4),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+      ),
+      size: _markerSize,
+      context: context,
+    );
+  }
 
   @override
   void didUpdateWidget(covariant ShopMapWidget oldWidget) {
@@ -163,11 +225,23 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
     final shopPosition = NLatLng(widget.shopLatitude, widget.shopLongitude);
     boundsPoints.add(shopPosition);
 
+    _shopIcon ??= await _buildShopIcon();
+    _userIcon ??= await _buildUserIcon();
+
     final shopMarker = NMarker(
       id: 'shop_marker',
       position: shopPosition,
-      caption: NOverlayCaption(text: widget.shopName),
+      icon: _shopIcon,
+      size: _markerSize,
+      isForceShowIcon: true,
+      caption: NOverlayCaption(
+        text: widget.shopName,
+        textSize: 11,
+        color: Colors.black87,
+        haloColor: Colors.white,
+      ),
     );
+    shopMarker.setZIndex(10);
     await controller.addOverlay(shopMarker);
     _activeOverlayIds.add('shop_marker');
 
@@ -178,13 +252,17 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
       final userMarker = NMarker(
         id: 'user_marker',
         position: userPosition,
+        icon: _userIcon,
+        size: _markerSize,
+        isForceShowIcon: true,
         caption: NOverlayCaption(
           text: '현재 위치',
-          textSize: 12,
-          color: Colors.blue,
+          textSize: 11,
+          color: AppColors.lavenderDark,
+          haloColor: Colors.white,
         ),
-        iconTintColor: Colors.blue,
       );
+      userMarker.setZIndex(20);
       await controller.addOverlay(userMarker);
       _activeOverlayIds.add('user_marker');
     }
