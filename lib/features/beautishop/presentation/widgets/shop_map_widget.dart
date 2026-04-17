@@ -45,12 +45,12 @@ class _ShopMapWidgetState extends State<ShopMapWidget> {
   NOverlayImage? _shopIcon;
   NOverlayImage? _userIcon;
 
-  static const _markerSize = Size(28, 28);
+  static const _markerSize = Size(34, 34);
 
   Widget _buildCircleMarker({required Decoration decoration}) {
     return Container(
       decoration: decoration,
-      child: const Icon(Icons.place, color: Colors.white, size: 14),
+      child: const Icon(Icons.place, color: Colors.white, size: 17),
     );
   }
 
