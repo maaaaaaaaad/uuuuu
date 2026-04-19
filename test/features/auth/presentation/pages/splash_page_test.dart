@@ -65,6 +65,10 @@ class MockAuthRepository implements AuthRepository {
   Future<void> clearStoredTokens() async {
     storedTokens = null;
   }
+
+  @override
+  Future<Either<Failure, void>> withdraw(String reason) async =>
+      const Right(null);
 }
 
 void main() {
