@@ -97,12 +97,12 @@ class _WithdrawalPageState extends ConsumerState<WithdrawalPage> {
     final state = ref.watch(withdrawalProvider);
 
     return Scaffold(
-      backgroundColor: SemanticColors.background.card,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('회원 탈퇴'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: SemanticColors.background.appBar,
+        backgroundColor: Colors.white,
         foregroundColor: SemanticColors.text.primary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
