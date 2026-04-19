@@ -38,6 +38,11 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   Future<void> logout() async {
     if (exception != null) throw exception!;
   }
+
+  @override
+  Future<void> withdraw(String reason) async {
+    if (exception != null) throw exception!;
+  }
 }
 
 class MockAuthLocalDataSource implements AuthLocalDataSource {
