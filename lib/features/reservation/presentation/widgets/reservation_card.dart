@@ -15,6 +15,9 @@ class ReservationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shopDeleted =
+        reservation.shopName == null || reservation.shopName!.isEmpty;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Material(
@@ -22,7 +25,15 @@ class ReservationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         elevation: 1,
         child: InkWell(
-          onTap: onTap,
+          onTap: shopDeleted
+              ? () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('삭제된 샵의 예약입니다. 상세 정보를 확인할 수 없습니다.'),
+                    ),
+                  );
+                }
+              : onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -54,14 +65,21 @@ class ReservationCard extends StatelessWidget {
                     Icon(
                       Icons.storefront,
                       size: 14,
-                      color: SemanticColors.icon.secondary,
+                      color: shopDeleted
+                          ? SemanticColors.state.error
+                          : SemanticColors.icon.secondary,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      reservation.shopName ?? '',
+                      shopDeleted ? '삭제된 샵' : reservation.shopName!,
                       style: TextStyle(
                         fontSize: 13,
-                        color: SemanticColors.text.secondary,
+                        color: shopDeleted
+                            ? SemanticColors.state.error
+                            : SemanticColors.text.secondary,
+                        fontWeight: shopDeleted
+                            ? FontWeight.w500
+                            : FontWeight.normal,
                       ),
                     ),
                   ],
