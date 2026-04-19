@@ -95,4 +95,20 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> clearStoredTokens() async {
     await _localDataSource.clearTokens();
   }
+
+  @override
+  Future<Either<Failure, void>> withdraw(String reason) async {
+    try {
+      await _remoteDataSource.withdraw(reason);
+      try {
+        await _kakaoAuthService.logout();
+      } catch (_) {}
+      await _localDataSource.clearTokens();
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: '회원 탈퇴에 실패했습니다'),
+      );
+    }
+  }
 }
