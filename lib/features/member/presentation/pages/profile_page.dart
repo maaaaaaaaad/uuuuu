@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/location/presentation/widgets/location_setting_toggle.dart';
+import 'package:jellomark/features/member/presentation/pages/withdrawal_page.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/features/recent_shops/presentation/pages/recent_shops_page.dart';
 import 'package:jellomark/features/reservation/presentation/pages/my_reservations_page.dart';
@@ -305,6 +306,25 @@ class ProfilePage extends ConsumerWidget {
                       child: const Text('로그아웃'),
                     ),
                   ),
+                  const SizedBox(height: 32),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const WithdrawalPage(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      '회원 탈퇴',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: SemanticColors.text.secondary,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
