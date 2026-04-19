@@ -10,6 +10,8 @@ abstract class AuthRemoteDataSource {
   Future<MemberModel> getCurrentMember();
 
   Future<void> logout();
+
+  Future<void> withdraw(String reason);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -45,5 +47,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> logout() async {
     await _apiClient.post('/api/auth/logout');
+  }
+
+  @override
+  Future<void> withdraw(String reason) async {
+    await _apiClient.post(
+      '/api/members/me/withdraw',
+      data: {'reason': reason},
+    );
   }
 }
