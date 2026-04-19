@@ -16,25 +16,27 @@ class CheckAuthStatusUseCase {
     }
 
     final memberResult = await _authRepository.getCurrentMember();
+    if (memberResult.isRight()) {
+      return memberResult;
+    }
 
-    return memberResult.fold((failure) async {
-      final refreshResult = await _authRepository.refreshToken(
-        tokens.refreshToken,
+    final refreshResult = await _authRepository.refreshToken(
+      tokens.refreshToken,
+    );
+    if (refreshResult.isLeft()) {
+      await _authRepository.clearStoredTokens();
+      return Left(
+        refreshResult.fold(
+          (f) => f,
+          (_) => const AuthFailure('토큰 갱신에 실패했습니다'),
+        ),
       );
+    }
 
-      return refreshResult.fold(
-        (refreshFailure) {
-          _authRepository.clearStoredTokens();
-          return Left(refreshFailure);
-        },
-        (_) async {
-          final retryResult = await _authRepository.getCurrentMember();
-          return retryResult.fold((retryFailure) {
-            _authRepository.clearStoredTokens();
-            return Left(retryFailure);
-          }, (member) => Right(member));
-        },
-      );
-    }, (member) => Right(member));
+    final retryResult = await _authRepository.getCurrentMember();
+    if (retryResult.isLeft()) {
+      await _authRepository.clearStoredTokens();
+    }
+    return retryResult;
   }
 }
