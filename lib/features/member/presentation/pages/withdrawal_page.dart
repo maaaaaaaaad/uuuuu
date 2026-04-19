@@ -234,15 +234,31 @@ class _WithdrawalPageState extends ConsumerState<WithdrawalPage> {
               itemCount: _reasons.length,
               itemBuilder: (ctx, i) {
                 final reason = _reasons[i];
-                return RadioListTile<String>(
-                  title: Text(reason),
-                  value: reason,
-                  groupValue: state.selectedReason,
-                  onChanged: (v) {
-                    if (v != null) {
-                      ref.read(withdrawalProvider.notifier).selectReason(v);
-                    }
-                  },
+                final selected = state.selectedReason == reason;
+                return InkWell(
+                  onTap: () => ref
+                      .read(withdrawalProvider.notifier)
+                      .selectReason(reason),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          selected
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_unchecked,
+                          color: selected
+                              ? SemanticColors.state.error
+                              : SemanticColors.icon.secondary,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(reason)),
+                      ],
+                    ),
+                  ),
                 );
               },
             ),
