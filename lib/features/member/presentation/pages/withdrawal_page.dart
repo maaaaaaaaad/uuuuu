@@ -115,26 +115,29 @@ class _WithdrawalPageState extends ConsumerState<WithdrawalPage> {
           },
         ),
       ),
-      body: Column(
-        children: [
-          LinearProgressIndicator(
-            value: (state.step + 1) / 5,
-            backgroundColor: SemanticColors.border.glass,
-          ),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                _buildNoticeStep(),
-                _buildReasonStep(state),
-                _buildAgreementStep(state),
-                _buildConfirmTextStep(state),
-                _buildReAuthStep(state),
-              ],
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            LinearProgressIndicator(
+              value: (state.step + 1) / 5,
+              backgroundColor: SemanticColors.border.glass,
             ),
-          ),
-        ],
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _buildNoticeStep(),
+                  _buildReasonStep(state),
+                  _buildAgreementStep(state),
+                  _buildConfirmTextStep(state),
+                  _buildReAuthStep(state),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
