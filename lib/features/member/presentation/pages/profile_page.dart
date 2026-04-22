@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/location/presentation/widgets/location_setting_toggle.dart';
+import 'package:jellomark/features/legal/data/legal_texts.dart';
+import 'package:jellomark/features/legal/presentation/pages/legal_text_page.dart';
 import 'package:jellomark/features/member/presentation/pages/withdrawal_page.dart';
 import 'package:jellomark/features/member/presentation/providers/member_providers.dart';
 import 'package:jellomark/features/recent_shops/presentation/pages/recent_shops_page.dart';
@@ -286,6 +288,60 @@ class ProfilePage extends ConsumerWidget {
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: LocationSettingToggle(),
+                        ),
+                        Divider(
+                          height: 1,
+                          color: SemanticColors.border.glass,
+                        ),
+                        _buildMenuItem(
+                          icon: Icons.description_outlined,
+                          title: '이용약관',
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const LegalTextPage(
+                                  title: '이용약관',
+                                  body: LegalTexts.termsOfService,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        Divider(
+                          height: 1,
+                          color: SemanticColors.border.glass,
+                        ),
+                        _buildMenuItem(
+                          icon: Icons.privacy_tip_outlined,
+                          title: '개인정보처리방침',
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const LegalTextPage(
+                                  title: '개인정보처리방침',
+                                  body: LegalTexts.privacyPolicy,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        Divider(
+                          height: 1,
+                          color: SemanticColors.border.glass,
+                        ),
+                        _buildMenuItem(
+                          icon: Icons.location_on_outlined,
+                          title: '위치정보 이용약관',
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const LegalTextPage(
+                                  title: '위치정보 이용약관',
+                                  body: LegalTexts.locationTerms,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
