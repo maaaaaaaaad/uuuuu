@@ -289,10 +289,32 @@ class ProfilePage extends ConsumerWidget {
                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: LocationSettingToggle(),
                         ),
-                        Divider(
-                          height: 1,
-                          color: SemanticColors.border.glass,
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 8),
+                      child: Text(
+                        '약관 및 정책',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: SemanticColors.text.secondary,
                         ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: SemanticColors.background.card,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: SemanticColors.border.glass),
+                    ),
+                    child: Column(
+                      children: [
                         _buildMenuItem(
                           icon: Icons.description_outlined,
                           title: '이용약관',
