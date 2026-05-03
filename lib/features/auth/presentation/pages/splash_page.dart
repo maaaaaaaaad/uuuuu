@@ -42,7 +42,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     try {
       final checkAuthStatus = ref.read(checkAuthStatusUseCaseProvider);
       final result = await checkAuthStatus()
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 20));
 
       if (!mounted) return;
 
