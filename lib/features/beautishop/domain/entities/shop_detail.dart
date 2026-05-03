@@ -13,6 +13,7 @@ class ShopDetail extends BeautyShop {
     required this.description,
     required this.phoneNumber,
     super.images,
+    super.menuImages,
     this.operatingHoursMap,
     this.notice,
     super.latitude,
