@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/data/models/beauty_shop_model.dart';
@@ -102,6 +103,7 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
       description: description ?? '',
       phoneNumber: phoneNumber,
       images: shop.images,
+      menuImages: shop.menuImages,
       operatingHoursMap: operatingHoursMap,
       rating: shop.rating,
       reviewCount: shop.reviewCount,
@@ -355,6 +357,13 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
                 ),
               ),
               _buildAnimatedTreatmentCard(treatmentsAsync),
+              if (shopDetail.menuImages.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                GlassCard(
+                  padding: const EdgeInsets.all(16),
+                  child: _buildMenuImagesSection(shopDetail.menuImages),
+                ),
+              ],
               if (shopDetail.description.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 SizedBox(
@@ -415,6 +424,97 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
               ],
             )
           : const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildMenuImagesSection(List<String> menuImages) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.menu_book_outlined,
+              size: 18,
+              color: SemanticColors.icon.primary,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '시술 메뉴판',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: SemanticColors.text.primary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 180,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: menuImages.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final url = menuImages[index];
+              return GestureDetector(
+                onTap: () => _showFullScreenMenuImage(menuImages, index),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: url,
+                    width: 140,
+                    height: 180,
+                    fit: BoxFit.cover,
+                    placeholder: (_, _) => Container(
+                      width: 140,
+                      height: 180,
+                      color: SemanticColors.background.input,
+                    ),
+                    errorWidget: (_, _, _) => Container(
+                      width: 140,
+                      height: 180,
+                      color: SemanticColors.background.input,
+                      child: Icon(
+                        Icons.broken_image_outlined,
+                        color: SemanticColors.icon.secondary,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showFullScreenMenuImage(List<String> images, int initialIndex) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            iconTheme: const IconThemeData(color: Colors.white),
+            elevation: 0,
+          ),
+          body: PageView.builder(
+            controller: PageController(initialPage: initialIndex),
+            itemCount: images.length,
+            itemBuilder: (_, index) => InteractiveViewer(
+              child: Center(
+                child: CachedNetworkImage(
+                  imageUrl: images[index],
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
