@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:jellomark/config/theme.dart';
 import 'package:jellomark/core/notification/navigator_key.dart';
 import 'package:jellomark/features/auth/presentation/pages/login_page.dart';
@@ -16,6 +17,13 @@ class JelloMarkApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: AppTheme.lightTheme,
+      locale: const Locale('ko', 'KR'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('ko', 'KR')],
       home: const SplashPage(),
       routes: {
         '/login': (context) => const LoginPage(),
