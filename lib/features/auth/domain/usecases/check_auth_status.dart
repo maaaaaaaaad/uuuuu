@@ -14,17 +14,6 @@ class CheckAuthStatusUseCase {
     if (tokens == null) {
       return const Left(NoTokenFailure());
     }
-
-    final result = await _authRepository.getCurrentMember();
-    if (result.isLeft()) {
-      final failure = result.fold(
-        (f) => f,
-        (_) => const AuthFailure('unexpected'),
-      );
-      if (failure is AuthFailure) {
-        await _authRepository.clearStoredTokens();
-      }
-    }
-    return result;
+    return _authRepository.getCurrentMember();
   }
 }
