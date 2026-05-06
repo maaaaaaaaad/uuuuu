@@ -11,13 +11,15 @@ abstract class TokenProvider {
   Future<void> clearTokens();
 }
 
+enum _RefreshOutcome { success, tokenInvalid, transient }
+
 class AuthInterceptor extends QueuedInterceptor {
   final TokenProvider tokenProvider;
   final String baseUrl;
 
   Dio? _refreshDio;
   bool _isRefreshing = false;
-  final _refreshCompleter = <Completer<bool>>[];
+  final _refreshCompleter = <Completer<_RefreshOutcome>>[];
 
   AuthInterceptor({
     required this.tokenProvider,
@@ -60,9 +62,13 @@ class AuthInterceptor extends QueuedInterceptor {
       return handler.next(err);
     }
 
-    final success = await _refreshTokens(refreshToken);
-    if (!success) {
+    final outcome = await _refreshTokens(refreshToken);
+    if (outcome == _RefreshOutcome.tokenInvalid) {
       await tokenProvider.clearTokens();
+      return handler.next(err);
+    }
+    if (outcome == _RefreshOutcome.transient) {
+      // Keep tokens — let user retry next time. Do not log out.
       return handler.next(err);
     }
 
@@ -82,9 +88,9 @@ class AuthInterceptor extends QueuedInterceptor {
     }
   }
 
-  Future<bool> _refreshTokens(String refreshToken) async {
+  Future<_RefreshOutcome> _refreshTokens(String refreshToken) async {
     if (_isRefreshing) {
-      final completer = Completer<bool>();
+      final completer = Completer<_RefreshOutcome>();
       _refreshCompleter.add(completer);
       return completer.future;
     }
@@ -106,23 +112,30 @@ class AuthInterceptor extends QueuedInterceptor {
           refreshToken: newRefreshToken,
         );
 
-        _completeRefreshRequests(true);
-        return true;
+        _completeRefreshRequests(_RefreshOutcome.success);
+        return _RefreshOutcome.success;
       }
 
-      _completeRefreshRequests(false);
-      return false;
+      _completeRefreshRequests(_RefreshOutcome.transient);
+      return _RefreshOutcome.transient;
+    } on DioException catch (e) {
+      final status = e.response?.statusCode;
+      final outcome = (status == 401 || status == 403)
+          ? _RefreshOutcome.tokenInvalid
+          : _RefreshOutcome.transient;
+      _completeRefreshRequests(outcome);
+      return outcome;
     } catch (_) {
-      _completeRefreshRequests(false);
-      return false;
+      _completeRefreshRequests(_RefreshOutcome.transient);
+      return _RefreshOutcome.transient;
     } finally {
       _isRefreshing = false;
     }
   }
 
-  void _completeRefreshRequests(bool success) {
+  void _completeRefreshRequests(_RefreshOutcome outcome) {
     for (final completer in _refreshCompleter) {
-      completer.complete(success);
+      completer.complete(outcome);
     }
     _refreshCompleter.clear();
   }
