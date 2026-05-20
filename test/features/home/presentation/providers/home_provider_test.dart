@@ -43,10 +43,8 @@ void main() {
       expect(state.categories, isEmpty);
       expect(state.isLoading, isFalse);
       expect(state.error, isNull);
-      expect(state.newShopsPage, 0);
       expect(state.hasMoreRecommended, isFalse);
-      expect(state.hasMoreNewShops, isTrue);
-      expect(state.isLoadingMoreNewShops, isFalse);
+      expect(state.hasMoreNewShops, isFalse);
     });
 
     test('copyWith creates a new state with updated values', () {
@@ -171,9 +169,7 @@ void main() {
             getCategoriesUseCaseProvider.overrideWithValue(
               mockGetCategoriesUseCase,
             ),
-            currentLocationProvider.overrideWith(
-              (ref) async => null,
-            ),
+            currentLocationProvider.overrideWith((ref) async => null),
           ],
         );
 
@@ -208,9 +204,7 @@ void main() {
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
           ),
-          currentLocationProvider.overrideWith(
-            (ref) async => null,
-          ),
+          currentLocationProvider.overrideWith((ref) async => null),
         ],
       );
 
@@ -246,9 +240,7 @@ void main() {
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
           ),
-          currentLocationProvider.overrideWith(
-            (ref) async => null,
-          ),
+          currentLocationProvider.overrideWith((ref) async => null),
         ],
       );
 
@@ -289,9 +281,7 @@ void main() {
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
           ),
-          currentLocationProvider.overrideWith(
-            (ref) async => null,
-          ),
+          currentLocationProvider.overrideWith((ref) async => null),
         ],
       );
 
@@ -323,9 +313,7 @@ void main() {
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
           ),
-          currentLocationProvider.overrideWith(
-            (ref) async => null,
-          ),
+          currentLocationProvider.overrideWith((ref) async => null),
         ],
       );
 
@@ -371,9 +359,7 @@ void main() {
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
           ),
-          currentLocationProvider.overrideWith(
-            (ref) async => null,
-          ),
+          currentLocationProvider.overrideWith((ref) async => null),
         ],
       );
 
@@ -384,14 +370,7 @@ void main() {
       expect(state.hasMoreRecommended, isTrue);
     });
 
-    test('loadMoreNewShops appends shops and increments page', () async {
-      const initialShops = [
-        BeautyShop(id: '1', name: 'New1', address: 'Addr', isNew: true),
-      ];
-      const moreShops = [
-        BeautyShop(id: '2', name: 'New2', address: 'Addr', isNew: true),
-      ];
-
+    test('refresh reloads shops', () async {
       when(
         () => mockGetCategoriesUseCase(),
       ).thenAnswer((_) async => const Right([]));
@@ -403,198 +382,19 @@ void main() {
         final filter = invocation.positionalArguments[0] as BeautyShopFilter;
         if (filter.sortBy == 'CREATED_AT') {
           newShopsCallCount++;
-          if (newShopsCallCount == 1) {
-            return const Right(
-              PagedBeautyShops(
-                items: initialShops,
-                hasNext: true,
-                totalElements: 10,
-              ),
-            );
-          } else {
-            return const Right(
-              PagedBeautyShops(
-                items: moreShops,
-                hasNext: false,
-                totalElements: 10,
-              ),
-            );
-          }
-        }
-        return const Right(
-          PagedBeautyShops(items: [], hasNext: false, totalElements: 0),
-        );
-      });
-
-      final container = ProviderContainer(
-        overrides: [
-          getFilteredShopsUseCaseProvider.overrideWithValue(
-            mockGetFilteredShopsUseCase,
-          ),
-          getCategoriesUseCaseProvider.overrideWithValue(
-            mockGetCategoriesUseCase,
-          ),
-          currentLocationProvider.overrideWith(
-            (ref) async => null,
-          ),
-        ],
-      );
-
-      final notifier = container.read(homeNotifierProvider.notifier);
-      await notifier.loadData();
-
-      var state = container.read(homeNotifierProvider);
-      expect(state.newShops, initialShops);
-      expect(state.newShopsPage, 0);
-      expect(state.hasMoreNewShops, isTrue);
-
-      await notifier.loadMoreNewShops();
-
-      state = container.read(homeNotifierProvider);
-      expect(state.newShops.length, 2);
-      expect(state.newShops, [...initialShops, ...moreShops]);
-      expect(state.newShopsPage, 1);
-      expect(state.hasMoreNewShops, isFalse);
-    });
-
-    test('loadMoreNewShops does not load if hasMore is false', () async {
-      when(
-        () => mockGetCategoriesUseCase(),
-      ).thenAnswer((_) async => const Right([]));
-      when(() => mockGetFilteredShopsUseCase(any())).thenAnswer(
-        (_) async => const Right(
-          PagedBeautyShops(items: [], hasNext: false, totalElements: 0),
-        ),
-      );
-
-      final container = ProviderContainer(
-        overrides: [
-          getFilteredShopsUseCaseProvider.overrideWithValue(
-            mockGetFilteredShopsUseCase,
-          ),
-          getCategoriesUseCaseProvider.overrideWithValue(
-            mockGetCategoriesUseCase,
-          ),
-          currentLocationProvider.overrideWith(
-            (ref) async => null,
-          ),
-        ],
-      );
-
-      final notifier = container.read(homeNotifierProvider.notifier);
-      await notifier.loadData();
-
-      clearInteractions(mockGetFilteredShopsUseCase);
-
-      await notifier.loadMoreNewShops();
-
-      verifyNever(() => mockGetFilteredShopsUseCase(any()));
-    });
-
-    test(
-      'loadMoreNewShops sets isLoadingMoreNewShops during load',
-      () async {
-        when(
-          () => mockGetCategoriesUseCase(),
-        ).thenAnswer((_) async => const Right([]));
-
-        int callCount = 0;
-        when(() => mockGetFilteredShopsUseCase(any())).thenAnswer((
-          invocation,
-        ) async {
-          final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-          if (filter.sortBy == 'CREATED_AT') {
-            callCount++;
-            if (callCount == 1) {
-              return const Right(
-                PagedBeautyShops(
-                  items: [BeautyShop(id: '1', name: 'Shop', address: 'Addr')],
-                  hasNext: true,
-                  totalElements: 10,
+          return Right(
+            PagedBeautyShops(
+              items: [
+                BeautyShop(
+                  id: newShopsCallCount == 1 ? '1' : '2',
+                  name: 'Shop$newShopsCallCount',
+                  address: 'Addr',
                 ),
-              );
-            } else {
-              await Future.delayed(const Duration(milliseconds: 50));
-              return const Right(
-                PagedBeautyShops(items: [], hasNext: false, totalElements: 10),
-              );
-            }
-          }
-          return const Right(
-            PagedBeautyShops(items: [], hasNext: false, totalElements: 0),
+              ],
+              hasNext: false,
+              totalElements: 1,
+            ),
           );
-        });
-
-        final container = ProviderContainer(
-          overrides: [
-            getFilteredShopsUseCaseProvider.overrideWithValue(
-              mockGetFilteredShopsUseCase,
-            ),
-            getCategoriesUseCaseProvider.overrideWithValue(
-              mockGetCategoriesUseCase,
-            ),
-            currentLocationProvider.overrideWith(
-              (ref) async => null,
-            ),
-          ],
-        );
-
-        final notifier = container.read(homeNotifierProvider.notifier);
-        await notifier.loadData();
-
-        final future = notifier.loadMoreNewShops();
-
-        expect(
-          container.read(homeNotifierProvider).isLoadingMoreNewShops,
-          isTrue,
-        );
-
-        await future;
-
-        expect(
-          container.read(homeNotifierProvider).isLoadingMoreNewShops,
-          isFalse,
-        );
-      },
-    );
-
-    test('refresh resets pagination state', () async {
-      when(
-        () => mockGetCategoriesUseCase(),
-      ).thenAnswer((_) async => const Right([]));
-
-      int callCount = 0;
-      when(() => mockGetFilteredShopsUseCase(any())).thenAnswer((
-        invocation,
-      ) async {
-        final filter = invocation.positionalArguments[0] as BeautyShopFilter;
-        if (filter.sortBy == 'CREATED_AT') {
-          callCount++;
-          if (callCount == 1) {
-            return const Right(
-              PagedBeautyShops(
-                items: [BeautyShop(id: '1', name: 'Shop', address: 'Addr')],
-                hasNext: true,
-                totalElements: 10,
-              ),
-            );
-          } else if (callCount == 2) {
-            return const Right(
-              PagedBeautyShops(
-                items: [BeautyShop(id: '2', name: 'Shop2', address: 'Addr')],
-                hasNext: false,
-                totalElements: 10,
-              ),
-            );
-          } else {
-            return const Right(
-              PagedBeautyShops(
-                items: [BeautyShop(id: '3', name: 'Fresh', address: 'Addr')],
-                hasNext: true,
-                totalElements: 10,
-              ),
-            );
-          }
         }
         return const Right(
           PagedBeautyShops(items: [], hasNext: false, totalElements: 0),
@@ -609,31 +409,25 @@ void main() {
           getCategoriesUseCaseProvider.overrideWithValue(
             mockGetCategoriesUseCase,
           ),
-          currentLocationProvider.overrideWith(
-            (ref) async => null,
-          ),
+          currentLocationProvider.overrideWith((ref) async => null),
         ],
       );
 
       final notifier = container.read(homeNotifierProvider.notifier);
       await notifier.loadData();
-      await notifier.loadMoreNewShops();
-
-      var state = container.read(homeNotifierProvider);
-      expect(state.newShopsPage, 1);
-      expect(state.hasMoreNewShops, isFalse);
+      expect(container.read(homeNotifierProvider).newShops.first.id, '1');
 
       await notifier.refresh();
-
-      state = container.read(homeNotifierProvider);
-      expect(state.newShopsPage, 0);
-      expect(state.hasMoreNewShops, isTrue);
+      expect(container.read(homeNotifierProvider).newShops.first.id, '2');
     });
 
     test(
       'loadData calculates distance and sorts nearbyShops by distance then rating',
       () async {
-        const userLocation = UserLocation(latitude: 37.5172, longitude: 127.0473);
+        const userLocation = UserLocation(
+          latitude: 37.5172,
+          longitude: 127.0473,
+        );
 
         const nearbyShopsFromApi = [
           BeautyShop(
@@ -695,9 +489,7 @@ void main() {
             getCategoriesUseCaseProvider.overrideWithValue(
               mockGetCategoriesUseCase,
             ),
-            currentLocationProvider.overrideWith(
-              (ref) async => userLocation,
-            ),
+            currentLocationProvider.overrideWith((ref) async => userLocation),
           ],
         );
 
@@ -762,9 +554,7 @@ void main() {
             getCategoriesUseCaseProvider.overrideWithValue(
               mockGetCategoriesUseCase,
             ),
-            currentLocationProvider.overrideWith(
-              (ref) async => null,
-            ),
+            currentLocationProvider.overrideWith((ref) async => null),
           ],
         );
 
