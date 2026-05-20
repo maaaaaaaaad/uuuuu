@@ -79,12 +79,20 @@ class AuthInterceptor extends QueuedInterceptor {
 
     final retryOptions = err.requestOptions;
     retryOptions.headers['Authorization'] = 'Bearer $newToken';
+    prepareRetryData(retryOptions);
 
     try {
       final response = await _getRefreshDio.fetch(retryOptions);
       return handler.resolve(response);
     } on DioException catch (e) {
       return handler.next(e);
+    }
+  }
+
+  static void prepareRetryData(RequestOptions options) {
+    final data = options.data;
+    if (data is FormData) {
+      options.data = data.clone();
     }
   }
 
