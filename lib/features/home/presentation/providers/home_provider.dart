@@ -17,9 +17,7 @@ class HomeState extends Equatable {
   final List<Category> categories;
   final bool isLoading;
   final String? error;
-  final int newShopsPage;
   final bool hasMoreNewShops;
-  final bool isLoadingMoreNewShops;
   final bool hasMoreRecommended;
   final UserLocation? userLocation;
 
@@ -32,15 +30,16 @@ class HomeState extends Equatable {
     this.categories = const [],
     this.isLoading = false,
     this.error,
-    this.newShopsPage = 0,
-    this.hasMoreNewShops = true,
-    this.isLoadingMoreNewShops = false,
+    this.hasMoreNewShops = false,
     this.hasMoreRecommended = false,
     this.userLocation,
   });
 
   List<BeautyShop> get displayedRecommendedShops =>
       recommendedShops.take(recommendedDisplayLimit).toList();
+
+  List<BeautyShop> get displayedNewShops =>
+      newShops.take(recommendedDisplayLimit).toList();
 
   HomeState copyWith({
     List<BeautyShop>? recommendedShops,
@@ -49,9 +48,7 @@ class HomeState extends Equatable {
     List<Category>? categories,
     bool? isLoading,
     String? error,
-    int? newShopsPage,
     bool? hasMoreNewShops,
-    bool? isLoadingMoreNewShops,
     bool? hasMoreRecommended,
     UserLocation? userLocation,
   }) {
@@ -62,10 +59,7 @@ class HomeState extends Equatable {
       categories: categories ?? this.categories,
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      newShopsPage: newShopsPage ?? this.newShopsPage,
       hasMoreNewShops: hasMoreNewShops ?? this.hasMoreNewShops,
-      isLoadingMoreNewShops:
-          isLoadingMoreNewShops ?? this.isLoadingMoreNewShops,
       hasMoreRecommended: hasMoreRecommended ?? this.hasMoreRecommended,
       userLocation: userLocation ?? this.userLocation,
     );
@@ -79,9 +73,7 @@ class HomeState extends Equatable {
     categories,
     isLoading,
     error,
-    newShopsPage,
     hasMoreNewShops,
-    isLoadingMoreNewShops,
     hasMoreRecommended,
     userLocation,
   ];
@@ -118,12 +110,9 @@ class HomeNotifier extends StateNotifier<HomeState> {
     state = state.copyWith(userLocation: userLocation);
 
     final categoriesResult = await _getCategoriesUseCase();
-    categoriesResult.fold(
-      (failure) {},
-      (categories) {
-        state = state.copyWith(categories: categories);
-      },
-    );
+    categoriesResult.fold((failure) {}, (categories) {
+      state = state.copyWith(categories: categories);
+    });
 
     final nearbyShopsFilter = BeautyShopFilter(
       sortBy: 'DISTANCE',
@@ -134,12 +123,9 @@ class HomeNotifier extends StateNotifier<HomeState> {
       longitude: userLocation?.longitude,
     );
     final nearbyResult = await _getFilteredShopsUseCase(nearbyShopsFilter);
-    nearbyResult.fold(
-      (failure) {},
-      (pagedShops) {
-        state = state.copyWith(nearbyShops: pagedShops.items);
-      },
-    );
+    nearbyResult.fold((failure) {}, (pagedShops) {
+      state = state.copyWith(nearbyShops: pagedShops.items);
+    });
 
     const recommendedFilter = BeautyShopFilter(
       sortBy: 'RATING',
@@ -147,80 +133,45 @@ class HomeNotifier extends StateNotifier<HomeState> {
       size: HomeState.recommendedDisplayLimit + 1,
     );
     final recommendedResult = await _getFilteredShopsUseCase(recommendedFilter);
-    recommendedResult.fold(
-      (failure) {},
-      (pagedShops) {
-        final hasMore =
-            pagedShops.items.length > HomeState.recommendedDisplayLimit ||
-                pagedShops.hasNext;
-        final shopsWithDistance = _addDistanceToShops(pagedShops.items, userLocation);
-        state = state.copyWith(
-          recommendedShops: shopsWithDistance,
-          hasMoreRecommended: hasMore,
-        );
-      },
-    );
+    recommendedResult.fold((failure) {}, (pagedShops) {
+      final hasMore =
+          pagedShops.items.length > HomeState.recommendedDisplayLimit ||
+          pagedShops.hasNext;
+      final shopsWithDistance = _addDistanceToShops(
+        pagedShops.items,
+        userLocation,
+      );
+      state = state.copyWith(
+        recommendedShops: shopsWithDistance,
+        hasMoreRecommended: hasMore,
+      );
+    });
 
     const newShopsFilter = BeautyShopFilter(
       sortBy: 'CREATED_AT',
       sortOrder: 'DESC',
-      size: 10,
+      size: HomeState.recommendedDisplayLimit + 1,
     );
     final newShopsResult = await _getFilteredShopsUseCase(newShopsFilter);
-    newShopsResult.fold(
-      (failure) {},
-      (pagedShops) {
-        final shopsWithDistance = _addDistanceToShops(pagedShops.items, userLocation);
-        state = state.copyWith(
-          newShops: shopsWithDistance,
-          hasMoreNewShops: pagedShops.hasNext,
-          newShopsPage: 0,
-        );
-      },
-    );
+    newShopsResult.fold((failure) {}, (pagedShops) {
+      final hasMore =
+          pagedShops.items.length > HomeState.recommendedDisplayLimit ||
+          pagedShops.hasNext;
+      final shopsWithDistance = _addDistanceToShops(
+        pagedShops.items,
+        userLocation,
+      );
+      state = state.copyWith(
+        newShops: shopsWithDistance,
+        hasMoreNewShops: hasMore,
+      );
+    });
 
     state = state.copyWith(isLoading: false);
   }
 
-  Future<void> loadMoreNewShops() async {
-    if (!state.hasMoreNewShops || state.isLoadingMoreNewShops) return;
-
-    state = state.copyWith(isLoadingMoreNewShops: true);
-
-    final nextPage = state.newShopsPage + 1;
-    final filter = BeautyShopFilter(
-      sortBy: 'CREATED_AT',
-      sortOrder: 'DESC',
-      size: 10,
-      page: nextPage,
-    );
-
-    final result = await _getFilteredShopsUseCase(filter);
-    result.fold(
-      (failure) {
-        state = state.copyWith(
-          isLoadingMoreNewShops: false,
-          error: failure.message,
-        );
-      },
-      (pagedShops) {
-        final shopsWithDistance = _addDistanceToShops(pagedShops.items, state.userLocation);
-        state = state.copyWith(
-          newShops: [...state.newShops, ...shopsWithDistance],
-          hasMoreNewShops: pagedShops.hasNext,
-          newShopsPage: nextPage,
-          isLoadingMoreNewShops: false,
-        );
-      },
-    );
-  }
-
   Future<void> refresh() async {
-    state = state.copyWith(
-      error: null,
-      newShopsPage: 0,
-      hasMoreNewShops: true,
-    );
+    state = state.copyWith(error: null);
     await loadData();
   }
 
