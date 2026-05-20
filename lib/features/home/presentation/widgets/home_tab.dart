@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/entities/beauty_shop.dart';
 import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_screen.dart';
-import 'package:jellomark/features/home/presentation/pages/recommended_shops_page.dart';
+import 'package:jellomark/features/home/domain/entities/home_section.dart';
+import 'package:jellomark/features/home/presentation/pages/section_shops_page.dart';
 import 'package:jellomark/features/home/presentation/providers/home_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/utils/category_icon_mapper.dart';
@@ -55,14 +56,14 @@ class _HomeTabState extends ConsumerState<HomeTab> {
 
   void _navigateToShopDetail(String shopId, List<BeautyShop> shops) {
     final shop = shops.firstWhere((s) => s.id == shopId);
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => ShopDetailScreen(shop: shop)),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => ShopDetailScreen(shop: shop)));
   }
 
-  void _navigateToRecommendedShops() {
+  void _navigateToSection(HomeSection section) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const RecommendedShopsPage()),
+      MaterialPageRoute(builder: (_) => SectionShopsPage(section: section)),
     );
   }
 
@@ -95,15 +96,11 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                   ),
                 )
               else
-              Expanded(
-                child: RefreshIndicator(
-                  color: SemanticColors.indicator.loading,
-                  onRefresh: () => ref.read(homeNotifierProvider.notifier).refresh(),
-                  child: NotificationListener<ScrollNotification>(
-                    onNotification: (notification) {
-                      _onScrollNotification(notification);
-                      return false;
-                    },
+                Expanded(
+                  child: RefreshIndicator(
+                    color: SemanticColors.indicator.loading,
+                    onRefresh: () =>
+                        ref.read(homeNotifierProvider.notifier).refresh(),
                     child: CustomScrollView(
                       key: const Key('home_tab_scroll_view'),
                       controller: _scrollController,
@@ -132,8 +129,12 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                               title: '내 주변 인기 샵',
                               shops: homeState.nearbyShops,
                               showMore: true,
-                              onShopTap: (id) =>
-                                  _navigateToShopDetail(id, homeState.nearbyShops),
+                              onMoreTap: () =>
+                                  _navigateToSection(HomeSection.nearbyPopular),
+                              onShopTap: (id) => _navigateToShopDetail(
+                                id,
+                                homeState.nearbyShops,
+                              ),
                             ),
                           ),
                         if (homeState.nearbyShops.isNotEmpty)
@@ -142,7 +143,8 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                           child: SectionHeader(
                             title: '추천 샵',
                             showMore: homeState.hasMoreRecommended,
-                            onMoreTap: _navigateToRecommendedShops,
+                            onMoreTap: () =>
+                                _navigateToSection(HomeSection.recommended),
                           ),
                         ),
                         const SliverToBoxAdapter(child: SizedBox(height: 12)),
@@ -165,23 +167,20 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                   ),
                                 );
                               },
-                              childCount: homeState.displayedRecommendedShops.length,
+                              childCount:
+                                  homeState.displayedRecommendedShops.length,
                               addAutomaticKeepAlives: false,
                               addRepaintBoundaries: true,
                             ),
                           ),
                         ),
                         const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                        const SliverToBoxAdapter(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              '새로 입점한 샵',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                        SliverToBoxAdapter(
+                          child: SectionHeader(
+                            title: '새로 입점한 샵',
+                            showMore: homeState.hasMoreNewShops,
+                            onMoreTap: () =>
+                                _navigateToSection(HomeSection.newShops),
                           ),
                         ),
                         const SliverToBoxAdapter(child: SizedBox(height: 12)),
@@ -190,7 +189,7 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                           sliver: SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
-                                final shop = homeState.newShops[index];
+                                final shop = homeState.displayedNewShops[index];
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12),
                                   child: ShopCard(
@@ -203,30 +202,17 @@ class _HomeTabState extends ConsumerState<HomeTab> {
                                   ),
                                 );
                               },
-                              childCount: homeState.newShops.length,
+                              childCount: homeState.displayedNewShops.length,
                               addAutomaticKeepAlives: false,
                               addRepaintBoundaries: true,
                             ),
                           ),
                         ),
-                        if (homeState.isLoadingMoreNewShops)
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  key: const Key('new_shops_loading_indicator'),
-                                  color: SemanticColors.indicator.loading,
-                                ),
-                              ),
-                            ),
-                          ),
                         const SliverToBoxAdapter(child: SizedBox(height: 100)),
                       ],
                     ),
                   ),
                 ),
-              ),
             ],
           ),
           if (_showFloatingSearchIcon)
@@ -247,19 +233,6 @@ class _HomeTabState extends ConsumerState<HomeTab> {
         ],
       ),
     );
-  }
-
-  void _onScrollNotification(ScrollNotification notification) {
-    if (notification is ScrollUpdateNotification ||
-        notification is ScrollEndNotification) {
-      final metrics = notification.metrics;
-      if (metrics.extentAfter < 300) {
-        final homeState = ref.read(homeNotifierProvider);
-        if (homeState.hasMoreNewShops && !homeState.isLoadingMoreNewShops) {
-          ref.read(homeNotifierProvider.notifier).loadMoreNewShops();
-        }
-      }
-    }
   }
 }
 
@@ -287,11 +260,7 @@ class _FloatingSearchButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Icon(
-          Icons.search,
-          color: SemanticColors.icon.accent,
-          size: 24,
-        ),
+        child: Icon(Icons.search, color: SemanticColors.icon.accent, size: 24),
       ),
     );
   }
