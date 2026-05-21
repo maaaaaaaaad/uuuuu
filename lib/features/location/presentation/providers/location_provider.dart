@@ -7,6 +7,7 @@ import 'package:jellomark/features/location/domain/entities/user_location.dart';
 import 'package:jellomark/features/location/domain/repositories/directions_repository.dart';
 import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
 import 'package:jellomark/features/location/domain/usecases/get_current_location_usecase.dart';
+import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
 
 final getCurrentLocationUseCaseProvider = Provider<GetCurrentLocationUseCase>(
   (ref) => sl<GetCurrentLocationUseCase>(),
@@ -18,6 +19,10 @@ final locationRepositoryProvider = Provider<LocationRepository>(
 
 final currentLocationProvider =
     FutureProvider.autoDispose<UserLocation?>((ref) async {
+  final isEnabled =
+      await ref.watch(locationSettingRepositoryProvider).isLocationEnabled();
+  if (!isEnabled) return null;
+
   final useCase = ref.watch(getCurrentLocationUseCaseProvider);
   final result = await useCase();
   return result.fold(
