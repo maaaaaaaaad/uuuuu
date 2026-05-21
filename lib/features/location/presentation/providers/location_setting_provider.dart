@@ -7,6 +7,7 @@ import 'package:jellomark/features/location/data/datasources/location_setting_lo
 import 'package:jellomark/features/location/data/repositories/location_setting_repository_impl.dart';
 import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
 import 'package:jellomark/features/location/domain/repositories/location_setting_repository.dart';
+import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 
 enum LocationSettingToggleResult {
   success,
@@ -38,15 +39,15 @@ class LocationSettingState {
 
 final locationSettingLocalDataSourceProvider =
     Provider<LocationSettingLocalDataSource>(
-  (ref) => LocationSettingLocalDataSourceImpl(),
-);
+      (ref) => LocationSettingLocalDataSourceImpl(),
+    );
 
-final locationSettingRepositoryProvider = Provider<LocationSettingRepository>(
-  (ref) {
-    final dataSource = ref.watch(locationSettingLocalDataSourceProvider);
-    return LocationSettingRepositoryImpl(dataSource: dataSource);
-  },
-);
+final locationSettingRepositoryProvider = Provider<LocationSettingRepository>((
+  ref,
+) {
+  final dataSource = ref.watch(locationSettingLocalDataSourceProvider);
+  return LocationSettingRepositoryImpl(dataSource: dataSource);
+});
 
 final locationRepositoryForSettingProvider = Provider<LocationRepository>(
   (ref) => sl<LocationRepository>(),
@@ -80,6 +81,7 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
     if (currentState.isEnabled) {
       await settingRepository.setLocationEnabled(false);
       state = AsyncData(currentState.copyWith(isEnabled: false));
+      ref.invalidate(currentLocationProvider);
       return LocationSettingToggleResult.success;
     } else {
       final permissionStatus = await locationRepository.checkPermissionStatus();
@@ -89,8 +91,8 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
       }
 
       if (permissionStatus == LocationPermissionResult.denied) {
-        final Either<Failure, bool> result =
-            await locationRepository.requestLocationPermission();
+        final Either<Failure, bool> result = await locationRepository
+            .requestLocationPermission();
         final granted = result.fold((_) => false, (value) => value);
         if (!granted) {
           return LocationSettingToggleResult.denied;
@@ -98,12 +100,15 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
       }
 
       await settingRepository.setLocationEnabled(true);
-      final newPermissionStatus =
-          await locationRepository.checkPermissionStatus();
-      state = AsyncData(currentState.copyWith(
-        isEnabled: true,
-        permissionStatus: newPermissionStatus,
-      ));
+      final newPermissionStatus = await locationRepository
+          .checkPermissionStatus();
+      state = AsyncData(
+        currentState.copyWith(
+          isEnabled: true,
+          permissionStatus: newPermissionStatus,
+        ),
+      );
+      ref.invalidate(currentLocationProvider);
       return LocationSettingToggleResult.success;
     }
   }
@@ -122,7 +127,8 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
     final settingRepository = ref.read(locationSettingRepositoryProvider);
     final locationRepository = ref.read(locationRepositoryForSettingProvider);
 
-    final isServiceEnabled = await locationRepository.isLocationServiceEnabled();
+    final isServiceEnabled = await locationRepository
+        .isLocationServiceEnabled();
     debugPrint('[LocationSetting] isLocationServiceEnabled: $isServiceEnabled');
 
     if (!isServiceEnabled) {
@@ -141,19 +147,22 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
         permissionStatus: permissionStatus,
       );
       state = AsyncData(newState);
+      ref.invalidate(currentLocationProvider);
       return LocationSettingToggleResult.success;
     }
 
     // deniedForever라도 requestPermission을 호출해야 iOS 시스템 다이얼로그가 표시됨
     // iOS에서 앱 삭제 후에도 권한 상태가 캐싱될 수 있어 실제 요청이 필요
-    debugPrint('[LocationSetting] Requesting permission (status: $permissionStatus)...');
+    debugPrint(
+      '[LocationSetting] Requesting permission (status: $permissionStatus)...',
+    );
     final result = await locationRepository.requestLocationPermission();
     debugPrint('[LocationSetting] requestLocationPermission result: $result');
     final granted = result.fold((_) => false, (value) => value);
 
     if (!granted) {
-      final newPermissionStatus =
-          await locationRepository.checkPermissionStatus();
+      final newPermissionStatus = await locationRepository
+          .checkPermissionStatus();
       if (newPermissionStatus == LocationPermissionResult.deniedForever) {
         return LocationSettingToggleResult.deniedForever;
       }
@@ -161,12 +170,14 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
     }
 
     await settingRepository.setLocationEnabled(true);
-    final newPermissionStatus = await locationRepository.checkPermissionStatus();
+    final newPermissionStatus = await locationRepository
+        .checkPermissionStatus();
     final newState = LocationSettingState(
       isEnabled: true,
       permissionStatus: newPermissionStatus,
     );
     state = AsyncData(newState);
+    ref.invalidate(currentLocationProvider);
     return LocationSettingToggleResult.success;
   }
 
@@ -178,5 +189,5 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
 
 final locationSettingNotifierProvider =
     AsyncNotifierProvider<LocationSettingNotifier, LocationSettingState>(
-  LocationSettingNotifier.new,
-);
+      LocationSettingNotifier.new,
+    );
