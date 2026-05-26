@@ -63,9 +63,12 @@ jobs:
 
   release-ios:
     if: ${{ inputs.tracks == 'both' || inputs.tracks == 'ios' }}
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.38.7'
