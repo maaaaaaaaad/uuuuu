@@ -19,6 +19,7 @@ platform :android do
   desc "Upload Android App Bundle to Play Store Internal Testing"
   lane :play_internal do
     upload_to_play_store(
+      package_name: "com.jello.jellomark",
       track: "internal",
       aab: "build/app/outputs/bundle/release/app-release.aab",
       json_key: ENV["PLAY_STORE_JSON_KEY_PATH"],
@@ -78,7 +79,7 @@ platform :ios do
       export_method: "app-store",
       output_directory: "build/ios",
       output_name: "Runner.ipa",
-      xcargs: "-allowProvisioningUpdates",
+      xcargs: "-allowProvisioningUpdates CODE_SIGN_STYLE=Manual PROVISIONING_PROFILE_SPECIFIER='#{BUNDLE_ID_IOS} AppStore' CODE_SIGN_IDENTITY='Apple Distribution' DEVELOPMENT_TEAM=473NP427RC",
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: {
