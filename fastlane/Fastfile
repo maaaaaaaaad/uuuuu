@@ -72,6 +72,16 @@ platform :ios do
       key_content: ENV["APP_STORE_CONNECT_API_KEY"]
     )
 
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "ios/Runner.xcodeproj",
+      bundle_identifier: BUNDLE_ID_IOS,
+      code_sign_identity: "Apple Distribution",
+      profile_name: "#{BUNDLE_ID_IOS} AppStore",
+      team_id: "473NP427RC",
+      targets: ["Runner"]
+    )
+
     build_app(
       workspace: "ios/Runner.xcworkspace",
       scheme: "Runner",
@@ -79,7 +89,7 @@ platform :ios do
       export_method: "app-store",
       output_directory: "build/ios",
       output_name: "Runner.ipa",
-      xcargs: "-allowProvisioningUpdates CODE_SIGN_STYLE=Manual PROVISIONING_PROFILE_SPECIFIER='#{BUNDLE_ID_IOS} AppStore' CODE_SIGN_IDENTITY='Apple Distribution' DEVELOPMENT_TEAM=473NP427RC",
+      xcargs: "-allowProvisioningUpdates",
       export_options: {
         signingStyle: "manual",
         provisioningProfiles: {
