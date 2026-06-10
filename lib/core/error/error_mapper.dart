@@ -9,6 +9,8 @@ class ErrorMapper {
     'INVALID_TOKEN': '인증이 만료되었습니다. 다시 로그인해주세요',
     'INVALID_KAKAO_TOKEN': '카카오 로그인에 실패했습니다. 다시 시도해주세요',
     'KAKAO_API': '카카오 서비스에 일시적인 문제가 발생했습니다',
+    'INVALID_APPLE_TOKEN': 'Apple 로그인에 실패했습니다. 다시 시도해주세요',
+    'APPLE_API': 'Apple 서비스에 일시적인 문제가 발생했습니다',
 
     'DUPLICATE_OWNER_EMAIL': '이미 사용 중인 이메일입니다',
     'DUPLICATE_OWNER_NICKNAME': '이미 사용 중인 닉네임입니다',
