@@ -28,6 +28,19 @@ class MockAuthRepository implements AuthRepository {
           const TokenPair(accessToken: 'access', refreshToken: 'refresh'),
     );
   }
+  @override
+  Future<Either<Failure, TokenPair>> loginWithAppleSdk() async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, TokenPair>> loginWithApple(
+    String identityToken,
+    String? fullName,
+  ) async {
+    throw UnimplementedError();
+  }
+
 
   @override
   Future<Either<Failure, TokenPair>> loginWithKakao(
