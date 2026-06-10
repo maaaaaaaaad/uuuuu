@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/auth/domain/entities/token_pair.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
+import 'package:jellomark/features/auth/domain/usecases/login_with_apple.dart';
 import 'package:jellomark/features/auth/domain/usecases/login_with_kakao.dart';
 import 'package:jellomark/features/auth/presentation/pages/login_page.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
@@ -88,6 +89,9 @@ void main() {
         overrides: [
           loginWithKakaoUseCaseProvider.overrideWithValue(
             LoginWithKakaoUseCase(authRepository: mockAuthRepository),
+          ),
+          loginWithAppleUseCaseProvider.overrideWithValue(
+            LoginWithAppleUseCase(authRepository: mockAuthRepository),
           ),
         ],
         child: MaterialApp(
