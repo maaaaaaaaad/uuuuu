@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jellomark/core/error/failure.dart';
+import 'package:jellomark/features/auth/data/datasources/apple_auth_service.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
@@ -27,7 +28,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     String? fullName,
   ) async {
     if (exception != null) throw exception!;
-    return tokenPairModel;
+    return loginResult!;
   }
 
 
@@ -97,21 +98,35 @@ class MockKakaoAuthService implements KakaoAuthService {
   }
 }
 
+class MockAppleAuthService implements AppleAuthService {
+  AppleSignInResult? appleResult;
+  Exception? exception;
+
+  @override
+  Future<AppleSignInResult> loginWithApple() async {
+    if (exception != null) throw exception!;
+    return appleResult!;
+  }
+}
+
 void main() {
   group('AuthRepositoryImpl', () {
     late AuthRepository repository;
     late MockAuthRemoteDataSource mockRemoteDataSource;
     late MockAuthLocalDataSource mockLocalDataSource;
     late MockKakaoAuthService mockKakaoAuthService;
+    late MockAppleAuthService mockAppleAuthService;
 
     setUp(() {
       mockRemoteDataSource = MockAuthRemoteDataSource();
       mockLocalDataSource = MockAuthLocalDataSource();
       mockKakaoAuthService = MockKakaoAuthService();
+      mockAppleAuthService = MockAppleAuthService();
       repository = AuthRepositoryImpl(
         remoteDataSource: mockRemoteDataSource,
         localDataSource: mockLocalDataSource,
         kakaoAuthService: mockKakaoAuthService,
+        appleAuthService: mockAppleAuthService,
       );
     });
 
