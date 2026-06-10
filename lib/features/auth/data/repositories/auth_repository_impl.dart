@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/core/network/api_error_handler.dart';
+import 'package:jellomark/features/auth/data/datasources/apple_auth_service.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
@@ -13,14 +14,17 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
   final AuthLocalDataSource _localDataSource;
   final KakaoAuthService _kakaoAuthService;
+  final AppleAuthService _appleAuthService;
 
   AuthRepositoryImpl({
     required AuthRemoteDataSource remoteDataSource,
     required AuthLocalDataSource localDataSource,
     required KakaoAuthService kakaoAuthService,
+    required AppleAuthService appleAuthService,
   }) : _remoteDataSource = remoteDataSource,
        _localDataSource = localDataSource,
-       _kakaoAuthService = kakaoAuthService;
+       _kakaoAuthService = kakaoAuthService,
+       _appleAuthService = appleAuthService;
 
   @override
   Future<Either<Failure, TokenPair>> loginWithKakao(
@@ -83,6 +87,35 @@ class AuthRepositoryImpl implements AuthRepository {
       return await loginWithKakao(kakaoAccessToken);
     } catch (e) {
       return Left(KakaoLoginFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, TokenPair>> loginWithAppleSdk() async {
+    try {
+      final result = await _appleAuthService.loginWithApple();
+      return await loginWithApple(result.identityToken, result.fullName);
+    } catch (e) {
+      return Left(AppleLoginFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, TokenPair>> loginWithApple(
+    String identityToken,
+    String? fullName,
+  ) async {
+    try {
+      final tokenPair = await _remoteDataSource.loginWithApple(
+        identityToken,
+        fullName,
+      );
+      await _localDataSource.saveTokens(tokenPair);
+      return Right(tokenPair);
+    } on DioException catch (e) {
+      return Left(
+        ApiErrorHandler.fromDioException(e, fallback: 'Apple 로그인에 실패했습니다'),
+      );
     }
   }
 
