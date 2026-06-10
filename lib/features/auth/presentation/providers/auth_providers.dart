@@ -2,11 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/core/di/injection_container.dart';
 import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jellomark/features/auth/domain/usecases/check_auth_status.dart';
+import 'package:jellomark/features/auth/domain/usecases/login_with_apple.dart';
 import 'package:jellomark/features/auth/domain/usecases/login_with_kakao.dart';
 import 'package:jellomark/features/auth/domain/usecases/logout.dart';
 
 final loginWithKakaoUseCaseProvider = Provider<LoginWithKakaoUseCase>((ref) {
   return LoginWithKakaoUseCase(authRepository: sl<AuthRepository>());
+});
+
+final loginWithAppleUseCaseProvider = Provider<LoginWithAppleUseCase>((ref) {
+  return LoginWithAppleUseCase(authRepository: sl<AuthRepository>());
 });
 
 final logoutUseCaseProvider = Provider<LogoutUseCase>((ref) {
@@ -35,8 +40,12 @@ class AuthState {
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final LoginWithKakaoUseCase _loginWithKakaoUseCase;
+  final LoginWithAppleUseCase _loginWithAppleUseCase;
 
-  AuthNotifier(this._loginWithKakaoUseCase) : super(const AuthState());
+  AuthNotifier(
+    this._loginWithKakaoUseCase,
+    this._loginWithAppleUseCase,
+  ) : super(const AuthState());
 
   Future<bool> loginWithKakao() async {
     state = state.copyWith(status: AuthStatus.loading);
@@ -57,10 +66,33 @@ class AuthNotifier extends StateNotifier<AuthState> {
       },
     );
   }
+
+  Future<bool> loginWithApple() async {
+    state = state.copyWith(status: AuthStatus.loading);
+
+    final result = await _loginWithAppleUseCase();
+
+    return result.fold(
+      (failure) {
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: failure.message,
+        );
+        return false;
+      },
+      (_) {
+        state = state.copyWith(status: AuthStatus.authenticated);
+        return true;
+      },
+    );
+  }
 }
 
 final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
   ref,
 ) {
-  return AuthNotifier(ref.watch(loginWithKakaoUseCaseProvider));
+  return AuthNotifier(
+    ref.watch(loginWithKakaoUseCaseProvider),
+    ref.watch(loginWithAppleUseCaseProvider),
+  );
 });
