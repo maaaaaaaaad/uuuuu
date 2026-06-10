@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
@@ -118,10 +120,76 @@ class LoginPage extends ConsumerWidget {
               ),
               SizedBox(height: screenHeight * 0.15),
               _buildKakaoLoginButton(context, ref, isLoading),
+              const SizedBox(height: 12),
+              if (Platform.isIOS)
+                _buildAppleLoginButton(context, ref, isLoading),
               const SizedBox(height: 32),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAppleLoginButton(BuildContext context, WidgetRef ref, bool isLoading) {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: SemanticColors.overlay.shadowLight,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: isLoading
+            ? null
+            : () async {
+                final success = await ref
+                    .read(authNotifierProvider.notifier)
+                    .loginWithApple();
+                if (success && context.mounted) {
+                  Navigator.of(context).pushReplacementNamed('/home');
+                }
+              },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black,
+          shadowColor: SemanticColors.special.transparent,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: Colors.black54,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.apple, color: Colors.white, size: 24),
+                  SizedBox(width: 12),
+                  Text(
+                    'Apple로 시작하기',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }
