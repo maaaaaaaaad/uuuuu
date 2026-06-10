@@ -1,7 +1,7 @@
 name: jellomark
 description: "JelloMark - Beauty Shop Discovery & Booking Platform"
 publish_to: 'none'
-version: 1.0.0+74
+version: 1.0.0+75
 
 environment:
   sdk: ^3.10.7
@@ -20,6 +20,7 @@ dependencies:
   equatable: ^2.0.8
   dartz: ^0.10.1
   kakao_flutter_sdk_user: ^1.10.0
+  sign_in_with_apple: ^6.1.4
   flutter_riverpod: ^2.6.1
   shared_preferences: ^2.3.5
   flutter_naver_map: ^1.3.0
