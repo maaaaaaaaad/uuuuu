@@ -5,6 +5,8 @@ import 'package:jellomark/features/auth/data/models/token_pair_model.dart';
 abstract class AuthRemoteDataSource {
   Future<TokenPairModel> loginWithKakao(String kakaoAccessToken);
 
+  Future<TokenPairModel> loginWithApple(String identityToken, String? fullName);
+
   Future<TokenPairModel> refreshToken(String refreshToken);
 
   Future<MemberModel> getCurrentMember();
@@ -25,6 +27,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final response = await _apiClient.post(
       '/api/auth/kakao',
       data: {'kakaoAccessToken': kakaoAccessToken},
+    );
+    return TokenPairModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<TokenPairModel> loginWithApple(
+    String identityToken,
+    String? fullName,
+  ) async {
+    final response = await _apiClient.post(
+      '/api/auth/apple',
+      data: {
+        'identityToken': identityToken,
+        if (fullName != null) 'fullName': fullName,
+      },
     );
     return TokenPairModel.fromJson(response.data as Map<String, dynamic>);
   }
