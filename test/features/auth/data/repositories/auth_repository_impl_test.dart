@@ -21,6 +21,15 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     if (exception != null) throw exception!;
     return loginResult!;
   }
+  @override
+  Future<TokenPairModel> loginWithApple(
+    String identityToken,
+    String? fullName,
+  ) async {
+    if (exception != null) throw exception!;
+    return tokenPairModel;
+  }
+
 
   @override
   Future<TokenPairModel> refreshToken(String refreshToken) async {
