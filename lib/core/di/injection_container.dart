@@ -3,6 +3,7 @@ import 'package:jellomark/config/env_config.dart';
 import 'package:jellomark/core/network/api_client.dart';
 import 'package:jellomark/core/network/auth_interceptor.dart';
 import 'package:jellomark/core/storage/secure_token_storage.dart';
+import 'package:jellomark/features/auth/data/datasources/apple_auth_service.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:jellomark/features/auth/data/datasources/kakao_auth_service.dart';
@@ -113,6 +114,8 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<KakaoAuthService>(() => KakaoAuthServiceImpl());
 
+  sl.registerLazySingleton<AppleAuthService>(() => AppleAuthServiceImpl());
+
   sl.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(secureStorage: sl<SecureStorageWrapper>()),
   );
@@ -126,6 +129,7 @@ Future<void> initDependencies() async {
       remoteDataSource: sl<AuthRemoteDataSource>(),
       localDataSource: sl<AuthLocalDataSource>(),
       kakaoAuthService: sl<KakaoAuthService>(),
+      appleAuthService: sl<AppleAuthService>(),
     ),
   );
 
