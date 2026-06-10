@@ -8,6 +8,13 @@ abstract class AuthRepository {
 
   Future<Either<Failure, TokenPair>> loginWithKakao(String kakaoAccessToken);
 
+  Future<Either<Failure, TokenPair>> loginWithAppleSdk();
+
+  Future<Either<Failure, TokenPair>> loginWithApple(
+    String identityToken,
+    String? fullName,
+  );
+
   Future<Either<Failure, TokenPair>> refreshToken(String refreshToken);
 
   Future<Either<Failure, Member>> getCurrentMember();
