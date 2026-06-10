@@ -24,6 +24,10 @@ class KakaoLoginFailure extends Failure {
   const KakaoLoginFailure(super.message);
 }
 
+class AppleLoginFailure extends Failure {
+  const AppleLoginFailure(super.message);
+}
+
 class NoTokenFailure extends Failure {
   const NoTokenFailure() : super('저장된 토큰이 없습니다');
 }
