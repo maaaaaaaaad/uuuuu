@@ -15,6 +15,19 @@ class MockAuthRepository implements AuthRepository {
       ),
     );
   }
+  @override
+  Future<Either<Failure, TokenPair>> loginWithAppleSdk() async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, TokenPair>> loginWithApple(
+    String identityToken,
+    String? fullName,
+  ) async {
+    throw UnimplementedError();
+  }
+
 
   @override
   Future<Either<Failure, TokenPair>> loginWithKakao(
