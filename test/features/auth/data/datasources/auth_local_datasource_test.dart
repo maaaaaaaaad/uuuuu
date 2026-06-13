@@ -68,6 +68,33 @@ void main() {
 
         expect(result, isNull);
       });
+
+      test('should return null when access token is empty string', () async {
+        await mockStorage.write(key: 'access_token', value: '');
+        await mockStorage.write(key: 'refresh_token', value: 'stored_refresh');
+
+        final result = await dataSource.getTokens();
+
+        expect(result, isNull);
+      });
+
+      test('should return null when refresh token is empty string', () async {
+        await mockStorage.write(key: 'access_token', value: 'stored_access');
+        await mockStorage.write(key: 'refresh_token', value: '');
+
+        final result = await dataSource.getTokens();
+
+        expect(result, isNull);
+      });
+
+      test('should return null when both tokens are empty strings', () async {
+        await mockStorage.write(key: 'access_token', value: '');
+        await mockStorage.write(key: 'refresh_token', value: '');
+
+        final result = await dataSource.getTokens();
+
+        expect(result, isNull);
+      });
     });
 
     group('clearTokens', () {
