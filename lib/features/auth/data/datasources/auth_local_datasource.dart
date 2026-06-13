@@ -39,7 +39,10 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     final accessToken = await _secureStorage.read(key: _accessTokenKey);
     final refreshToken = await _secureStorage.read(key: _refreshTokenKey);
 
-    if (accessToken == null || refreshToken == null) {
+    if (accessToken == null ||
+        accessToken.isEmpty ||
+        refreshToken == null ||
+        refreshToken.isEmpty) {
       return null;
     }
 
