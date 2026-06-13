@@ -195,6 +195,53 @@ void main() {
       });
     });
 
+    group('loginWithApple', () {
+      test('should return TokenPair and save tokens on success', () async {
+        const tokenPair = TokenPairModel(
+          accessToken: 'apple_access',
+          refreshToken: 'apple_refresh',
+        );
+        mockRemoteDataSource.loginResult = tokenPair;
+
+        final result = await repository.loginWithApple('identity_token', 'Yu Seungbum');
+
+        expect(result, Right(tokenPair));
+        expect(mockLocalDataSource.savedTokens, tokenPair);
+      });
+
+      test('should reject and not save tokens when server returns empty access token', () async {
+        mockRemoteDataSource.loginResult = const TokenPairModel(
+          accessToken: '',
+          refreshToken: 'apple_refresh',
+        );
+
+        final result = await repository.loginWithApple('identity_token', null);
+
+        expect(result.isLeft(), isTrue);
+        result.fold(
+          (failure) => expect(failure, isA<AppleLoginFailure>()),
+          (_) => fail('Should be failure'),
+        );
+        expect(mockLocalDataSource.savedTokens, isNull);
+      });
+
+      test('should reject and not save tokens when server returns empty refresh token', () async {
+        mockRemoteDataSource.loginResult = const TokenPairModel(
+          accessToken: 'apple_access',
+          refreshToken: '',
+        );
+
+        final result = await repository.loginWithApple('identity_token', null);
+
+        expect(result.isLeft(), isTrue);
+        result.fold(
+          (failure) => expect(failure, isA<AppleLoginFailure>()),
+          (_) => fail('Should be failure'),
+        );
+        expect(mockLocalDataSource.savedTokens, isNull);
+      });
+    });
+
     group('getCurrentMember', () {
       test('should return Member on success', () async {
         const member = MemberModel(
