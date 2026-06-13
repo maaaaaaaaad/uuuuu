@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jellomark/features/auth/presentation/helpers/auth_action_guard.dart';
 import 'package:jellomark/features/favorite/presentation/providers/favorites_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
@@ -44,6 +45,13 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton>
   Future<void> _toggleFavorite(bool currentStatus) async {
     if (_isToggling) return;
 
+    final loggedIn = await ensureLoggedIn(
+      context,
+      ref,
+      description: '즐겨찾기를 사용하려면 로그인이 필요해요.',
+    );
+    if (!loggedIn || !mounted) return;
+
     setState(() => _isToggling = true);
     _controller.forward().then((_) => _controller.reverse());
 
@@ -55,7 +63,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton>
     }
 
     ref.invalidate(favoriteStatusProvider(widget.shopId));
-    setState(() => _isToggling = false);
+    if (mounted) setState(() => _isToggling = false);
   }
 
   @override
