@@ -22,6 +22,7 @@ import 'package:jellomark/features/location/domain/entities/route.dart'
     as domain;
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
 import 'package:jellomark/features/recent_shops/domain/entities/recent_shop.dart';
+import 'package:jellomark/features/auth/presentation/helpers/auth_action_guard.dart';
 import 'package:jellomark/features/recent_shops/presentation/providers/recent_shops_provider.dart';
 import 'package:jellomark/features/treatment/presentation/providers/treatment_provider.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
@@ -589,6 +590,13 @@ class _ShopDetailScreenState extends ConsumerState<ShopDetailScreen> {
 
   Future<void> _navigateToCreateReservation(
       String shopId, List<ServiceMenu> treatments) async {
+    final loggedIn = await ensureLoggedIn(
+      context,
+      ref,
+      description: '예약하려면 로그인이 필요해요.',
+    );
+    if (!loggedIn || !mounted) return;
+
     bool hasPermission = false;
     try {
       final messaging = FirebaseMessaging.instance;
