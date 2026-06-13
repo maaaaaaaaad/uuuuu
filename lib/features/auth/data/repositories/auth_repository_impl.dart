@@ -110,6 +110,11 @@ class AuthRepositoryImpl implements AuthRepository {
         identityToken,
         fullName,
       );
+      if (tokenPair.accessToken.isEmpty || tokenPair.refreshToken.isEmpty) {
+        return const Left(
+          AppleLoginFailure('Apple 로그인 응답에서 유효한 토큰을 받지 못했습니다'),
+        );
+      }
       await _localDataSource.saveTokens(tokenPair);
       return Right(tokenPair);
     } on DioException catch (e) {
