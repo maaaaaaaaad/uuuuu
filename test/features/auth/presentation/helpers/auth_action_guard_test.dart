@@ -19,15 +19,15 @@ class _StubAuthRepository implements AuthRepository {
   Future<TokenPair?> getStoredTokens() async => stored;
 
   @override
-  Future<Either<Failure, TokenPair>> loginWithKakao(String _) async => throw UnimplementedError();
+  Future<Either<Failure, TokenPair>> loginWithKakao(String kakaoAccessToken) async => throw UnimplementedError();
   @override
   Future<Either<Failure, TokenPair>> loginWithKakaoSdk() async => throw UnimplementedError();
   @override
-  Future<Either<Failure, TokenPair>> loginWithApple(String _, String? __) async => throw UnimplementedError();
+  Future<Either<Failure, TokenPair>> loginWithApple(String identityToken, String? fullName) async => throw UnimplementedError();
   @override
   Future<Either<Failure, TokenPair>> loginWithAppleSdk() async => throw UnimplementedError();
   @override
-  Future<Either<Failure, TokenPair>> refreshToken(String _) async => throw UnimplementedError();
+  Future<Either<Failure, TokenPair>> refreshToken(String refreshToken) async => throw UnimplementedError();
   @override
   Future<Either<Failure, Member>> getCurrentMember() async => throw UnimplementedError();
   @override
@@ -35,7 +35,7 @@ class _StubAuthRepository implements AuthRepository {
   @override
   Future<void> clearStoredTokens() async {}
   @override
-  Future<Either<Failure, void>> withdraw(String _) async => const Right(null);
+  Future<Either<Failure, void>> withdraw(String reason) async => const Right(null);
 }
 
 void main() {
