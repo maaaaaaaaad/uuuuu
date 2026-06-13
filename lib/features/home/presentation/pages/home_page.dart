@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jellomark/features/auth/presentation/helpers/auth_action_guard.dart';
 import 'package:jellomark/features/favorite/presentation/pages/favorites_page.dart';
 import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
 import 'package:jellomark/features/location/presentation/providers/location_permission_alert_provider.dart';
@@ -146,6 +147,22 @@ class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver
     setState(() => _currentIndex = 1);
   }
 
+  Future<void> _handleTabTap(int index) async {
+    final requiresLogin = index == 3 || index == 4;
+    if (requiresLogin) {
+      final description = index == 3
+          ? '즐겨찾기를 보려면 로그인이 필요해요.'
+          : '마이페이지를 보려면 로그인이 필요해요.';
+      final loggedIn = await ensureLoggedIn(
+        context,
+        ref,
+        description: description,
+      );
+      if (!loggedIn || !mounted) return;
+    }
+    setState(() => _currentIndex = index);
+  }
+
   static const _navItems = [
     BottomNavItem(
       icon: Icons.home_outlined,
@@ -220,7 +237,7 @@ class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver
       ),
         bottomNavigationBar: GlassBottomNavBar(
           currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
+          onTap: _handleTabTap,
           items: _navItems,
         ),
       ),
