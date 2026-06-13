@@ -222,7 +222,7 @@ void main() {
       expect(bottomNav.currentIndex, 1);
     });
 
-    testWidgets('should show different content for each tab', (tester) async {
+    testWidgets('should show different content for tabs that do not require login', (tester) async {
       await tester.pumpWidget(createHomePage());
 
       expect(find.byType(HomeTab), findsOneWidget);
@@ -230,11 +230,8 @@ void main() {
       await tester.tap(find.byIcon(Icons.search_outlined));
       await tester.pumpAndSettle();
       expect(find.text('취소'), findsOneWidget);
-
-      await tester.tap(find.byIcon(Icons.person_outline));
-      await tester.pumpAndSettle();
-      expect(find.text('프로필'), findsOneWidget);
     });
+
 
     testWidgets('should have lavender gradient background', (tester) async {
       await tester.pumpWidget(createHomePage());
