@@ -109,7 +109,7 @@ void main() {
       );
     }
 
-    testWidgets('should navigate to home in guest mode when no token stored', (
+    testWidgets('should navigate to login when no token stored', (
       tester,
     ) async {
       mockRepository.storedTokens = null;
@@ -117,7 +117,7 @@ void main() {
       await tester.pumpWidget(createSplashPage());
       await tester.pumpAndSettle();
 
-      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('Login'), findsOneWidget);
     });
 
     testWidgets('should navigate to home when token is valid', (tester) async {
@@ -139,7 +139,7 @@ void main() {
       expect(find.text('Home'), findsOneWidget);
     });
 
-    testWidgets('should navigate to home in guest mode when token is invalid', (
+    testWidgets('should navigate to login when token is invalid', (
       tester,
     ) async {
       mockRepository.storedTokens = const TokenPairModel(
@@ -152,10 +152,10 @@ void main() {
       await tester.pumpWidget(createSplashPage());
       await tester.pumpAndSettle();
 
-      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('Login'), findsOneWidget);
     });
 
-    testWidgets('should navigate to home in guest mode when auth check throws', (
+    testWidgets('should navigate to login when auth check throws', (
       tester,
     ) async {
       final throwingRepo = _ThrowingAuthRepository();
@@ -178,7 +178,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('Login'), findsOneWidget);
     });
 
     testWidgets('should have keyboard warmup TextField', (
