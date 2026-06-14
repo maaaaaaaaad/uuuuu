@@ -20,7 +20,11 @@ Future<bool> ensureLoggedIn(
   final authRepository = sl<AuthRepository>();
   final tokens = await authRepository.getStoredTokens();
   if (tokens != null) {
-    return true;
+    final memberResult = await authRepository.getCurrentMember();
+    if (memberResult.isRight()) {
+      return true;
+    }
+    await authRepository.clearStoredTokens();
   }
 
   if (!context.mounted) return false;
