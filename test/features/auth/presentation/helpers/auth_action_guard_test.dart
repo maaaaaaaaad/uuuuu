@@ -10,13 +10,32 @@ import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart
 import 'package:jellomark/features/auth/presentation/helpers/auth_action_guard.dart';
 import 'package:jellomark/features/member/domain/entities/member.dart';
 
+const _kSampleMember = Member(
+  id: 'm-1',
+  nickname: '테스터123456',
+  displayName: '테스터',
+  socialProvider: 'KAKAO',
+  socialId: 'kakao-1',
+);
+
 class _StubAuthRepository implements AuthRepository {
   TokenPair? stored;
+  Either<Failure, Member> memberResult = const Right(_kSampleMember);
+  int clearCallCount = 0;
 
   _StubAuthRepository(this.stored);
 
   @override
   Future<TokenPair?> getStoredTokens() async => stored;
+
+  @override
+  Future<Either<Failure, Member>> getCurrentMember() async => memberResult;
+
+  @override
+  Future<void> clearStoredTokens() async {
+    clearCallCount++;
+    stored = null;
+  }
 
   @override
   Future<Either<Failure, TokenPair>> loginWithKakao(String kakaoAccessToken) async => throw UnimplementedError();
@@ -29,11 +48,7 @@ class _StubAuthRepository implements AuthRepository {
   @override
   Future<Either<Failure, TokenPair>> refreshToken(String refreshToken) async => throw UnimplementedError();
   @override
-  Future<Either<Failure, Member>> getCurrentMember() async => throw UnimplementedError();
-  @override
   Future<Either<Failure, void>> logout() async => const Right(null);
-  @override
-  Future<void> clearStoredTokens() async {}
   @override
   Future<Either<Failure, void>> withdraw(String reason) async => const Right(null);
 }
@@ -68,7 +83,7 @@ void main() {
   }
 
   group('ensureLoggedIn', () {
-    testWidgets('returns true immediately when tokens are stored', (tester) async {
+    testWidgets('returns true when tokens stored and backend accepts', (tester) async {
       sl.registerSingleton<AuthRepository>(
         _StubAuthRepository(
           const TokenPairModel(accessToken: 'a', refreshToken: 'b'),
@@ -80,6 +95,21 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('OK'), findsOneWidget);
+    });
+
+    testWidgets('clears stale tokens and shows prompt when backend rejects', (tester) async {
+      final repo = _StubAuthRepository(
+        const TokenPairModel(accessToken: 'stale', refreshToken: 'stale'),
+      )..memberResult = const Left(AuthFailure('토큰이 만료되었습니다'));
+      sl.registerSingleton<AuthRepository>(repo);
+
+      await tester.pumpWidget(buildHarness((c, r) => ensureLoggedIn(c, r)));
+      await tester.tap(find.text('진행'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('로그인이 필요해요'), findsOneWidget);
+      expect(repo.clearCallCount, 1);
+      expect(repo.stored, isNull);
     });
 
     testWidgets('shows guest login prompt when no tokens', (tester) async {
