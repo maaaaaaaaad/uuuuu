@@ -146,6 +146,21 @@ void main() {
       expect(find.text('Home'), findsOneWidget);
     });
 
+    testWidgets('should display guest entry button when guest mode is on', (tester) async {
+      await tester.pumpWidget(createLoginPage());
+
+      expect(find.text('회원가입 없이 둘러보기'), findsOneWidget);
+    });
+
+    testWidgets('should navigate to home when guest entry tapped', (tester) async {
+      await tester.pumpWidget(createLoginPage());
+
+      await tester.tap(find.text('회원가입 없이 둘러보기'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home'), findsOneWidget);
+    });
+
     testWidgets('should show error snackbar when login fails', (tester) async {
       mockAuthRepository.loginFailure = KakaoLoginFailure('로그인에 실패했습니다');
 
