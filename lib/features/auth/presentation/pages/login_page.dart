@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jellomark/config/feature_flags.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
@@ -123,6 +124,10 @@ class LoginPage extends ConsumerWidget {
               const SizedBox(height: 12),
               if (Platform.isIOS)
                 _buildAppleLoginButton(context, ref, isLoading),
+              if (kGuestModeEnabled) ...[
+                const SizedBox(height: 16),
+                _buildGuestEntryButton(context, isLoading),
+              ],
               const SizedBox(height: 32),
             ],
           ),
@@ -190,6 +195,28 @@ class LoginPage extends ConsumerWidget {
                   ),
                 ],
               ),
+      ),
+    );
+  }
+
+  Widget _buildGuestEntryButton(BuildContext context, bool isLoading) {
+    return TextButton(
+      onPressed: isLoading
+          ? null
+          : () => Navigator.of(context).pushReplacementNamed('/home'),
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Text(
+        '회원가입 없이 둘러보기',
+        style: TextStyle(
+          fontSize: 13,
+          color: SemanticColors.text.secondary,
+          decoration: TextDecoration.underline,
+          decorationColor: SemanticColors.text.secondary,
+        ),
       ),
     );
   }
