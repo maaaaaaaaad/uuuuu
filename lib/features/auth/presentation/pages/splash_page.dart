@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:jellomark/config/feature_flags.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -48,16 +47,12 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       if (!mounted) return;
 
       result.fold(
-        (_) => Navigator.of(context).pushReplacementNamed(
-          kGuestModeEnabled ? '/home' : '/login',
-        ),
+        (_) => Navigator.of(context).pushReplacementNamed('/login'),
         (_) => Navigator.of(context).pushReplacementNamed('/home'),
       );
     } catch (_) {
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed(
-        kGuestModeEnabled ? '/home' : '/login',
-      );
+      Navigator.of(context).pushReplacementNamed('/login');
     }
   }
 
