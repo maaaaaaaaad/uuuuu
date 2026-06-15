@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class WriteReviewBottomSheet extends StatefulWidget {
   final String shopName;
@@ -16,7 +17,7 @@ class WriteReviewBottomSheet extends StatefulWidget {
     required String shopName,
     required Future<bool> Function({int? rating, String? content}) onSubmit,
   }) {
-    return showModalBottomSheet<bool>(
+    return showAppBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -63,8 +64,7 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
 
     try {
       final content = _contentController.text.trim();
-      final validContent =
-          content.length >= _minContentLength ? content : null;
+      final validContent = content.length >= _minContentLength ? content : null;
       final success = await widget.onSubmit(
         rating: _selectedRating,
         content: validContent,
@@ -109,13 +109,8 @@ class _WriteReviewBottomSheetState extends State<WriteReviewBottomSheet> {
       child: Container(
         decoration: BoxDecoration(
           color: SemanticColors.background.bottomSheet,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(30),
-          ),
-          border: Border.all(
-            color: SemanticColors.border.glass,
-            width: 1.5,
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          border: Border.all(color: SemanticColors.border.glass, width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
