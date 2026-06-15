@@ -19,18 +19,23 @@ Future<T?> showAppBottomSheet<T>({
 }) {
   return showModalBottomSheet<T>(
     context: context,
-    backgroundColor: backgroundColor ?? Colors.transparent,
+    backgroundColor: Colors.transparent,
     isScrollControlled: isScrollControlled,
     isDismissible: isDismissible,
     enableDrag: enableDrag,
     shape: shape,
-    builder: (innerContext) => Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(innerContext).viewInsets.bottom,
+    builder: (innerContext) => DecoratedBox(
+      decoration: BoxDecoration(
+        color: backgroundColor ?? Theme.of(innerContext).scaffoldBackgroundColor,
       ),
-      child: SafeArea(
-        top: false,
-        child: builder(innerContext),
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(innerContext).viewInsets.bottom,
+        ),
+        child: SafeArea(
+          top: false,
+          child: builder(innerContext),
+        ),
       ),
     ),
   );
