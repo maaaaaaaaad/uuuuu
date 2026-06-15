@@ -197,22 +197,28 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
               color: SemanticColors.icon.disabled,
             ),
             const SizedBox(height: 20),
-            Text(
-              '주변 매장을 보려면 위치 권한이 필요해요',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: SemanticColors.text.primary,
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                '주변 매장을 보려면 위치 권한이 필요해요',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: SemanticColors.text.primary,
+                ),
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              'iOS 설정에서 권한을 허용하면\n주변 매장을 지도로 확인할 수 있어요',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                color: SemanticColors.text.secondary,
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                'iOS 설정에서 권한을 허용하면\n주변 매장을 지도로 확인할 수 있어요',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: SemanticColors.text.secondary,
+                ),
               ),
             ),
             const SizedBox(height: 24),
