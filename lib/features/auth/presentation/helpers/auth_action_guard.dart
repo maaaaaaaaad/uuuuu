@@ -33,17 +33,17 @@ Future<bool> ensureLoggedIn(
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (sheetContext) => _GuestLoginPromptSheet(
+        builder: (sheetContext) => _LoginPromptSheet(
           description: description ?? _kLoginRequiredDescription,
         ),
       ) ??
       false;
 }
 
-class _GuestLoginPromptSheet extends ConsumerWidget {
+class _LoginPromptSheet extends ConsumerWidget {
   final String description;
 
-  const _GuestLoginPromptSheet({required this.description});
+  const _LoginPromptSheet({required this.description});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -66,59 +66,68 @@ class _GuestLoginPromptSheet extends ConsumerWidget {
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      padding: EdgeInsets.fromLTRB(
-        24,
-        16,
-        24,
-        24 + MediaQuery.of(context).viewInsets.bottom,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: SemanticColors.text.disabled,
-              borderRadius: BorderRadius.circular(2),
-            ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: SemanticColors.text.disabled,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                _kLoginRequiredTitle,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: SemanticColors.text.primary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: SemanticColors.text.secondary,
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildKakaoButton(context, ref, isLoading),
+              const SizedBox(height: 12),
+              if (Platform.isIOS) _buildAppleButton(context, ref, isLoading),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: isLoading
+                    ? null
+                    : () => Navigator.of(context).pop(false),
+                child: Text(
+                  '닫기',
+                  style: TextStyle(color: SemanticColors.text.secondary),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-          Text(
-            _kLoginRequiredTitle,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: SemanticColors.text.primary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: SemanticColors.text.secondary,
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildKakaoButton(context, ref, isLoading),
-          const SizedBox(height: 12),
-          if (Platform.isIOS) _buildAppleButton(context, ref, isLoading),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: isLoading ? null : () => Navigator.of(context).pop(false),
-            child: Text(
-              '닫기',
-              style: TextStyle(color: SemanticColors.text.secondary),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildKakaoButton(BuildContext context, WidgetRef ref, bool isLoading) {
+  Widget _buildKakaoButton(
+    BuildContext context,
+    WidgetRef ref,
+    bool isLoading,
+  ) {
     return SizedBox(
       width: double.infinity,
       height: 52,
@@ -137,7 +146,9 @@ class _GuestLoginPromptSheet extends ConsumerWidget {
           backgroundColor: SemanticColors.button.kakao,
           foregroundColor: SemanticColors.button.kakaoText,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
         child: isLoading
             ? const SizedBox(
@@ -153,7 +164,11 @@ class _GuestLoginPromptSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildAppleButton(BuildContext context, WidgetRef ref, bool isLoading) {
+  Widget _buildAppleButton(
+    BuildContext context,
+    WidgetRef ref,
+    bool isLoading,
+  ) {
     return SizedBox(
       width: double.infinity,
       height: 52,
@@ -172,7 +187,9 @@ class _GuestLoginPromptSheet extends ConsumerWidget {
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
