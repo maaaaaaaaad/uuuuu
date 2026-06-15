@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/member/presentation/providers/withdrawal_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class WithdrawalPage extends ConsumerStatefulWidget {
   const WithdrawalPage({super.key});
@@ -45,7 +46,7 @@ class _WithdrawalPageState extends ConsumerState<WithdrawalPage> {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('정말 탈퇴하시겠어요?'),
@@ -74,9 +75,7 @@ class _WithdrawalPageState extends ConsumerState<WithdrawalPage> {
     final reAuthResult = await ref.read(loginWithKakaoUseCaseProvider).call();
     final reAuthFailed = reAuthResult.isLeft();
     if (reAuthFailed) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('카카오 재인증에 실패했습니다')),
-      );
+      messenger.showSnackBar(const SnackBar(content: Text('카카오 재인증에 실패했습니다')));
       return;
     }
 
@@ -171,10 +170,7 @@ class _WithdrawalPageState extends ConsumerState<WithdrawalPage> {
             ),
             child: Text(
               '탈퇴 후 삭제된 데이터는 복구할 수 없으며,\n30일 내 동일 계정으로 재가입 시 이전 데이터가 복구되지 않습니다.',
-              style: TextStyle(
-                fontSize: 13,
-                color: SemanticColors.state.error,
-              ),
+              style: TextStyle(fontSize: 13, color: SemanticColors.state.error),
             ),
           ),
           const Spacer(),
@@ -201,7 +197,11 @@ class _WithdrawalPageState extends ConsumerState<WithdrawalPage> {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(Icons.remove_circle_outline, color: SemanticColors.state.error, size: 18),
+          Icon(
+            Icons.remove_circle_outline,
+            color: SemanticColors.state.error,
+            size: 18,
+          ),
           const SizedBox(width: 8),
           Expanded(child: Text(text)),
         ],
@@ -410,9 +410,7 @@ class _WithdrawalPageState extends ConsumerState<WithdrawalPage> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            '마지막으로 카카오 재인증 후 탈퇴를 완료합니다.\n아래 버튼을 누르면 카카오 인증이 진행됩니다.',
-          ),
+          const Text('마지막으로 카카오 재인증 후 탈퇴를 완료합니다.\n아래 버튼을 누르면 카카오 인증이 진행됩니다.'),
           const Spacer(),
           SizedBox(
             width: double.infinity,
