@@ -134,7 +134,10 @@ class _HomePageState extends ConsumerState<HomePage>
       case 1:
         return const SearchPage(key: ValueKey(1));
       case 2:
-        return const NearbyShopsMapPage(key: ValueKey(2));
+        return NearbyShopsMapPage(
+          key: const ValueKey(2),
+          onSwitchToHomeTab: () => setState(() => _currentIndex = 0),
+        );
       case 3:
         return const FavoritesPage(key: ValueKey(3));
       case 4:
