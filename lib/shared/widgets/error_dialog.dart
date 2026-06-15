@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class ErrorDialog {
   static Future<void> show({
@@ -9,7 +10,7 @@ class ErrorDialog {
     String confirmText = '확인',
     VoidCallback? onConfirm,
   }) {
-    return showDialog<void>(
+    return showAppDialog<void>(
       context: context,
       barrierDismissible: true,
       barrierColor: SemanticColors.overlay.dialogBarrier,
@@ -35,10 +36,7 @@ class ErrorDialog {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: SemanticColors.state.error,
-                  ),
+                  Icon(Icons.error_outline, color: SemanticColors.state.error),
                   const SizedBox(width: 8),
                   Text(
                     title,
