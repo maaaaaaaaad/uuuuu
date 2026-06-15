@@ -12,6 +12,7 @@ import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/glass_card.dart';
 import 'package:jellomark/shared/widgets/units/app_cached_image.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class MyReviewsPage extends ConsumerStatefulWidget {
   const MyReviewsPage({super.key});
@@ -35,7 +36,7 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
   }
 
   void _showEditSheet(Review review) {
-    showModalBottomSheet(
+    showAppBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (sheetContext) => EditReviewBottomSheet(
@@ -52,9 +53,9 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
               );
 
           if (success && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('리뷰가 수정되었습니다')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('리뷰가 수정되었습니다')));
           }
           return success;
         },
@@ -63,7 +64,7 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
   }
 
   Future<void> _navigateToShopDetail(Review review) async {
-    showDialog(
+    showAppDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Center(
@@ -84,9 +85,9 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
     } catch (e) {
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('샵 정보를 불러올 수 없습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('샵 정보를 불러올 수 없습니다')));
       }
     }
   }
@@ -94,16 +95,14 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
   void _openImageViewer(List<String> images, int initialIndex) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => FullScreenImageViewer(
-          images: images,
-          initialIndex: initialIndex,
-        ),
+        builder: (context) =>
+            FullScreenImageViewer(images: images, initialIndex: initialIndex),
       ),
     );
   }
 
   Future<void> _showDeleteConfirmation(Review review) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('리뷰 삭제'),
@@ -127,15 +126,12 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
     if (confirmed == true && mounted) {
       final success = await ref
           .read(myReviewsNotifierProvider.notifier)
-          .deleteReview(
-            shopId: review.shopId,
-            reviewId: review.id,
-          );
+          .deleteReview(shopId: review.shopId, reviewId: review.id);
 
       if (mounted && success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('리뷰가 삭제되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('리뷰가 삭제되었습니다')));
       }
     }
   }
@@ -163,9 +159,7 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
         decoration: const BoxDecoration(
           gradient: AppGradients.softWhiteGradient,
         ),
-        child: SafeArea(
-          child: _buildContent(state),
-        ),
+        child: SafeArea(child: _buildContent(state)),
       ),
     );
   }
@@ -696,8 +690,9 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
             Container(
               height: 80,
               decoration: BoxDecoration(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
                 color: SemanticColors.background.skeleton,
               ),
               padding: const EdgeInsets.all(12),
