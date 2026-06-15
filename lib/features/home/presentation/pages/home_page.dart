@@ -13,6 +13,7 @@ import 'package:jellomark/features/search/presentation/pages/search_page.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/features/notification/presentation/providers/notification_provider.dart';
 import 'package:jellomark/shared/widgets/glass_bottom_nav_bar.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -21,7 +22,8 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver {
+class _HomePageState extends ConsumerState<HomePage>
+    with WidgetsBindingObserver {
   int _currentIndex = 0;
 
   @override
@@ -82,16 +84,20 @@ class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver
     if (!mounted) return;
 
     if (result == LocationSettingToggleResult.serviceDisabled) {
-      debugPrint('[HomePage] Location services disabled, showing location settings dialog...');
+      debugPrint(
+        '[HomePage] Location services disabled, showing location settings dialog...',
+      );
       _showLocationServiceDisabledDialog(notifier);
     } else if (result == LocationSettingToggleResult.deniedForever) {
-      debugPrint('[HomePage] Permission denied forever, showing settings dialog...');
+      debugPrint(
+        '[HomePage] Permission denied forever, showing settings dialog...',
+      );
       _showSettingsRequiredDialog(notifier);
     }
   }
 
   void _showLocationServiceDisabledDialog(LocationSettingNotifier notifier) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('위치 서비스 비활성화'),
@@ -118,7 +124,7 @@ class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver
   }
 
   void _showSettingsRequiredDialog(LocationSettingNotifier notifier) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('위치 권한 설정 필요'),
@@ -221,20 +227,17 @@ class _HomePageState extends ConsumerState<HomePage> with WidgetsBindingObserver
       child: Scaffold(
         extendBody: true,
         body: Container(
-        decoration: const BoxDecoration(
-          gradient: AppGradients.softWhiteGradient,
+          decoration: const BoxDecoration(
+            gradient: AppGradients.softWhiteGradient,
+          ),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            child: _buildTab(_currentIndex),
+          ),
         ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (child, animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-          child: _buildTab(_currentIndex),
-        ),
-      ),
         bottomNavigationBar: GlassBottomNavBar(
           currentIndex: _currentIndex,
           onTap: _handleTabTap,
