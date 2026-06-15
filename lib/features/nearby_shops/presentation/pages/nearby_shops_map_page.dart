@@ -39,14 +39,13 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     super.dispose();
   }
 
-  Widget _buildCircleMarker({required Decoration decoration, double iconSize = 14}) {
+  Widget _buildCircleMarker({
+    required Decoration decoration,
+    double iconSize = 14,
+  }) {
     return Container(
       decoration: decoration,
-      child: Icon(
-        Icons.place,
-        color: Colors.white,
-        size: iconSize,
-      ),
+      child: Icon(Icons.place, color: Colors.white, size: iconSize),
     );
   }
 
@@ -179,69 +178,71 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             color: SemanticColors.icon.disabled,
           ),
           const SizedBox(height: 16),
-          Text(
-            message,
-            style: TextStyle(color: SemanticColors.text.secondary),
-          ),
+          Text(message, style: TextStyle(color: SemanticColors.text.secondary)),
         ],
       ),
     );
   }
 
   Widget _buildPermissionRequiredState() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.location_off,
-            size: 64,
-            color: SemanticColors.icon.disabled,
-          ),
-          const SizedBox(height: 20),
-          Text(
-            '주변 매장을 보려면 위치 권한이 필요해요',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: SemanticColors.text.primary,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(32, 0, 32, 70),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.location_off,
+              size: 64,
+              color: SemanticColors.icon.disabled,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'iOS 설정에서 권한을 허용하면\n주변 매장을 지도로 확인할 수 있어요',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              color: SemanticColors.text.secondary,
-            ),
-          ),
-          const SizedBox(height: 24),
-          OutlinedButton(
-            onPressed: () => ref
-                .read(locationSettingNotifierProvider.notifier)
-                .openAppSettings(),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 20),
+            Text(
+              '주변 매장을 보려면 위치 권한이 필요해요',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: SemanticColors.text.primary,
               ),
             ),
-            child: const Text('설정으로 이동'),
-          ),
-          if (widget.onSwitchToHomeTab != null) ...[
             const SizedBox(height: 8),
-            TextButton(
-              onPressed: widget.onSwitchToHomeTab,
-              child: Text(
-                '홈으로 돌아가기',
-                style: TextStyle(color: SemanticColors.text.secondary),
+            Text(
+              'iOS 설정에서 권한을 허용하면\n주변 매장을 지도로 확인할 수 있어요',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: SemanticColors.text.secondary,
               ),
             ),
+            const SizedBox(height: 24),
+            OutlinedButton(
+              onPressed: () => ref
+                  .read(locationSettingNotifierProvider.notifier)
+                  .openAppSettings(),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text('설정으로 이동'),
+            ),
+            if (widget.onSwitchToHomeTab != null) ...[
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: widget.onSwitchToHomeTab,
+                child: Text(
+                  '홈으로 돌아가기',
+                  style: TextStyle(color: SemanticColors.text.secondary),
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -257,7 +258,10 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             right: 0,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: SemanticColors.background.card,
                   borderRadius: BorderRadius.circular(20),
@@ -292,8 +296,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
               ),
             ),
           ),
-        if (state.selectedShop != null)
-          _buildBottomSheet(state.selectedShop!),
+        if (state.selectedShop != null) _buildBottomSheet(state.selectedShop!),
         if (state.selectedExternalShop != null)
           _buildExternalShopBottomSheet(state.selectedExternalShop!),
       ],
@@ -374,7 +377,9 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
       marker.setZIndex(0);
 
       marker.setOnTapListener((marker) {
-        ref.read(nearbyShopsMapProvider.notifier).selectExternalShop(externalShop);
+        ref
+            .read(nearbyShopsMapProvider.notifier)
+            .selectExternalShop(externalShop);
       });
 
       await controller.addOverlay(marker);
@@ -439,7 +444,8 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
       bottom: 0,
       child: GestureDetector(
         onVerticalDragEnd: (details) {
-          if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+          if (details.primaryVelocity != null &&
+              details.primaryVelocity! > 300) {
             ref.read(nearbyShopsMapProvider.notifier).clearSelection();
           }
         },
@@ -523,7 +529,8 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
       bottom: 0,
       child: GestureDetector(
         onVerticalDragEnd: (details) {
-          if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+          if (details.primaryVelocity != null &&
+              details.primaryVelocity! > 300) {
             ref.read(nearbyShopsMapProvider.notifier).clearSelection();
           }
         },
@@ -650,9 +657,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
   void _navigateToShopDetail(BeautyShop shop) {
     ref.read(nearbyShopsMapProvider.notifier).clearSelection();
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ShopDetailScreen(shop: shop),
-      ),
+      MaterialPageRoute(builder: (context) => ShopDetailScreen(shop: shop)),
     );
   }
 }
