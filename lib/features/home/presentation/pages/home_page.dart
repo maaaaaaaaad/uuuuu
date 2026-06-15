@@ -13,7 +13,6 @@ import 'package:jellomark/features/search/presentation/pages/search_page.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/features/notification/presentation/providers/notification_provider.dart';
 import 'package:jellomark/shared/widgets/glass_bottom_nav_bar.dart';
-import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -75,78 +74,8 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   Future<void> _handleAgreePermission() async {
-    debugPrint('[HomePage] _handleAgreePermission called');
     final notifier = ref.read(locationSettingNotifierProvider.notifier);
-    debugPrint('[HomePage] Calling requestPermissionAndEnable...');
-    final result = await notifier.requestPermissionAndEnable();
-    debugPrint('[HomePage] requestPermissionAndEnable result: $result');
-
-    if (!mounted) return;
-
-    if (result == LocationSettingToggleResult.serviceDisabled) {
-      debugPrint(
-        '[HomePage] Location services disabled, showing location settings dialog...',
-      );
-      _showLocationServiceDisabledDialog(notifier);
-    } else if (result == LocationSettingToggleResult.deniedForever) {
-      debugPrint(
-        '[HomePage] Permission denied forever, showing settings dialog...',
-      );
-      _showSettingsRequiredDialog(notifier);
-    }
-  }
-
-  void _showLocationServiceDisabledDialog(LocationSettingNotifier notifier) {
-    showAppDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('위치 서비스 비활성화'),
-        content: const Text(
-          '기기의 위치 서비스가 꺼져 있습니다.\n\n'
-          '위치 기반 서비스를 사용하려면 설정에서 위치 서비스를 켜주세요.\n\n'
-          '설정 > 개인 정보 보호 및 보안 > 위치 서비스',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('나중에'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              await notifier.openLocationSettings();
-            },
-            child: const Text('설정으로 이동'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showSettingsRequiredDialog(LocationSettingNotifier notifier) {
-    showAppDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('위치 권한 설정 필요'),
-        content: const Text(
-          '이전에 위치 권한을 거부하셨습니다.\n\n'
-          '위치 기반 서비스를 사용하려면 iOS 설정에서 직접 권한을 허용해주세요.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('나중에'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              await notifier.openAppSettings();
-            },
-            child: const Text('설정으로 이동'),
-          ),
-        ],
-      ),
-    );
+    await notifier.requestPermissionAndEnable();
   }
 
   void _switchToSearchTab() {
