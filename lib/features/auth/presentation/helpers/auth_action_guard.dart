@@ -6,6 +6,7 @@ import 'package:jellomark/features/auth/domain/repositories/auth_repository.dart
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/core/di/injection_container.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 const String _kLoginRequiredTitle = '로그인이 필요해요';
 const String _kLoginRequiredDescription = '이 기능을 사용하려면 로그인해 주세요.';
@@ -29,10 +30,8 @@ Future<bool> ensureLoggedIn(
 
   if (!context.mounted) return false;
 
-  return await showModalBottomSheet<bool>(
+  return await showAppBottomSheet<bool>(
         context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
         builder: (sheetContext) => _LoginPromptSheet(
           description: description ?? _kLoginRequiredDescription,
         ),
@@ -66,59 +65,51 @@ class _LoginPromptSheet extends ConsumerWidget {
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: SemanticColors.text.disabled,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                _kLoginRequiredTitle,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: SemanticColors.text.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                description,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: SemanticColors.text.secondary,
-                ),
-              ),
-              const SizedBox(height: 24),
-              _buildKakaoButton(context, ref, isLoading),
-              const SizedBox(height: 12),
-              if (Platform.isIOS) _buildAppleButton(context, ref, isLoading),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: isLoading
-                    ? null
-                    : () => Navigator.of(context).pop(false),
-                child: Text(
-                  '닫기',
-                  style: TextStyle(color: SemanticColors.text.secondary),
-                ),
-              ),
-            ],
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: SemanticColors.text.disabled,
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-        ),
+          const SizedBox(height: 20),
+          Text(
+            _kLoginRequiredTitle,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: SemanticColors.text.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: SemanticColors.text.secondary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          _buildKakaoButton(context, ref, isLoading),
+          const SizedBox(height: 12),
+          if (Platform.isIOS) _buildAppleButton(context, ref, isLoading),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: isLoading
+                ? null
+                : () => Navigator.of(context).pop(false),
+            child: Text(
+              '닫기',
+              style: TextStyle(color: SemanticColors.text.secondary),
+            ),
+          ),
+        ],
       ),
     );
   }
