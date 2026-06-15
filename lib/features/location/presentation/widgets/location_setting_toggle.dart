@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class LocationSettingToggle extends ConsumerWidget {
   const LocationSettingToggle({super.key});
@@ -25,10 +26,7 @@ class LocationSettingToggle extends ConsumerWidget {
         children: [
           Text(
             '위치 정보 사용',
-            style: TextStyle(
-              fontSize: 16,
-              color: SemanticColors.text.primary,
-            ),
+            style: TextStyle(fontSize: 16, color: SemanticColors.text.primary),
           ),
           SizedBox(
             width: 24,
@@ -51,15 +49,9 @@ class LocationSettingToggle extends ConsumerWidget {
         children: [
           Text(
             '위치 정보 사용',
-            style: TextStyle(
-              fontSize: 16,
-              color: SemanticColors.text.primary,
-            ),
+            style: TextStyle(fontSize: 16, color: SemanticColors.text.primary),
           ),
-          Icon(
-            Icons.error_outline,
-            color: SemanticColors.state.error,
-          ),
+          Icon(Icons.error_outline, color: SemanticColors.state.error),
         ],
       ),
     );
@@ -98,7 +90,9 @@ class LocationSettingToggle extends ConsumerWidget {
           Switch(
             value: state.isEnabled,
             onChanged: (_) => _handleToggle(context, ref),
-            activeTrackColor: SemanticColors.button.primary.withValues(alpha: 0.5),
+            activeTrackColor: SemanticColors.button.primary.withValues(
+              alpha: 0.5,
+            ),
             activeThumbColor: SemanticColors.button.primary,
           ),
         ],
@@ -126,13 +120,11 @@ class LocationSettingToggle extends ConsumerWidget {
   }
 
   void _showSettingsDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showAppDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('위치 권한 필요'),
-        content: const Text(
-          '위치 정보를 사용하려면 설정에서 위치 권한을 허용해주세요.',
-        ),
+        content: const Text('위치 정보를 사용하려면 설정에서 위치 권한을 허용해주세요.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
