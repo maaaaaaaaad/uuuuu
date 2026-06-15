@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class NotificationPermissionDialog {
   static Future<void> show({required BuildContext context}) {
-    return showDialog<void>(
+    return showAppDialog<void>(
       context: context,
       barrierDismissible: false,
       barrierColor: SemanticColors.overlay.dialogBarrier,
@@ -25,10 +26,7 @@ class _NotificationPermissionContent extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: SemanticColors.border.glass,
-            width: 1.5,
-          ),
+          border: Border.all(color: SemanticColors.border.glass, width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.15),
@@ -98,10 +96,7 @@ class _NotificationPermissionContent extends StatelessWidget {
               ),
               child: const Text(
                 '취소',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -126,10 +121,7 @@ class _NotificationPermissionContent extends StatelessWidget {
               ),
               child: const Text(
                 '확인',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ),
           ),
