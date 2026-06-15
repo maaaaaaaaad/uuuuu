@@ -11,6 +11,7 @@ import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/pill_chip.dart';
 import 'package:jellomark/shared/widgets/units/glass_search_bar.dart';
 import 'package:jellomark/shared/widgets/units/shop_card.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -74,7 +75,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     final state = ref.read(searchNotifierProvider);
     final homeState = ref.read(homeNotifierProvider);
 
-    showModalBottomSheet(
+    showAppBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => ShopFilterBottomSheet(
@@ -169,10 +170,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           GestureDetector(
             onTap: _onClear,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 10,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: SemanticColors.background.card,
                 borderRadius: BorderRadius.circular(20),
