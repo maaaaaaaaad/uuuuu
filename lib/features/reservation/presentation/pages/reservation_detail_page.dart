@@ -13,6 +13,7 @@ import 'package:jellomark/features/review/domain/usecases/create_review_usecase.
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class ReservationDetailPage extends ConsumerWidget {
   final String reservationId;
@@ -38,16 +39,17 @@ class ReservationDetailPage extends ConsumerWidget {
           decoration: const BoxDecoration(
             gradient: AppGradients.softWhiteGradient,
           ),
-          child: SafeArea(
-            child: _buildBody(context, ref, state),
-          ),
+          child: SafeArea(child: _buildBody(context, ref, state)),
         ),
       ),
     );
   }
 
   Widget _buildBody(
-      BuildContext context, WidgetRef ref, ReservationDetailState state) {
+    BuildContext context,
+    WidgetRef ref,
+    ReservationDetailState state,
+  ) {
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -92,11 +94,7 @@ class ReservationDetailPage extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 48,
-            color: SemanticColors.icon.disabled,
-          ),
+          Icon(Icons.search_off, size: 48, color: SemanticColors.icon.disabled),
           const SizedBox(height: 16),
           Text(
             '예약을 찾을 수 없습니다',
@@ -111,7 +109,10 @@ class ReservationDetailPage extends ConsumerWidget {
   }
 
   Widget _buildDetail(
-      BuildContext context, WidgetRef ref, Reservation reservation) {
+    BuildContext context,
+    WidgetRef ref,
+    Reservation reservation,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -243,10 +244,7 @@ class ReservationDetailPage extends ConsumerWidget {
         const SizedBox(width: 12),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 14,
-            color: SemanticColors.text.secondary,
-          ),
+          style: TextStyle(fontSize: 14, color: SemanticColors.text.secondary),
         ),
         const Spacer(),
         Text(
@@ -346,7 +344,10 @@ class ReservationDetailPage extends ConsumerWidget {
   }
 
   Widget _buildReviewButton(
-      BuildContext context, WidgetRef ref, Reservation reservation) {
+    BuildContext context,
+    WidgetRef ref,
+    Reservation reservation,
+  ) {
     return SizedBox(
       width: double.infinity,
       height: 48,
@@ -368,7 +369,10 @@ class ReservationDetailPage extends ConsumerWidget {
   }
 
   Widget _buildCancelButton(
-      BuildContext context, WidgetRef ref, Reservation reservation) {
+    BuildContext context,
+    WidgetRef ref,
+    Reservation reservation,
+  ) {
     return SizedBox(
       width: double.infinity,
       height: 48,
@@ -390,7 +394,10 @@ class ReservationDetailPage extends ConsumerWidget {
   }
 
   Future<void> _showReviewSheet(
-      BuildContext context, WidgetRef ref, Reservation reservation) async {
+    BuildContext context,
+    WidgetRef ref,
+    Reservation reservation,
+  ) async {
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (_) => WriteReviewPage(
@@ -403,25 +410,25 @@ class ReservationDetailPage extends ConsumerWidget {
               rating: rating,
               content: content,
             );
-            return result.fold(
-              (failure) => failure.message,
-              (_) => null,
-            );
+            return result.fold((failure) => failure.message, (_) => null);
           },
         ),
       ),
     );
 
     if (result == true && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('리뷰가 등록되었습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('리뷰가 등록되었습니다')));
     }
   }
 
   Future<void> _showCancelDialog(
-      BuildContext context, WidgetRef ref, Reservation reservation) async {
-    final confirmed = await showDialog<bool>(
+    BuildContext context,
+    WidgetRef ref,
+    Reservation reservation,
+  ) async {
+    final confirmed = await showAppDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('예약 취소'),
@@ -453,7 +460,10 @@ class ReservationDetailPage extends ConsumerWidget {
   }
 
   Widget _buildRebookButton(
-      BuildContext context, WidgetRef ref, Reservation reservation) {
+    BuildContext context,
+    WidgetRef ref,
+    Reservation reservation,
+  ) {
     return SizedBox(
       width: double.infinity,
       height: 48,
@@ -479,7 +489,10 @@ class ReservationDetailPage extends ConsumerWidget {
   }
 
   Future<void> _handleRebook(
-      BuildContext context, WidgetRef ref, Reservation reservation) async {
+    BuildContext context,
+    WidgetRef ref,
+    Reservation reservation,
+  ) async {
     try {
       final useCase = sl<GetShopTreatmentsUseCase>();
       final result = await useCase(shopId: reservation.shopId);
