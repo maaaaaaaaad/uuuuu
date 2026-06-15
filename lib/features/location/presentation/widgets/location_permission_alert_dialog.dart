@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
+import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class LocationPermissionAlertDialog {
   static Future<void> show({
@@ -8,14 +9,12 @@ class LocationPermissionAlertDialog {
     required VoidCallback onAgree,
     required VoidCallback onCancel,
   }) {
-    return showDialog<void>(
+    return showAppDialog<void>(
       context: context,
       barrierDismissible: false,
       barrierColor: SemanticColors.overlay.dialogBarrier,
-      builder: (context) => _LocationPermissionAlertContent(
-        onAgree: onAgree,
-        onCancel: onCancel,
-      ),
+      builder: (context) =>
+          _LocationPermissionAlertContent(onAgree: onAgree, onCancel: onCancel),
     );
   }
 }
@@ -36,10 +35,7 @@ class _LocationPermissionAlertContent extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: SemanticColors.border.glass,
-            width: 1.5,
-          ),
+          border: Border.all(color: SemanticColors.border.glass, width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.15),
@@ -71,11 +67,7 @@ class _LocationPermissionAlertContent extends StatelessWidget {
         color: AppColors.pastelPink.withValues(alpha: 0.2),
         shape: BoxShape.circle,
       ),
-      child: Icon(
-        Icons.location_on,
-        size: 32,
-        color: AppColors.pastelPink,
-      ),
+      child: Icon(Icons.location_on, size: 32, color: AppColors.pastelPink),
     );
   }
 
@@ -137,10 +129,7 @@ class _CancelButton extends StatelessWidget {
         ),
         child: const Text(
           '취소',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -169,10 +158,7 @@ class _AgreeButton extends StatelessWidget {
         ),
         child: const Text(
           '동의',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ),
     );
