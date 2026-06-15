@@ -7,12 +7,15 @@ import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbna
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
 import 'package:jellomark/features/external_shop/domain/entities/external_shop.dart';
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
+import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
 import 'package:jellomark/features/nearby_shops/presentation/providers/nearby_shops_map_provider.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
 class NearbyShopsMapPage extends ConsumerStatefulWidget {
-  const NearbyShopsMapPage({super.key});
+  final VoidCallback? onSwitchToHomeTab;
+
+  const NearbyShopsMapPage({super.key, this.onSwitchToHomeTab});
 
   @override
   ConsumerState<NearbyShopsMapPage> createState() => _NearbyShopsMapPageState();
@@ -141,7 +144,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
         error: (error, _) => _buildErrorState('위치를 가져올 수 없습니다'),
         data: (location) {
           if (location == null) {
-            return _buildErrorState('위치 권한이 필요합니다');
+            return _buildPermissionRequiredState();
           }
           return _buildMapWithBottomSheet(location, state);
         },
@@ -180,6 +183,64 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             message,
             style: TextStyle(color: SemanticColors.text.secondary),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPermissionRequiredState() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.location_off,
+            size: 64,
+            color: SemanticColors.icon.disabled,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            '주변 매장을 보려면 위치 권한이 필요해요',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: SemanticColors.text.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'iOS 설정에서 권한을 허용하면\n주변 매장을 지도로 확인할 수 있어요',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              color: SemanticColors.text.secondary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          OutlinedButton(
+            onPressed: () => ref
+                .read(locationSettingNotifierProvider.notifier)
+                .openAppSettings(),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('설정으로 이동'),
+          ),
+          if (widget.onSwitchToHomeTab != null) ...[
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: widget.onSwitchToHomeTab,
+              child: Text(
+                '홈으로 돌아가기',
+                style: TextStyle(color: SemanticColors.text.secondary),
+              ),
+            ),
+          ],
         ],
       ),
     );
