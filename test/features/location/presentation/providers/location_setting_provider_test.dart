@@ -131,6 +131,86 @@ void main() {
       verify(() => mockLocationRepository.requestLocationPermission()).called(1);
     });
 
+    test('should reflect permission status — denied means toggle is OFF even if SharedPreferences is true', () async {
+      when(() => mockSettingRepository.isLocationEnabled())
+          .thenAnswer((_) async => true);
+      when(() => mockLocationRepository.checkPermissionStatus())
+          .thenAnswer((_) async => LocationPermissionResult.denied);
+
+      final container = ProviderContainer(
+        overrides: [
+          locationSettingRepositoryProvider
+              .overrideWithValue(mockSettingRepository),
+          locationRepositoryForSettingProvider
+              .overrideWithValue(mockLocationRepository),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(locationSettingNotifierProvider.future);
+      final state =
+          container.read(locationSettingNotifierProvider).requireValue;
+
+      expect(state.isEnabled, isFalse);
+    });
+
+    test('should reflect permission status — deniedForever means toggle is OFF even if SharedPreferences is true', () async {
+      when(() => mockSettingRepository.isLocationEnabled())
+          .thenAnswer((_) async => true);
+      when(() => mockLocationRepository.checkPermissionStatus())
+          .thenAnswer((_) async => LocationPermissionResult.deniedForever);
+
+      final container = ProviderContainer(
+        overrides: [
+          locationSettingRepositoryProvider
+              .overrideWithValue(mockSettingRepository),
+          locationRepositoryForSettingProvider
+              .overrideWithValue(mockLocationRepository),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(locationSettingNotifierProvider.future);
+      final state =
+          container.read(locationSettingNotifierProvider).requireValue;
+
+      expect(state.isEnabled, isFalse);
+    });
+
+    test('toggle ON should set isEnabled=true after permission granted', () async {
+      when(() => mockSettingRepository.isLocationEnabled())
+          .thenAnswer((_) async => false);
+      var checkCallCount = 0;
+      when(() => mockLocationRepository.checkPermissionStatus())
+          .thenAnswer((_) async {
+        checkCallCount++;
+        return checkCallCount == 1
+            ? LocationPermissionResult.denied
+            : LocationPermissionResult.granted;
+      });
+      when(() => mockLocationRepository.requestLocationPermission())
+          .thenAnswer((_) async => const Right(true));
+      when(() => mockSettingRepository.setLocationEnabled(true))
+          .thenAnswer((_) async {});
+
+      final container = ProviderContainer(
+        overrides: [
+          locationSettingRepositoryProvider
+              .overrideWithValue(mockSettingRepository),
+          locationRepositoryForSettingProvider
+              .overrideWithValue(mockLocationRepository),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(locationSettingNotifierProvider.future);
+      await container.read(locationSettingNotifierProvider.notifier).toggle();
+
+      final state =
+          container.read(locationSettingNotifierProvider).requireValue;
+      expect(state.isEnabled, isTrue);
+    });
+
     test(
         'should return deniedForever result when permission is denied forever',
         () async {
