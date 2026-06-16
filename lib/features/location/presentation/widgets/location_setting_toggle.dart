@@ -4,11 +4,37 @@ import 'package:jellomark/features/location/presentation/providers/location_sett
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
-class LocationSettingToggle extends ConsumerWidget {
+class LocationSettingToggle extends ConsumerStatefulWidget {
   const LocationSettingToggle({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LocationSettingToggle> createState() =>
+      _LocationSettingToggleState();
+}
+
+class _LocationSettingToggleState extends ConsumerState<LocationSettingToggle>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(locationSettingNotifierProvider.notifier).refresh();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final settingAsync = ref.watch(locationSettingNotifierProvider);
 
     return settingAsync.when(
