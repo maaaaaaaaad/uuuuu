@@ -64,11 +64,12 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
     final settingRepository = ref.watch(locationSettingRepositoryProvider);
     final locationRepository = ref.watch(locationRepositoryForSettingProvider);
 
-    final isEnabled = await settingRepository.isLocationEnabled();
+    final userIntent = await settingRepository.isLocationEnabled();
     final permissionStatus = await locationRepository.checkPermissionStatus();
 
     return LocationSettingState(
-      isEnabled: isEnabled,
+      isEnabled:
+          userIntent && permissionStatus == LocationPermissionResult.granted,
       permissionStatus: permissionStatus,
     );
   }
@@ -104,7 +105,8 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
           .checkPermissionStatus();
       state = AsyncData(
         currentState.copyWith(
-          isEnabled: true,
+          isEnabled:
+              newPermissionStatus == LocationPermissionResult.granted,
           permissionStatus: newPermissionStatus,
         ),
       );
