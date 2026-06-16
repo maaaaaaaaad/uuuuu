@@ -213,7 +213,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             SizedBox(
               width: double.infinity,
               child: Text(
-                'iOS 설정에서 권한을 허용하면\n주변 매장을 지도로 확인할 수 있어요',
+                '디바이스 설정에서 권한을 허용하면\n주변 매장을 지도로 확인할 수 있어요',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,
