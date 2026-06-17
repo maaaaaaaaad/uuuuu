@@ -145,10 +145,20 @@ class _LocationSettingToggleState extends ConsumerState<LocationSettingToggle>
     if (result == LocationSettingToggleResult.deniedForever ||
         result == LocationSettingToggleResult.denied ||
         result == LocationSettingToggleResult.serviceDisabled) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('디바이스 설정에서 위치 권한을 변경할 수 있어요'),
-          duration: Duration(seconds: 3),
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(
+          content: const Text('디바이스 설정에서 위치 권한을 변경할 수 있어요'),
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: '설정 열기',
+            onPressed: () {
+              ref
+                  .read(locationSettingNotifierProvider.notifier)
+                  .openAppSettings();
+            },
+          ),
         ),
       );
     }
