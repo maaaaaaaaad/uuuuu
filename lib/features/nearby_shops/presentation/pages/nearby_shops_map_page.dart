@@ -34,6 +34,7 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     latitude: 37.4979,
     longitude: 127.0276,
   );
+  bool _fallbackShopsLoaded = false;
 
   static const _smallMarkerSize = Size(28, 28);
   static const _largeMarkerSize = Size(40, 40);
@@ -145,24 +146,35 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     return Scaffold(
       body: locationAsync.when(
         loading: () => _buildLoadingState(),
-        error: (_, _) => Stack(
-          children: [
-            _buildMapWithBottomSheet(_fallbackLocation, state),
-            _buildFallbackBanner(),
-          ],
-        ),
+        error: (_, _) => _buildFallbackView(state),
         data: (location) {
           if (location == null) {
-            return Stack(
-              children: [
-                _buildMapWithBottomSheet(_fallbackLocation, state),
-                _buildFallbackBanner(),
-              ],
-            );
+            return _buildFallbackView(state);
           }
           return _buildMapWithBottomSheet(location, state);
         },
       ),
+    );
+  }
+
+  Widget _buildFallbackView(NearbyShopsMapState state) {
+    if (!_fallbackShopsLoaded) {
+      _fallbackShopsLoaded = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ref
+            .read(nearbyShopsMapProvider.notifier)
+            .loadShops(
+              latitude: _fallbackLocation.latitude,
+              longitude: _fallbackLocation.longitude,
+            );
+      });
+    }
+    return Stack(
+      children: [
+        _buildMapWithBottomSheet(_fallbackLocation, state),
+        _buildFallbackBanner(),
+      ],
     );
   }
 
@@ -189,12 +201,26 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  '기본 위치(강남역) 기준으로 표시 중',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: SemanticColors.text.secondary,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '기본 위치(강남역) 기준 표시 중',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: SemanticColors.text.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '내 위치 사용은 마이 탭 → 위치 토글',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: SemanticColors.text.secondary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               if (widget.onSwitchToHomeTab != null)
