@@ -18,15 +18,12 @@ class LocationRepositoryImpl implements LocationRepository {
       }
 
       final permissionStatus = await dataSource.checkPermissionStatus();
-      if (permissionStatus == LocationPermissionStatus.deniedForever) {
-        return const Left(LocationPermissionDeniedForeverFailure());
-      }
-
       if (permissionStatus != LocationPermissionStatus.granted) {
-        final granted = await dataSource.requestPermission();
-        if (!granted) {
-          return const Left(LocationPermissionDeniedFailure());
-        }
+        return Left(
+          permissionStatus == LocationPermissionStatus.deniedForever
+              ? const LocationPermissionDeniedForeverFailure()
+              : const LocationPermissionDeniedFailure(),
+        );
       }
 
       final position = await dataSource.getCurrentPosition();
