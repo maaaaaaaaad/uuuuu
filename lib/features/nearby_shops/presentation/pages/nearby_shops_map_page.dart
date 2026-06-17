@@ -6,8 +6,8 @@ import 'package:jellomark/features/beautishop/presentation/pages/shop_detail_scr
 import 'package:jellomark/features/beautishop/presentation/widgets/image_thumbnail_grid.dart';
 import 'package:jellomark/features/beautishop/presentation/widgets/shop_info_header.dart';
 import 'package:jellomark/features/external_shop/domain/entities/external_shop.dart';
+import 'package:jellomark/features/location/domain/entities/user_location.dart';
 import 'package:jellomark/features/location/presentation/providers/location_provider.dart';
-import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
 import 'package:jellomark/features/nearby_shops/presentation/providers/nearby_shops_map_provider.dart';
 import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
@@ -29,6 +29,11 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
   NOverlayImage? _externalShopIcon;
   NOverlayImage? _registeredShopIcon;
   NOverlayImage? _userLocationIcon;
+
+  static const _fallbackLocation = UserLocation(
+    latitude: 37.4979,
+    longitude: 127.0276,
+  );
 
   static const _smallMarkerSize = Size(28, 28);
   static const _largeMarkerSize = Size(40, 40);
@@ -140,13 +145,78 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
     return Scaffold(
       body: locationAsync.when(
         loading: () => _buildLoadingState(),
-        error: (error, _) => _buildErrorState('위치를 가져올 수 없습니다'),
+        error: (_, _) => Stack(
+          children: [
+            _buildMapWithBottomSheet(_fallbackLocation, state),
+            _buildFallbackBanner(),
+          ],
+        ),
         data: (location) {
           if (location == null) {
-            return _buildPermissionRequiredState();
+            return Stack(
+              children: [
+                _buildMapWithBottomSheet(_fallbackLocation, state),
+                _buildFallbackBanner(),
+              ],
+            );
           }
           return _buildMapWithBottomSheet(location, state);
         },
+      ),
+    );
+  }
+
+  Widget _buildFallbackBanner() {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 12,
+      left: 16,
+      right: 16,
+      child: Material(
+        elevation: 4,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 18,
+                color: SemanticColors.icon.accent,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '기본 위치(강남역) 기준으로 표시 중',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: SemanticColors.text.secondary,
+                  ),
+                ),
+              ),
+              if (widget.onSwitchToHomeTab != null)
+                TextButton(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  onPressed: widget.onSwitchToHomeTab,
+                  child: Text(
+                    '홈으로',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: SemanticColors.text.secondary,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -163,92 +233,6 @@ class _NearbyShopsMapPageState extends ConsumerState<NearbyShopsMapPage> {
             style: TextStyle(color: SemanticColors.text.secondary),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(String message) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.location_off,
-            size: 64,
-            color: SemanticColors.icon.disabled,
-          ),
-          const SizedBox(height: 16),
-          Text(message, style: TextStyle(color: SemanticColors.text.secondary)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPermissionRequiredState() {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(32, 0, 32, 70),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.location_off,
-              size: 64,
-              color: SemanticColors.icon.disabled,
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: Text(
-                '주변 매장을 보려면 위치 권한이 필요해요',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: SemanticColors.text.primary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: Text(
-                '디바이스 설정에서 권한을 허용하면\n주변 매장을 지도로 확인할 수 있어요',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: SemanticColors.text.secondary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            OutlinedButton(
-              onPressed: () => ref
-                  .read(locationSettingNotifierProvider.notifier)
-                  .openAppSettings(),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text('설정으로 이동'),
-            ),
-            if (widget.onSwitchToHomeTab != null) ...[
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: widget.onSwitchToHomeTab,
-                child: Text(
-                  '홈으로 돌아가기',
-                  style: TextStyle(color: SemanticColors.text.secondary),
-                ),
-              ),
-            ],
-          ],
-        ),
       ),
     );
   }
