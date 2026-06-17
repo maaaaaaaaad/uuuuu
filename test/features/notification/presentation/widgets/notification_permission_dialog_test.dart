@@ -33,26 +33,23 @@ void main() {
     testWidgets('should display permission message', (tester) async {
       await showDialogInTest(tester);
 
-      expect(
-        find.text('예약 알림을 받으려면 알림 권한이 필요해요'),
-        findsOneWidget,
-      );
+      expect(find.text('예약 알림을 받아보세요'), findsOneWidget);
     });
 
-    testWidgets('should display cancel and confirm buttons', (tester) async {
+    testWidgets('should display close and settings buttons', (tester) async {
       await showDialogInTest(tester);
 
-      expect(find.text('취소'), findsOneWidget);
-      expect(find.text('확인'), findsOneWidget);
+      expect(find.text('닫기'), findsOneWidget);
+      expect(find.text('설정으로 이동'), findsOneWidget);
     });
 
-    testWidgets('cancel button should close dialog', (tester) async {
+    testWidgets('close button should dismiss dialog', (tester) async {
       await showDialogInTest(tester);
 
-      await tester.tap(find.text('취소'));
+      await tester.tap(find.text('닫기'));
       await tester.pumpAndSettle();
 
-      expect(find.text('예약 알림을 받으려면 알림 권한이 필요해요'), findsNothing);
+      expect(find.text('예약 알림을 받아보세요'), findsNothing);
     });
 
     testWidgets('icon has pastel pink color', (tester) async {
