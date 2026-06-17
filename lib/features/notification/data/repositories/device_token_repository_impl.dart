@@ -8,12 +8,15 @@ import 'package:jellomark/features/notification/domain/repositories/device_token
 class DeviceTokenRepositoryImpl implements DeviceTokenRepository {
   final DeviceTokenRemoteDataSource _remoteDataSource;
 
-  DeviceTokenRepositoryImpl({required DeviceTokenRemoteDataSource remoteDataSource})
-      : _remoteDataSource = remoteDataSource;
+  DeviceTokenRepositoryImpl({
+    required DeviceTokenRemoteDataSource remoteDataSource,
+  }) : _remoteDataSource = remoteDataSource;
 
   @override
   Future<Either<Failure, void>> registerToken(
-      String token, String platform) async {
+    String token,
+    String platform,
+  ) async {
     try {
       await _remoteDataSource.registerToken(token, platform);
       return const Right(null);
