@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jellomark/features/location/domain/repositories/location_repository.dart';
 import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
-import 'package:jellomark/shared/widgets/app_bottom_sheet.dart';
 
 class LocationSettingToggle extends ConsumerStatefulWidget {
   const LocationSettingToggle({super.key});
@@ -127,52 +127,17 @@ class _LocationSettingToggleState extends ConsumerState<LocationSettingToggle>
   }
 
   String _getStatusText(LocationSettingState state) {
-    if (!state.isEnabled) {
-      return '현재 위치 기능을 사용하지 않습니다';
+    if (state.isEnabled) {
+      return '주변 뷰티샵 검색에 활용됩니다';
     }
-    return '주변 뷰티샵 검색에 활용됩니다';
+    if (state.permissionStatus == LocationPermissionResult.deniedForever ||
+        state.permissionStatus == LocationPermissionResult.denied) {
+      return '디바이스 설정에서 위치 권한을 변경할 수 있어요';
+    }
+    return '현재 위치 기능을 사용하지 않습니다';
   }
 
   Future<void> _handleToggle(BuildContext context, WidgetRef ref) async {
-    final result = await ref
-        .read(locationSettingNotifierProvider.notifier)
-        .toggle();
-
-    if (!context.mounted) return;
-
-    if (result == LocationSettingToggleResult.deniedForever) {
-      _showSettingsDialog(context, ref);
-    }
-  }
-
-  void _showSettingsDialog(BuildContext context, WidgetRef ref) {
-    showAppDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('위치 권한 필요'),
-        content: const Text('위치 정보를 사용하려면 설정에서 위치 권한을 허용해주세요.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              '취소',
-              style: TextStyle(color: SemanticColors.text.secondary),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await ref
-                  .read(locationSettingNotifierProvider.notifier)
-                  .openAppSettings();
-            },
-            child: Text(
-              '설정으로 이동',
-              style: TextStyle(color: SemanticColors.button.textButtonPink),
-            ),
-          ),
-        ],
-      ),
-    );
+    await ref.read(locationSettingNotifierProvider.notifier).toggle();
   }
 }
