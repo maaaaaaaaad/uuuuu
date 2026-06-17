@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/beautishop/domain/entities/service_menu.dart';
+import 'package:jellomark/features/notification/presentation/helpers/notification_permission_helper.dart';
 import 'package:jellomark/features/reservation/domain/entities/create_reservation_params.dart';
 import 'package:jellomark/features/reservation/presentation/providers/available_slots_provider.dart';
 import 'package:jellomark/features/reservation/presentation/providers/reservation_provider.dart';
@@ -26,8 +27,7 @@ class CreateReservationPage extends ConsumerStatefulWidget {
       _CreateReservationPageState();
 }
 
-class _CreateReservationPageState
-    extends ConsumerState<CreateReservationPage> {
+class _CreateReservationPageState extends ConsumerState<CreateReservationPage> {
   static const int _memoMaxLength = 200;
 
   ServiceMenu? _selectedTreatment;
@@ -82,7 +82,9 @@ class _CreateReservationPageState
     ref.read(availableSlotsNotifierProvider.notifier).reset();
 
     if (treatment != null) {
-      ref.read(availableDatesNotifierProvider.notifier).loadDates(
+      ref
+          .read(availableDatesNotifierProvider.notifier)
+          .loadDates(
             widget.shopId,
             treatment.id,
             _formatYearMonth(_displayedMonth),
@@ -102,7 +104,9 @@ class _CreateReservationPageState
     ref.read(availableSlotsNotifierProvider.notifier).reset();
 
     if (_selectedTreatment != null) {
-      ref.read(availableDatesNotifierProvider.notifier).loadDates(
+      ref
+          .read(availableDatesNotifierProvider.notifier)
+          .loadDates(
             widget.shopId,
             _selectedTreatment!.id,
             _formatYearMonth(month),
@@ -117,16 +121,22 @@ class _CreateReservationPageState
     });
 
     if (_selectedTreatment != null) {
-      ref.read(availableSlotsNotifierProvider.notifier).loadSlots(
-            widget.shopId,
-            _selectedTreatment!.id,
-            date,
-          );
+      ref
+          .read(availableSlotsNotifierProvider.notifier)
+          .loadSlots(widget.shopId, _selectedTreatment!.id, date);
     }
   }
 
   void _onTimeSelected(String time) {
     setState(() => _selectedTime = time);
+  }
+
+  Future<void> _handleReservationSuccess() async {
+    await promptForNotificationIfNeeded(context);
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const MyReservationsPage()),
+    );
   }
 
   Future<void> _submit() async {
@@ -152,21 +162,19 @@ class _CreateReservationPageState
     final datesState = ref.watch(availableDatesNotifierProvider);
     final slotsState = ref.watch(availableSlotsNotifierProvider);
 
-    ref.listen<CreateReservationState>(
-      createReservationNotifierProvider,
-      (previous, next) {
-        if (next.isSuccess) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const MyReservationsPage()),
-          );
-        }
-        if (next.error != null && previous?.error != next.error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(next.error!)),
-          );
-        }
-      },
-    );
+    ref.listen<CreateReservationState>(createReservationNotifierProvider, (
+      previous,
+      next,
+    ) {
+      if (next.isSuccess && previous?.isSuccess != true) {
+        _handleReservationSuccess();
+      }
+      if (next.error != null && previous?.error != next.error) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.error!)));
+      }
+    });
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -189,41 +197,41 @@ class _CreateReservationPageState
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTreatmentDropdown(),
-                  const SizedBox(height: 24),
-                  _buildSectionLabel('날짜 선택'),
-                  const SizedBox(height: 8),
-                  if (_selectedTreatment == null)
-                    _buildGuidanceText('시술을 먼저 선택해주세요')
-                  else
-                    _buildCalendarSection(datesState),
-                  const SizedBox(height: 24),
-                  _buildSectionLabel('시간 선택'),
-                  const SizedBox(height: 8),
-                  if (_selectedDate == null)
-                    _buildGuidanceText('날짜를 먼저 선택해주세요')
-                  else ...[
-                    TimeSlotGrid(
-                      slots: slotsState.slots,
-                      selectedTime: _selectedTime,
-                      onTimeSelected: _onTimeSelected,
-                      isLoading: slotsState.isLoading,
-                    ),
-                    if (slotsState.error != null)
-                      _buildErrorMessage(slotsState.error!),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTreatmentDropdown(),
+                    const SizedBox(height: 24),
+                    _buildSectionLabel('날짜 선택'),
+                    const SizedBox(height: 8),
+                    if (_selectedTreatment == null)
+                      _buildGuidanceText('시술을 먼저 선택해주세요')
+                    else
+                      _buildCalendarSection(datesState),
+                    const SizedBox(height: 24),
+                    _buildSectionLabel('시간 선택'),
+                    const SizedBox(height: 8),
+                    if (_selectedDate == null)
+                      _buildGuidanceText('날짜를 먼저 선택해주세요')
+                    else ...[
+                      TimeSlotGrid(
+                        slots: slotsState.slots,
+                        selectedTime: _selectedTime,
+                        onTimeSelected: _onTimeSelected,
+                        isLoading: slotsState.isLoading,
+                      ),
+                      if (slotsState.error != null)
+                        _buildErrorMessage(slotsState.error!),
+                    ],
+                    const SizedBox(height: 24),
+                    _buildMemoField(),
+                    const SizedBox(height: 32),
+                    _buildSubmitButton(createState),
                   ],
-                  const SizedBox(height: 24),
-                  _buildMemoField(),
-                  const SizedBox(height: 32),
-                  _buildSubmitButton(createState),
-                ],
+                ),
               ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -292,9 +300,10 @@ class _CreateReservationPageState
             onMonthChanged: _onMonthChanged,
             isLoading: datesState.isLoading,
           ),
-          if (datesState.error != null)
-            _buildErrorMessage(datesState.error!),
-          if (!datesState.isLoading && datesState.dates.isEmpty && _selectedTreatment != null)
+          if (datesState.error != null) _buildErrorMessage(datesState.error!),
+          if (!datesState.isLoading &&
+              datesState.dates.isEmpty &&
+              _selectedTreatment != null)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
@@ -314,10 +323,7 @@ class _CreateReservationPageState
     return Center(
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 14,
-          color: SemanticColors.text.secondary,
-        ),
+        style: TextStyle(fontSize: 14, color: SemanticColors.text.secondary),
       ),
     );
   }
@@ -327,10 +333,7 @@ class _CreateReservationPageState
       padding: const EdgeInsets.only(top: 8),
       child: Text(
         message,
-        style: TextStyle(
-          fontSize: 13,
-          color: SemanticColors.state.error,
-        ),
+        style: TextStyle(fontSize: 13, color: SemanticColors.state.error),
       ),
     );
   }
