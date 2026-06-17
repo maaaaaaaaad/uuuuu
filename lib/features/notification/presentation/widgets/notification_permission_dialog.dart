@@ -8,7 +8,6 @@ class NotificationPermissionDialog {
   static Future<void> show({required BuildContext context}) {
     return showAppDialog<void>(
       context: context,
-      barrierDismissible: false,
       barrierColor: SemanticColors.overlay.dialogBarrier,
       builder: (context) => const _NotificationPermissionContent(),
     );
@@ -67,15 +66,29 @@ class _NotificationPermissionContent extends StatelessWidget {
   }
 
   Widget _buildMessage() {
-    return Text(
-      '예약 알림을 받으려면 알림 권한이 필요해요',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.w500,
-        color: SemanticColors.text.primary,
-        height: 1.5,
-      ),
+    return Column(
+      children: [
+        Text(
+          '예약 알림을 받아보세요',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: SemanticColors.text.primary,
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '디바이스 설정에서 알림을 허용하면\n예약 확정·임박 안내를 받을 수 있어요',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 13,
+            color: SemanticColors.text.secondary,
+            height: 1.5,
+          ),
+        ),
+      ],
     );
   }
 
@@ -95,7 +108,7 @@ class _NotificationPermissionContent extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                '취소',
+                '닫기',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ),
@@ -120,7 +133,7 @@ class _NotificationPermissionContent extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                '확인',
+                '설정으로 이동',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ),
