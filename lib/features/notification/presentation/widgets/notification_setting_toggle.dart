@@ -138,6 +138,18 @@ class _NotificationSettingToggleState
   }
 
   Future<void> _handleToggle(BuildContext context, WidgetRef ref) async {
-    await ref.read(notificationSettingNotifierProvider.notifier).toggle();
+    final result = await ref
+        .read(notificationSettingNotifierProvider.notifier)
+        .toggle();
+    if (!context.mounted) return;
+    if (result == NotificationToggleResult.deniedForever ||
+        result == NotificationToggleResult.denied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('디바이스 설정에서 알림 권한을 변경할 수 있어요'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
   }
 }
