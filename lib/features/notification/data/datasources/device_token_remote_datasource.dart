@@ -9,7 +9,7 @@ class DeviceTokenRemoteDataSourceImpl implements DeviceTokenRemoteDataSource {
   final ApiClient _apiClient;
 
   DeviceTokenRemoteDataSourceImpl({required ApiClient apiClient})
-      : _apiClient = apiClient;
+    : _apiClient = apiClient;
 
   @override
   Future<void> registerToken(String token, String platform) async {
