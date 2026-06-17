@@ -19,7 +19,7 @@ class FcmService {
        _notificationHandler = notificationHandler;
 
   Future<void> initialize() async {
-    final settings = await _messaging.requestPermission();
+    final settings = await _messaging.getNotificationSettings();
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional) {
