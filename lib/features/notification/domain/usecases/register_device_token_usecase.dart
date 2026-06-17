@@ -6,7 +6,7 @@ class RegisterDeviceTokenUseCase {
   final DeviceTokenRepository _repository;
 
   RegisterDeviceTokenUseCase({required DeviceTokenRepository repository})
-      : _repository = repository;
+    : _repository = repository;
 
   Future<Either<Failure, void>> call(String token, String platform) {
     return _repository.registerToken(token, platform);
