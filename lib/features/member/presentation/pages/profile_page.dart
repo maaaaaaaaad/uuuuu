@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/providers/auth_providers.dart';
 import 'package:jellomark/features/location/presentation/widgets/location_setting_toggle.dart';
+import 'package:jellomark/features/notification/presentation/widgets/notification_setting_toggle.dart';
 import 'package:jellomark/features/legal/data/legal_texts.dart';
 import 'package:jellomark/features/legal/presentation/pages/legal_text_page.dart';
 import 'package:jellomark/features/member/presentation/pages/withdrawal_page.dart';
@@ -28,15 +29,9 @@ class ProfilePage extends ConsumerWidget {
       leading: Icon(icon, color: SemanticColors.icon.primary),
       title: Text(
         title,
-        style: TextStyle(
-          fontSize: 16,
-          color: SemanticColors.text.primary,
-        ),
+        style: TextStyle(fontSize: 16, color: SemanticColors.text.primary),
       ),
-      trailing: Icon(
-        Icons.chevron_right,
-        color: SemanticColors.icon.secondary,
-      ),
+      trailing: Icon(Icons.chevron_right, color: SemanticColors.icon.secondary),
       onTap: onTap,
     );
   }
@@ -51,10 +46,7 @@ class ProfilePage extends ConsumerWidget {
       leading: Icon(icon, color: SemanticColors.icon.primary),
       title: Text(
         title,
-        style: TextStyle(
-          fontSize: 16,
-          color: SemanticColors.text.primary,
-        ),
+        style: TextStyle(fontSize: 16, color: SemanticColors.text.primary),
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -220,10 +212,7 @@ class ProfilePage extends ConsumerWidget {
                             );
                           },
                         ),
-                        Divider(
-                          height: 1,
-                          color: SemanticColors.border.glass,
-                        ),
+                        Divider(height: 1, color: SemanticColors.border.glass),
                         _buildMenuItem(
                           icon: Icons.rate_review_outlined,
                           title: '내가 쓴 리뷰',
@@ -235,10 +224,7 @@ class ProfilePage extends ConsumerWidget {
                             );
                           },
                         ),
-                        Divider(
-                          height: 1,
-                          color: SemanticColors.border.glass,
-                        ),
+                        Divider(height: 1, color: SemanticColors.border.glass),
                         _buildMenuItemWithBadge(
                           icon: Icons.pending_actions_outlined,
                           title: '리뷰 작성 대기',
@@ -251,10 +237,7 @@ class ProfilePage extends ConsumerWidget {
                             );
                           },
                         ),
-                        Divider(
-                          height: 1,
-                          color: SemanticColors.border.glass,
-                        ),
+                        Divider(height: 1, color: SemanticColors.border.glass),
                         _buildMenuItem(
                           icon: Icons.receipt_long_outlined,
                           title: '이용기록',
@@ -266,10 +249,7 @@ class ProfilePage extends ConsumerWidget {
                             );
                           },
                         ),
-                        Divider(
-                          height: 1,
-                          color: SemanticColors.border.glass,
-                        ),
+                        Divider(height: 1, color: SemanticColors.border.glass),
                         _buildMenuItem(
                           icon: Icons.history,
                           title: '최근 본 샵',
@@ -281,13 +261,21 @@ class ProfilePage extends ConsumerWidget {
                             );
                           },
                         ),
-                        Divider(
-                          height: 1,
-                          color: SemanticColors.border.glass,
-                        ),
+                        Divider(height: 1, color: SemanticColors.border.glass),
                         const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           child: LocationSettingToggle(),
+                        ),
+                        Divider(height: 1, color: SemanticColors.border.glass),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: NotificationSettingToggle(),
                         ),
                       ],
                     ),
@@ -329,10 +317,7 @@ class ProfilePage extends ConsumerWidget {
                             );
                           },
                         ),
-                        Divider(
-                          height: 1,
-                          color: SemanticColors.border.glass,
-                        ),
+                        Divider(height: 1, color: SemanticColors.border.glass),
                         _buildMenuItem(
                           icon: Icons.privacy_tip_outlined,
                           title: '개인정보처리방침',
@@ -347,10 +332,7 @@ class ProfilePage extends ConsumerWidget {
                             );
                           },
                         ),
-                        Divider(
-                          height: 1,
-                          color: SemanticColors.border.glass,
-                        ),
+                        Divider(height: 1, color: SemanticColors.border.glass),
                         _buildMenuItem(
                           icon: Icons.location_on_outlined,
                           title: '위치정보 이용약관',
@@ -375,7 +357,9 @@ class ProfilePage extends ConsumerWidget {
                       onPressed: () => _handleLogout(context, ref),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: SemanticColors.button.outlineText,
-                        side: BorderSide(color: SemanticColors.button.outlineBorder),
+                        side: BorderSide(
+                          color: SemanticColors.button.outlineBorder,
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
