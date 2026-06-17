@@ -214,7 +214,9 @@ class MyReviewsState {
       hasMore: hasMore ?? this.hasMore,
       page: page ?? this.page,
       error: error,
-      loadMoreError: clearLoadMoreError ? null : (loadMoreError ?? this.loadMoreError),
+      loadMoreError: clearLoadMoreError
+          ? null
+          : (loadMoreError ?? this.loadMoreError),
     );
   }
 }
@@ -317,5 +319,5 @@ class MyReviewsNotifier extends StateNotifier<MyReviewsState> {
 
 final myReviewsNotifierProvider =
     StateNotifierProvider.autoDispose<MyReviewsNotifier, MyReviewsState>(
-  (ref) => MyReviewsNotifier(ref),
-);
+      (ref) => MyReviewsNotifier(ref),
+    );

@@ -28,7 +28,10 @@ class MemberProfileWidget extends StatelessWidget {
             ),
             Text(
               '${member.socialProvider}로 로그인',
-              style: TextStyle(fontSize: 14, color: SemanticColors.text.secondary),
+              style: TextStyle(
+                fontSize: 14,
+                color: SemanticColors.text.secondary,
+              ),
             ),
           ],
         ),

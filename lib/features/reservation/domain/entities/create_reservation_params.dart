@@ -16,5 +16,11 @@ class CreateReservationParams extends Equatable {
   });
 
   @override
-  List<Object?> get props => [shopId, treatmentId, reservationDate, startTime, memo];
+  List<Object?> get props => [
+    shopId,
+    treatmentId,
+    reservationDate,
+    startTime,
+    memo,
+  ];
 }

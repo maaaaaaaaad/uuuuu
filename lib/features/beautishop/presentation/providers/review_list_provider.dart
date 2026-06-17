@@ -158,23 +158,17 @@ class ReviewListNotifier extends StateNotifier<ReviewListState> {
     await loadReviews();
   }
 
-  Future<bool> createReview({
-    int? rating,
-    String? content,
-  }) async {
+  Future<bool> createReview({int? rating, String? content}) async {
     final result = await _createReviewUseCase(
       shopId: shopId,
       rating: rating,
       content: content,
     );
 
-    return result.fold(
-      (failure) => false,
-      (review) {
-        refresh();
-        return true;
-      },
-    );
+    return result.fold((failure) => false, (review) {
+      refresh();
+      return true;
+    });
   }
 }
 

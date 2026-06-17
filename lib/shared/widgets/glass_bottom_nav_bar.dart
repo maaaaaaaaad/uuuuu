@@ -46,7 +46,9 @@ class GlassBottomNavBar extends StatelessWidget {
     final hasFloating = floatingIndex != null;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    final floatingButtonTop = hasFloating ? (_floatingButtonSize / 2) - _buttonTopOffset : 0.0;
+    final floatingButtonTop = hasFloating
+        ? (_floatingButtonSize / 2) - _buttonTopOffset
+        : 0.0;
 
     return SizedBox(
       height: _barHeight + bottomPadding + floatingButtonTop,
@@ -172,18 +174,15 @@ class GlassBottomNavBar extends StatelessWidget {
             gradient: isSelected ? selectedGradient : defaultGradient,
             boxShadow: [
               BoxShadow(
-                color: (isSelected ? AppColors.lavenderDark : AppColors.accentPink)
-                    .withValues(alpha: 0.4),
+                color:
+                    (isSelected ? AppColors.lavenderDark : AppColors.accentPink)
+                        .withValues(alpha: 0.4),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Icon(
-            icon,
-            color: SemanticColors.text.onDark,
-            size: 28,
-          ),
+          child: Icon(icon, color: SemanticColors.text.onDark, size: 28),
         ),
       ),
     );
@@ -234,12 +233,7 @@ class _NotchedNavBarClipper extends CustomClipper<Path> {
       clockwise: false,
     );
 
-    path.quadraticBezierTo(
-      notchEndX - 12,
-      0,
-      notchEndX,
-      0,
-    );
+    path.quadraticBezierTo(notchEndX - 12, 0, notchEndX, 0);
 
     path.lineTo(size.width - cornerRadius, 0);
     path.quadraticBezierTo(size.width, 0, size.width, cornerRadius);

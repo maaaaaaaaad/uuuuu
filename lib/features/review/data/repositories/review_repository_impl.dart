@@ -106,10 +106,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
     required String reviewId,
   }) async {
     try {
-      await remoteDataSource.deleteReview(
-        shopId: shopId,
-        reviewId: reviewId,
-      );
+      await remoteDataSource.deleteReview(shopId: shopId, reviewId: reviewId);
       return const Right(null);
     } on DioException catch (e) {
       return Left(

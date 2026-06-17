@@ -92,13 +92,8 @@ class _EditReviewBottomSheetState extends State<EditReviewBottomSheet> {
       child: Container(
         decoration: BoxDecoration(
           color: SemanticColors.background.bottomSheet,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(30),
-          ),
-          border: Border.all(
-            color: SemanticColors.border.glass,
-            width: 1.5,
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          border: Border.all(color: SemanticColors.border.glass, width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),

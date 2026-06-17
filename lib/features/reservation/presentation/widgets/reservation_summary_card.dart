@@ -40,15 +40,25 @@ class ReservationSummaryCard extends StatelessWidget {
           const SizedBox(height: 12),
           _buildRow(Icons.content_cut, '시술', treatmentName),
           const SizedBox(height: 8),
-          _buildRow(Icons.monetization_on_outlined, '가격',
-              '${_formatPrice(treatmentPrice)}원'),
+          _buildRow(
+            Icons.monetization_on_outlined,
+            '가격',
+            '${_formatPrice(treatmentPrice)}원',
+          ),
           if (durationMinutes != null) ...[
             const SizedBox(height: 8),
             _buildRow(
-                Icons.timer_outlined, '소요시간', _formatDuration(durationMinutes!)),
+              Icons.timer_outlined,
+              '소요시간',
+              _formatDuration(durationMinutes!),
+            ),
           ],
           const SizedBox(height: 8),
-          _buildRow(Icons.calendar_today_outlined, '날짜', _formatDisplayDate(date)),
+          _buildRow(
+            Icons.calendar_today_outlined,
+            '날짜',
+            _formatDisplayDate(date),
+          ),
           const SizedBox(height: 8),
           _buildRow(Icons.access_time, '시간', time),
         ],
@@ -63,10 +73,7 @@ class ReservationSummaryCard extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13,
-            color: SemanticColors.text.secondary,
-          ),
+          style: TextStyle(fontSize: 13, color: SemanticColors.text.secondary),
         ),
         const Spacer(),
         Text(

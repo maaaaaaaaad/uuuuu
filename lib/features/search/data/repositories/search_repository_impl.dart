@@ -8,7 +8,7 @@ class SearchRepositoryImpl implements SearchRepository {
   final SearchLocalDataSource _localDataSource;
 
   SearchRepositoryImpl({required SearchLocalDataSource localDataSource})
-      : _localDataSource = localDataSource;
+    : _localDataSource = localDataSource;
 
   @override
   Future<Either<Failure, void>> saveSearchHistory(String keyword) async {

@@ -42,10 +42,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final LoginWithKakaoUseCase _loginWithKakaoUseCase;
   final LoginWithAppleUseCase _loginWithAppleUseCase;
 
-  AuthNotifier(
-    this._loginWithKakaoUseCase,
-    this._loginWithAppleUseCase,
-  ) : super(const AuthState());
+  AuthNotifier(this._loginWithKakaoUseCase, this._loginWithAppleUseCase)
+    : super(const AuthState());
 
   Future<bool> loginWithKakao() async {
     state = state.copyWith(status: AuthStatus.loading);

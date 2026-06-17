@@ -50,8 +50,15 @@ class FavoritesState extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [items, isLoading, error, hasMore, page, isLoadingMore, userLocation];
+  List<Object?> get props => [
+    items,
+    isLoading,
+    error,
+    hasMore,
+    page,
+    isLoadingMore,
+    userLocation,
+  ];
 }
 
 class FavoritesNotifier extends StateNotifier<FavoritesState> {
@@ -65,11 +72,11 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     required AddFavoriteUseCase addFavoriteUseCase,
     required RemoveFavoriteUseCase removeFavoriteUseCase,
     required Future<UserLocation?> Function() getCurrentLocation,
-  })  : _getFavoritesUseCase = getFavoritesUseCase,
-        _addFavoriteUseCase = addFavoriteUseCase,
-        _removeFavoriteUseCase = removeFavoriteUseCase,
-        _getCurrentLocation = getCurrentLocation,
-        super(const FavoritesState());
+  }) : _getFavoritesUseCase = getFavoritesUseCase,
+       _addFavoriteUseCase = addFavoriteUseCase,
+       _removeFavoriteUseCase = removeFavoriteUseCase,
+       _getCurrentLocation = getCurrentLocation,
+       super(const FavoritesState());
 
   Future<void> loadFavorites() async {
     state = state.copyWith(isLoading: true, error: null, page: 0, items: []);
@@ -77,13 +84,18 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     final userLocation = await _getCurrentLocation();
     state = state.copyWith(userLocation: userLocation);
 
-    final result = await _getFavoritesUseCase(const GetFavoritesParams(page: 0));
+    final result = await _getFavoritesUseCase(
+      const GetFavoritesParams(page: 0),
+    );
     result.fold(
       (failure) {
         state = state.copyWith(isLoading: false, error: failure.message);
       },
       (pagedFavorites) {
-        final itemsWithDistance = _addDistanceToFavorites(pagedFavorites.items, userLocation);
+        final itemsWithDistance = _addDistanceToFavorites(
+          pagedFavorites.items,
+          userLocation,
+        );
         state = state.copyWith(
           isLoading: false,
           items: itemsWithDistance,
@@ -99,13 +111,18 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
     state = state.copyWith(isLoadingMore: true);
 
     final nextPage = state.page + 1;
-    final result = await _getFavoritesUseCase(GetFavoritesParams(page: nextPage));
+    final result = await _getFavoritesUseCase(
+      GetFavoritesParams(page: nextPage),
+    );
     result.fold(
       (failure) {
         state = state.copyWith(isLoadingMore: false, error: failure.message);
       },
       (pagedFavorites) {
-        final itemsWithDistance = _addDistanceToFavorites(pagedFavorites.items, state.userLocation);
+        final itemsWithDistance = _addDistanceToFavorites(
+          pagedFavorites.items,
+          state.userLocation,
+        );
         state = state.copyWith(
           isLoadingMore: false,
           items: [...state.items, ...itemsWithDistance],
@@ -118,25 +135,22 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
 
   Future<void> addFavorite(String shopId) async {
     final result = await _addFavoriteUseCase(shopId);
-    result.fold(
-      (failure) {},
-      (favorite) {
-        final favoriteWithDistance = _addDistanceToFavorite(favorite, state.userLocation);
-        state = state.copyWith(items: [favoriteWithDistance, ...state.items]);
-      },
-    );
+    result.fold((failure) {}, (favorite) {
+      final favoriteWithDistance = _addDistanceToFavorite(
+        favorite,
+        state.userLocation,
+      );
+      state = state.copyWith(items: [favoriteWithDistance, ...state.items]);
+    });
   }
 
   Future<void> removeFavorite(String shopId) async {
     final result = await _removeFavoriteUseCase(shopId);
-    result.fold(
-      (failure) {},
-      (_) {
-        state = state.copyWith(
-          items: state.items.where((item) => item.shopId != shopId).toList(),
-        );
-      },
-    );
+    result.fold((failure) {}, (_) {
+      state = state.copyWith(
+        items: state.items.where((item) => item.shopId != shopId).toList(),
+      );
+    });
   }
 
   List<FavoriteShop> _addDistanceToFavorites(
@@ -147,7 +161,9 @@ class FavoritesNotifier extends StateNotifier<FavoritesState> {
       return favorites;
     }
 
-    return favorites.map((favorite) => _addDistanceToFavorite(favorite, userLocation)).toList();
+    return favorites
+        .map((favorite) => _addDistanceToFavorite(favorite, userLocation))
+        .toList();
   }
 
   FavoriteShop _addDistanceToFavorite(
@@ -192,16 +208,18 @@ final checkFavoriteUseCaseProvider = Provider<CheckFavoriteUseCase>(
 
 final favoritesNotifierProvider =
     StateNotifierProvider<FavoritesNotifier, FavoritesState>((ref) {
-  return FavoritesNotifier(
-    getFavoritesUseCase: ref.watch(getFavoritesUseCaseProvider),
-    addFavoriteUseCase: ref.watch(addFavoriteUseCaseProvider),
-    removeFavoriteUseCase: ref.watch(removeFavoriteUseCaseProvider),
-    getCurrentLocation: () => ref.read(currentLocationProvider.future),
-  );
-});
+      return FavoritesNotifier(
+        getFavoritesUseCase: ref.watch(getFavoritesUseCaseProvider),
+        addFavoriteUseCase: ref.watch(addFavoriteUseCaseProvider),
+        removeFavoriteUseCase: ref.watch(removeFavoriteUseCaseProvider),
+        getCurrentLocation: () => ref.read(currentLocationProvider.future),
+      );
+    });
 
-final favoriteStatusProvider =
-    FutureProvider.family<bool, String>((ref, shopId) async {
+final favoriteStatusProvider = FutureProvider.family<bool, String>((
+  ref,
+  shopId,
+) async {
   final checkUseCase = ref.watch(checkFavoriteUseCaseProvider);
   final result = await checkUseCase(shopId);
   return result.fold((failure) => false, (isFavorite) => isFavorite);

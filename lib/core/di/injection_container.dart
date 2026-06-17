@@ -256,7 +256,9 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<FavoriteRepository>(
-    () => FavoriteRepositoryImpl(remoteDataSource: sl<FavoriteRemoteDataSource>()),
+    () => FavoriteRepositoryImpl(
+      remoteDataSource: sl<FavoriteRemoteDataSource>(),
+    ),
   );
 
   sl.registerLazySingleton<AddFavoriteUseCase>(
@@ -280,7 +282,9 @@ Future<void> initDependencies() async {
   );
 
   sl.registerLazySingleton<RecentShopsRepository>(
-    () => RecentShopsRepositoryImpl(localDataSource: sl<RecentShopsLocalDataSource>()),
+    () => RecentShopsRepositoryImpl(
+      localDataSource: sl<RecentShopsLocalDataSource>(),
+    ),
   );
 
   sl.registerLazySingleton<AddRecentShopUseCase>(
@@ -331,7 +335,8 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<GetPendingReviewReservationsUseCase>(
     () => GetPendingReviewReservationsUseCase(
-        repository: sl<ReservationRepository>()),
+      repository: sl<ReservationRepository>(),
+    ),
   );
 
   sl.registerLazySingleton<UsageHistoryRemoteDataSource>(

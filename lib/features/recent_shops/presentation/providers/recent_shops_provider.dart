@@ -51,11 +51,11 @@ class RecentShopsNotifier extends StateNotifier<RecentShopsState> {
     required AddRecentShopUseCase addRecentShopUseCase,
     required ClearRecentShopsUseCase clearRecentShopsUseCase,
     required Future<UserLocation?> Function() getCurrentLocation,
-  })  : _getRecentShopsUseCase = getRecentShopsUseCase,
-        _addRecentShopUseCase = addRecentShopUseCase,
-        _clearRecentShopsUseCase = clearRecentShopsUseCase,
-        _getCurrentLocation = getCurrentLocation,
-        super(const RecentShopsState());
+  }) : _getRecentShopsUseCase = getRecentShopsUseCase,
+       _addRecentShopUseCase = addRecentShopUseCase,
+       _clearRecentShopsUseCase = clearRecentShopsUseCase,
+       _getCurrentLocation = getCurrentLocation,
+       super(const RecentShopsState());
 
   Future<void> loadRecentShops() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -131,10 +131,10 @@ final clearRecentShopsUseCaseProvider = Provider<ClearRecentShopsUseCase>(
 
 final recentShopsNotifierProvider =
     StateNotifierProvider<RecentShopsNotifier, RecentShopsState>((ref) {
-  return RecentShopsNotifier(
-    getRecentShopsUseCase: ref.watch(getRecentShopsUseCaseProvider),
-    addRecentShopUseCase: ref.watch(addRecentShopUseCaseProvider),
-    clearRecentShopsUseCase: ref.watch(clearRecentShopsUseCaseProvider),
-    getCurrentLocation: () => ref.read(currentLocationProvider.future),
-  );
-});
+      return RecentShopsNotifier(
+        getRecentShopsUseCase: ref.watch(getRecentShopsUseCaseProvider),
+        addRecentShopUseCase: ref.watch(addRecentShopUseCaseProvider),
+        clearRecentShopsUseCase: ref.watch(clearRecentShopsUseCaseProvider),
+        getCurrentLocation: () => ref.read(currentLocationProvider.future),
+      );
+    });

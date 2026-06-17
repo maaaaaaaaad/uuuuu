@@ -33,10 +33,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
       decoration: BoxDecoration(
         color: SemanticColors.background.appBar,
         border: Border(
-          bottom: BorderSide(
-            color: SemanticColors.border.glass,
-            width: 1,
-          ),
+          bottom: BorderSide(color: SemanticColors.border.glass, width: 1),
         ),
       ),
       child: _buildContent(context),
@@ -77,10 +74,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Center(
       child: Text(
         title!,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -92,10 +86,10 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: actions!
-          .map((action) => Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: action,
-              ))
+          .map(
+            (action) =>
+                Padding(padding: const EdgeInsets.only(left: 8), child: action),
+          )
           .toList(),
     );
   }
@@ -123,16 +117,9 @@ class GlassIconButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: SemanticColors.background.card,
           shape: BoxShape.circle,
-          border: Border.all(
-            color: SemanticColors.border.glass,
-            width: 1,
-          ),
+          border: Border.all(color: SemanticColors.border.glass, width: 1),
         ),
-        child: Icon(
-          icon,
-          size: size * 0.5,
-          color: SemanticColors.icon.primary,
-        ),
+        child: Icon(icon, size: size * 0.5, color: SemanticColors.icon.primary),
       ),
     );
   }

@@ -78,19 +78,19 @@ class BeautyShop extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        address,
-        latitude,
-        longitude,
-        images,
-        menuImages,
-        rating,
-        reviewCount,
-        distance,
-        tags,
-        discountRate,
-        isNew,
-        operatingHours,
-      ];
+    id,
+    name,
+    address,
+    latitude,
+    longitude,
+    images,
+    menuImages,
+    rating,
+    reviewCount,
+    distance,
+    tags,
+    discountRate,
+    isNew,
+    operatingHours,
+  ];
 }

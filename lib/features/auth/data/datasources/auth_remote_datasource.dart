@@ -68,9 +68,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> withdraw(String reason) async {
-    await _apiClient.post(
-      '/api/members/me/withdraw',
-      data: {'reason': reason},
-    );
+    await _apiClient.post('/api/members/me/withdraw', data: {'reason': reason});
   }
 }

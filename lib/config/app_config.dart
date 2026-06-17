@@ -30,8 +30,7 @@ class AppConfig {
     tz.setLocalLocation(tz.getLocation('Asia/Seoul'));
 
     try {
-      await Firebase.initializeApp()
-          .timeout(const Duration(seconds: 10));
+      await Firebase.initializeApp().timeout(const Duration(seconds: 10));
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     } catch (_) {}
 
@@ -48,8 +47,9 @@ class AppConfig {
     await initDependencies();
 
     try {
-      await sl<LocalNotificationService>().initialize()
-          .timeout(const Duration(seconds: 5));
+      await sl<LocalNotificationService>().initialize().timeout(
+        const Duration(seconds: 5),
+      );
     } catch (_) {}
   }
 }

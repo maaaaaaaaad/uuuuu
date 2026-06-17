@@ -105,8 +105,7 @@ class LocationSettingNotifier extends AsyncNotifier<LocationSettingState> {
           .checkPermissionStatus();
       state = AsyncData(
         currentState.copyWith(
-          isEnabled:
-              newPermissionStatus == LocationPermissionResult.granted,
+          isEnabled: newPermissionStatus == LocationPermissionResult.granted,
           permissionStatus: newPermissionStatus,
         ),
       );

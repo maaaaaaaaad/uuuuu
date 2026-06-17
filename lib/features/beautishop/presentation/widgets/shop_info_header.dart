@@ -34,10 +34,7 @@ class ShopInfoHeader extends StatelessWidget {
         children: [
           Text(
             name,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Row(
@@ -59,7 +56,11 @@ class ShopInfoHeader extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.place, size: 16, color: SemanticColors.icon.secondary),
+                Icon(
+                  Icons.place,
+                  size: 16,
+                  color: SemanticColors.icon.secondary,
+                ),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
@@ -117,7 +118,11 @@ class ShopInfoHeader extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.star_rounded, color: SemanticColors.icon.starFilled, size: 18),
+              Icon(
+                Icons.star_rounded,
+                color: SemanticColors.icon.starFilled,
+                size: 18,
+              ),
               const SizedBox(width: 4),
               Text(
                 rating.toStringAsFixed(1),

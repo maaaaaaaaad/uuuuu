@@ -67,10 +67,7 @@ class _GlassCardState extends State<GlassCard> {
             ),
             boxShadow: AppShadows.cardPopOut,
           ),
-          child: Padding(
-            padding: widget.padding,
-            child: widget.child,
-          ),
+          child: Padding(padding: widget.padding, child: widget.child),
         ),
       ),
     );

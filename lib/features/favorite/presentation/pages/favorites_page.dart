@@ -89,7 +89,8 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
     }
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(favoritesNotifierProvider.notifier).loadFavorites(),
+      onRefresh: () =>
+          ref.read(favoritesNotifierProvider.notifier).loadFavorites(),
       child: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
           if (notification is ScrollEndNotification) {
@@ -128,10 +129,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                 alignment: Alignment.centerRight,
                 padding: const EdgeInsets.only(right: 20),
                 color: SemanticColors.state.error,
-                child: Icon(
-                  Icons.delete,
-                  color: SemanticColors.text.onDark,
-                ),
+                child: Icon(Icons.delete, color: SemanticColors.text.onDark),
               ),
               onDismissed: (_) {
                 ref
@@ -139,7 +137,10 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                     .removeFavorite(favorite.shopId);
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: ShopCard(
                   shop: shop,
                   width: double.infinity,

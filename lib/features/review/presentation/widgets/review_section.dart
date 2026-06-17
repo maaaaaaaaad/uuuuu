@@ -10,7 +10,11 @@ class ReviewSection extends ConsumerStatefulWidget {
   final String shopId;
   final String shopName;
 
-  const ReviewSection({super.key, required this.shopId, required this.shopName});
+  const ReviewSection({
+    super.key,
+    required this.shopId,
+    required this.shopName,
+  });
 
   @override
   ConsumerState<ReviewSection> createState() => _ReviewSectionState();
@@ -43,7 +47,9 @@ class _ReviewSectionState extends ConsumerState<ReviewSection> {
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: CircularProgressIndicator(color: SemanticColors.indicator.loadingPink),
+              child: CircularProgressIndicator(
+                color: SemanticColors.indicator.loadingPink,
+              ),
             ),
           )
         else if (state.error != null && state.reviews.isEmpty)
@@ -113,7 +119,11 @@ class _ReviewItem extends StatelessWidget {
               CircleAvatar(
                 radius: 18,
                 backgroundColor: SemanticColors.background.avatar,
-                child: Icon(Icons.person, color: SemanticColors.icon.secondary, size: 20),
+                child: Icon(
+                  Icons.person,
+                  color: SemanticColors.icon.secondary,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -204,11 +214,7 @@ class _ReviewItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.store,
-                size: 14,
-                color: SemanticColors.icon.accent,
-              ),
+              Icon(Icons.store, size: 14, color: SemanticColors.icon.accent),
               const SizedBox(width: 6),
               Text(
                 '사장님 답글',
@@ -239,11 +245,23 @@ class _ReviewItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         if (index < rating.floor()) {
-          return Icon(Icons.star, size: 14, color: SemanticColors.icon.starFilled);
+          return Icon(
+            Icons.star,
+            size: 14,
+            color: SemanticColors.icon.starFilled,
+          );
         } else if (index < rating) {
-          return Icon(Icons.star_half, size: 14, color: SemanticColors.icon.starFilled);
+          return Icon(
+            Icons.star_half,
+            size: 14,
+            color: SemanticColors.icon.starFilled,
+          );
         } else {
-          return Icon(Icons.star_border, size: 14, color: SemanticColors.icon.starEmpty);
+          return Icon(
+            Icons.star_border,
+            size: 14,
+            color: SemanticColors.icon.starEmpty,
+          );
         }
       }),
     );

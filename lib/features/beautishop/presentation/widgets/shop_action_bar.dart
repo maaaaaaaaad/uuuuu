@@ -28,21 +28,13 @@ class ShopActionBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildActionButton(
-            icon: Icons.call,
-            label: '전화',
-            onTap: onCall,
-          ),
+          _buildActionButton(icon: Icons.call, label: '전화', onTap: onCall),
           _buildActionButton(
             icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
             label: '저장',
             onTap: onBookmark,
           ),
-          _buildActionButton(
-            icon: Icons.share,
-            label: '공유',
-            onTap: onShare,
-          ),
+          _buildActionButton(icon: Icons.share, label: '공유', onTap: onShare),
         ],
       ),
     );

@@ -73,9 +73,7 @@ class CustomTextField extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: SemanticColors.state.error,
-              ),
+              borderSide: BorderSide(color: SemanticColors.state.error),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -85,7 +83,9 @@ class CustomTextField extends StatelessWidget {
               ),
             ),
             filled: true,
-            fillColor: enabled ? SemanticColors.background.input : SemanticColors.background.inputDisabled,
+            fillColor: enabled
+                ? SemanticColors.background.input
+                : SemanticColors.background.inputDisabled,
           ),
         ),
       ],

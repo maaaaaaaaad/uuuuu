@@ -53,8 +53,7 @@ class ReservationCalendar extends StatelessWidget {
       children: [
         IconButton(
           onPressed: canGoPrevious
-              ? () => onMonthChanged(
-                  DateTime(year, month - 1))
+              ? () => onMonthChanged(DateTime(year, month - 1))
               : null,
           icon: const Icon(Icons.chevron_left),
           iconSize: 24,
@@ -68,8 +67,7 @@ class ReservationCalendar extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: () =>
-              onMonthChanged(DateTime(year, month + 1)),
+          onPressed: () => onMonthChanged(DateTime(year, month + 1)),
           icon: const Icon(Icons.chevron_right),
           iconSize: 24,
         ),
@@ -83,8 +81,8 @@ class ReservationCalendar extends StatelessWidget {
         final color = day == '일'
             ? Colors.red.shade300
             : day == '토'
-                ? Colors.blue.shade300
-                : SemanticColors.text.secondary;
+            ? Colors.blue.shade300
+            : SemanticColors.text.secondary;
         return Expanded(
           child: Center(
             child: Text(
@@ -124,14 +122,16 @@ class ReservationCalendar extends StatelessWidget {
       final isSelected = dateString == selectedDate;
       final isToday = dateString == todayString;
 
-      cells.add(_buildDayCell(
-        day: day,
-        dateString: dateString,
-        isPast: isPast,
-        isAvailable: isAvailable,
-        isSelected: isSelected,
-        isToday: isToday,
-      ));
+      cells.add(
+        _buildDayCell(
+          day: day,
+          dateString: dateString,
+          isPast: isPast,
+          isAvailable: isAvailable,
+          isSelected: isSelected,
+          isToday: isToday,
+        ),
+      );
     }
 
     return GridView.count(
@@ -188,7 +188,9 @@ class ReservationCalendar extends StatelessWidget {
           '$day',
           style: TextStyle(
             fontSize: 14,
-            fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.w400,
+            fontWeight: isSelected || isToday
+                ? FontWeight.w600
+                : FontWeight.w400,
             color: textColor,
           ),
         ),

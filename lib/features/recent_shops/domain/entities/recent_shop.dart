@@ -54,14 +54,14 @@ class RecentShop extends Equatable {
 
   @override
   List<Object?> get props => [
-        shopId,
-        shopName,
-        thumbnailUrl,
-        address,
-        rating,
-        viewedAt,
-        latitude,
-        longitude,
-        distance,
-      ];
+    shopId,
+    shopName,
+    thumbnailUrl,
+    address,
+    rating,
+    viewedAt,
+    latitude,
+    longitude,
+    distance,
+  ];
 }

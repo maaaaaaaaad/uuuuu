@@ -8,7 +8,10 @@ class GetAvailableDatesUseCase {
   GetAvailableDatesUseCase({required this.repository});
 
   Future<Either<Failure, List<String>>> call(
-      String shopId, String treatmentId, String yearMonth) {
+    String shopId,
+    String treatmentId,
+    String yearMonth,
+  ) {
     return repository.getAvailableDates(shopId, treatmentId, yearMonth);
   }
 }

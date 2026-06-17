@@ -74,10 +74,7 @@ class _GradientCardState extends State<GradientCard> {
               width: 1,
             ),
           ),
-          child: Padding(
-            padding: widget.padding,
-            child: widget.child,
-          ),
+          child: Padding(padding: widget.padding, child: widget.child),
         ),
       ),
     );

@@ -16,7 +16,7 @@ class FavoriteRemoteDataSourceImpl implements FavoriteRemoteDataSource {
   final ApiClient _apiClient;
 
   FavoriteRemoteDataSourceImpl({required ApiClient apiClient})
-      : _apiClient = apiClient;
+    : _apiClient = apiClient;
 
   @override
   Future<FavoriteShopModel> addFavorite(String shopId) async {

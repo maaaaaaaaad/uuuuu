@@ -51,8 +51,7 @@ class _WriteReviewPageState extends State<WriteReviewPage> {
 
     try {
       final content = _contentController.text.trim();
-      final validContent =
-          content.length >= _minContentLength ? content : null;
+      final validContent = content.length >= _minContentLength ? content : null;
       final errorMessage = await widget.onSubmit(
         rating: _selectedRating,
         content: validContent,

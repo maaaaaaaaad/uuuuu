@@ -17,14 +17,16 @@ class GetNearbyShopsParams {
 }
 
 class GetNearbyShopsUseCase
-    implements UseCase<Either<Failure, List<BeautyShop>>, GetNearbyShopsParams> {
+    implements
+        UseCase<Either<Failure, List<BeautyShop>>, GetNearbyShopsParams> {
   final BeautyShopRepository _repository;
 
   GetNearbyShopsUseCase(this._repository);
 
   @override
   Future<Either<Failure, List<BeautyShop>>> call(
-      GetNearbyShopsParams params) async {
+    GetNearbyShopsParams params,
+  ) async {
     return _repository.getNearbyShops(
       latitude: params.latitude,
       longitude: params.longitude,

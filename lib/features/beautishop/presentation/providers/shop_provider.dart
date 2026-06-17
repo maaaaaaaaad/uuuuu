@@ -7,8 +7,10 @@ final beautyShopRepositoryProvider = Provider<BeautyShopRepository>((ref) {
   return sl<BeautyShopRepository>();
 });
 
-final shopByIdProvider =
-    FutureProvider.family<BeautyShop, String>((ref, shopId) async {
+final shopByIdProvider = FutureProvider.family<BeautyShop, String>((
+  ref,
+  shopId,
+) async {
   final repository = ref.watch(beautyShopRepositoryProvider);
   final result = await repository.getBeautyShopById(shopId);
   return result.fold(

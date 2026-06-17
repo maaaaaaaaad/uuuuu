@@ -62,7 +62,9 @@ class FavoriteShopModel extends FavoriteShop {
 
   factory FavoriteShopModel.fromJson(Map<String, dynamic> json) {
     final shopJson = json['shop'] as Map<String, dynamic>?;
-    final shop = shopJson != null ? ShopSummary.fromJson(shopJson).toBeautyShop() : null;
+    final shop = shopJson != null
+        ? ShopSummary.fromJson(shopJson).toBeautyShop()
+        : null;
 
     return FavoriteShopModel(
       id: json['id'] as String,

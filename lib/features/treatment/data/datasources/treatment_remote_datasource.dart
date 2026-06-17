@@ -15,7 +15,9 @@ class TreatmentRemoteDataSourceImpl implements TreatmentRemoteDataSource {
 
   @override
   Future<List<TreatmentModel>> getShopTreatments(String shopId) async {
-    final response = await _apiClient.get('/api/beautishops/$shopId/treatments');
+    final response = await _apiClient.get(
+      '/api/beautishops/$shopId/treatments',
+    );
 
     final treatments = (response.data as List<dynamic>)
         .map((json) => TreatmentModel.fromJson(json as Map<String, dynamic>))

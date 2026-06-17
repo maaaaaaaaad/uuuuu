@@ -37,7 +37,10 @@ class SectionHeader extends StatelessWidget {
               onTap: onMoreTap,
               child: Text(
                 moreText,
-                style: TextStyle(fontSize: 14, color: SemanticColors.text.secondary),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: SemanticColors.text.secondary,
+                ),
               ),
             ),
         ],

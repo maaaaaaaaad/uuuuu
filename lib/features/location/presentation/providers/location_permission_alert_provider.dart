@@ -32,5 +32,5 @@ class LocationPermissionAlertNotifier extends Notifier<bool> {
 
 final locationPermissionAlertProvider =
     NotifierProvider<LocationPermissionAlertNotifier, bool>(
-  LocationPermissionAlertNotifier.new,
-);
+      LocationPermissionAlertNotifier.new,
+    );

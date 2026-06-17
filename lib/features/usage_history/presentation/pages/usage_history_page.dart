@@ -9,7 +9,9 @@ import 'package:jellomark/shared/theme/app_colors.dart';
 import 'package:jellomark/shared/theme/app_gradients.dart';
 import 'package:jellomark/shared/theme/semantic_colors.dart';
 
-final getShopTreatmentsUseCaseProvider = Provider<GetShopTreatmentsUseCase>((ref) {
+final getShopTreatmentsUseCaseProvider = Provider<GetShopTreatmentsUseCase>((
+  ref,
+) {
   return sl<GetShopTreatmentsUseCase>();
 });
 
@@ -51,10 +53,8 @@ class _UsageHistoryPageState extends ConsumerState<UsageHistoryPage> {
 
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => CreateReservationPage(
-              shopId: shopId,
-              treatments: treatments,
-            ),
+            builder: (_) =>
+                CreateReservationPage(shopId: shopId, treatments: treatments),
           ),
         );
       },
@@ -79,9 +79,7 @@ class _UsageHistoryPageState extends ConsumerState<UsageHistoryPage> {
         decoration: const BoxDecoration(
           gradient: AppGradients.softWhiteGradient,
         ),
-        child: SafeArea(
-          child: _buildBody(state),
-        ),
+        child: SafeArea(child: _buildBody(state)),
       ),
     );
   }
@@ -129,11 +127,7 @@ class _UsageHistoryPageState extends ConsumerState<UsageHistoryPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.history,
-              size: 48,
-              color: SemanticColors.icon.disabled,
-            ),
+            Icon(Icons.history, size: 48, color: SemanticColors.icon.disabled),
             const SizedBox(height: 16),
             Text(
               '이용기록이 없습니다',

@@ -131,15 +131,17 @@ class _ShopFilterBottomSheetState extends State<ShopFilterBottomSheet> {
                 onTap: () => _onCategoryTap(null),
               ),
               const SizedBox(width: 8),
-              ...widget.categories.map((category) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _FilterChip(
-                  key: Key('category_chip_${category.id}'),
-                  label: category.name,
-                  isSelected: _selectedCategoryId == category.id,
-                  onTap: () => _onCategoryTap(category.id),
+              ...widget.categories.map(
+                (category) => Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _FilterChip(
+                    key: Key('category_chip_${category.id}'),
+                    label: category.name,
+                    isSelected: _selectedCategoryId == category.id,
+                    onTap: () => _onCategoryTap(category.id),
+                  ),
                 ),
-              )),
+              ),
             ],
           ),
         ),
@@ -270,10 +272,7 @@ class _ShopFilterBottomSheetState extends State<ShopFilterBottomSheet> {
             ),
             child: const Text(
               '적용',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ),

@@ -58,15 +58,15 @@ class UsageHistoryModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        memberId,
-        shopId,
-        reservationId,
-        shopName,
-        treatmentName,
-        treatmentPrice,
-        treatmentDuration,
-        completedAt,
-        createdAt,
-      ];
+    id,
+    memberId,
+    shopId,
+    reservationId,
+    shopName,
+    treatmentName,
+    treatmentPrice,
+    treatmentDuration,
+    completedAt,
+    createdAt,
+  ];
 }

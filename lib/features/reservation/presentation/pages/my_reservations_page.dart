@@ -75,8 +75,7 @@ class _MyReservationsPageState extends ConsumerState<MyReservationsPage> {
           child: Column(
             children: [
               _buildFilterChips(state),
-              if (state.availableSortOrders.isNotEmpty)
-                _buildSortRow(state),
+              if (state.availableSortOrders.isNotEmpty) _buildSortRow(state),
               Expanded(child: _buildContent(state)),
             ],
           ),

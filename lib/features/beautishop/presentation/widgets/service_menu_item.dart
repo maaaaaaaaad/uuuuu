@@ -6,11 +6,7 @@ class ServiceMenuItem extends StatelessWidget {
   final ServiceMenu menu;
   final VoidCallback? onTap;
 
-  const ServiceMenuItem({
-    super.key,
-    required this.menu,
-    this.onTap,
-  });
+  const ServiceMenuItem({super.key, required this.menu, this.onTap});
 
   String _formatNumber(int number) {
     final str = number.toString();
@@ -58,7 +54,11 @@ class ServiceMenuItem extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.access_time, size: 14, color: SemanticColors.icon.disabled),
+                        Icon(
+                          Icons.access_time,
+                          size: 14,
+                          color: SemanticColors.icon.disabled,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           menu.formattedDuration!,

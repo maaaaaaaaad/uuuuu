@@ -19,5 +19,12 @@ class PagedFavorites extends Equatable {
   });
 
   @override
-  List<Object?> get props => [items, hasNext, totalElements, totalPages, page, size];
+  List<Object?> get props => [
+    items,
+    hasNext,
+    totalElements,
+    totalPages,
+    page,
+    size,
+  ];
 }

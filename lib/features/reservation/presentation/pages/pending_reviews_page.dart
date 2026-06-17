@@ -12,8 +12,7 @@ class PendingReviewsPage extends ConsumerStatefulWidget {
   const PendingReviewsPage({super.key});
 
   @override
-  ConsumerState<PendingReviewsPage> createState() =>
-      _PendingReviewsPageState();
+  ConsumerState<PendingReviewsPage> createState() => _PendingReviewsPageState();
 }
 
 class _PendingReviewsPageState extends ConsumerState<PendingReviewsPage> {
@@ -38,10 +37,7 @@ class _PendingReviewsPageState extends ConsumerState<PendingReviewsPage> {
               rating: rating,
               content: content,
             );
-            return result.fold(
-              (failure) => failure.message,
-              (_) => null,
-            );
+            return result.fold((failure) => failure.message, (_) => null);
           },
         ),
       ),
@@ -72,9 +68,7 @@ class _PendingReviewsPageState extends ConsumerState<PendingReviewsPage> {
         decoration: const BoxDecoration(
           gradient: AppGradients.softWhiteGradient,
         ),
-        child: SafeArea(
-          child: _buildBody(state),
-        ),
+        child: SafeArea(child: _buildBody(state)),
       ),
     );
   }

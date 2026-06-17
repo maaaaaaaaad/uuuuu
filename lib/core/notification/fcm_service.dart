@@ -14,9 +14,9 @@ class FcmService {
     required FirebaseMessaging messaging,
     required DeviceTokenRepository deviceTokenRepository,
     required NotificationHandler notificationHandler,
-  })  : _messaging = messaging,
-        _deviceTokenRepository = deviceTokenRepository,
-        _notificationHandler = notificationHandler;
+  }) : _messaging = messaging,
+       _deviceTokenRepository = deviceTokenRepository,
+       _notificationHandler = notificationHandler;
 
   Future<void> initialize() async {
     final settings = await _messaging.requestPermission();
@@ -32,7 +32,9 @@ class FcmService {
   }
 
   void _setupMessageHandlers() {
-    FirebaseMessaging.onMessage.listen(_notificationHandler.handleForegroundMessage);
+    FirebaseMessaging.onMessage.listen(
+      _notificationHandler.handleForegroundMessage,
+    );
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       _notificationHandler.handleNotificationTap(message.data);
     });

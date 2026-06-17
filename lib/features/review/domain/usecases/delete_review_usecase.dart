@@ -11,9 +11,6 @@ class DeleteReviewUseCase {
     required String shopId,
     required String reviewId,
   }) {
-    return repository.deleteReview(
-      shopId: shopId,
-      reviewId: reviewId,
-    );
+    return repository.deleteReview(shopId: shopId, reviewId: reviewId);
   }
 }

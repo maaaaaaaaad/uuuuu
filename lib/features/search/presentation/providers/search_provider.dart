@@ -144,13 +144,10 @@ class SearchNotifier extends StateNotifier<SearchState> {
     try {
       final locationUseCase = sl<GetCurrentLocationUseCase>();
       final locationResult = await locationUseCase();
-      locationResult.fold(
-        (failure) {},
-        (location) {
-          latitude = location.latitude;
-          longitude = location.longitude;
-        },
-      );
+      locationResult.fold((failure) {}, (location) {
+        latitude = location.latitude;
+        longitude = location.longitude;
+      });
     } catch (_) {}
 
     state = state.copyWith(latitude: latitude, longitude: longitude);
@@ -289,7 +286,9 @@ class SearchNotifier extends StateNotifier<SearchState> {
 
     state = state.copyWith(latitude: latitude, longitude: longitude);
 
-    debugPrint('[SearchNotifier] Filter: sortBy=${state.sortBy}, lat=$latitude, lng=$longitude');
+    debugPrint(
+      '[SearchNotifier] Filter: sortBy=${state.sortBy}, lat=$latitude, lng=$longitude',
+    );
 
     final filter = BeautyShopFilter(
       keyword: state.query.isEmpty ? null : state.query,

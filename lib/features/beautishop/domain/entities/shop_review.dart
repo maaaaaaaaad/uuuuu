@@ -54,15 +54,15 @@ class ShopReview extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        authorName,
-        rating,
-        content,
-        createdAt,
-        images,
-        authorProfileImage,
-        serviceName,
-        ownerReplyContent,
-        ownerReplyCreatedAt,
-      ];
+    id,
+    authorName,
+    rating,
+    content,
+    createdAt,
+    images,
+    authorProfileImage,
+    serviceName,
+    ownerReplyContent,
+    ownerReplyCreatedAt,
+  ];
 }

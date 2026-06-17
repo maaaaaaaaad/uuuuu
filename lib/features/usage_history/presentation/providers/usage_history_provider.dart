@@ -3,8 +3,7 @@ import 'package:jellomark/core/di/injection_container.dart';
 import 'package:jellomark/features/usage_history/domain/entities/usage_history.dart';
 import 'package:jellomark/features/usage_history/domain/usecases/get_usage_history_usecase.dart';
 
-final getUsageHistoryUseCaseProvider =
-    Provider<GetUsageHistoryUseCase>((ref) {
+final getUsageHistoryUseCaseProvider = Provider<GetUsageHistoryUseCase>((ref) {
   return sl<GetUsageHistoryUseCase>();
 });
 
@@ -60,5 +59,5 @@ class UsageHistoryNotifier extends StateNotifier<UsageHistoryState> {
 
 final usageHistoryNotifierProvider =
     StateNotifierProvider.autoDispose<UsageHistoryNotifier, UsageHistoryState>(
-  (ref) => UsageHistoryNotifier(ref),
-);
+      (ref) => UsageHistoryNotifier(ref),
+    );

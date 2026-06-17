@@ -23,7 +23,9 @@ class CategoryChip extends StatelessWidget {
         ? SemanticColors.background.chipSelected
         : SemanticColors.background.chip;
 
-    final iconColor = isSelected ? SemanticColors.icon.onDark : SemanticColors.text.primary;
+    final iconColor = isSelected
+        ? SemanticColors.icon.onDark
+        : SemanticColors.text.primary;
 
     return GestureDetector(
       onTap: onTap,

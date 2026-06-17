@@ -11,7 +11,7 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
   final FavoriteRemoteDataSource _remoteDataSource;
 
   FavoriteRepositoryImpl({required FavoriteRemoteDataSource remoteDataSource})
-      : _remoteDataSource = remoteDataSource;
+    : _remoteDataSource = remoteDataSource;
 
   @override
   Future<Either<Failure, FavoriteShop>> addFavorite(String shopId) async {
@@ -47,7 +47,10 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
     int size = 20,
   }) async {
     try {
-      final result = await _remoteDataSource.getFavorites(page: page, size: size);
+      final result = await _remoteDataSource.getFavorites(
+        page: page,
+        size: size,
+      );
       return Right(result);
     } on DioException catch (e) {
       return Left(

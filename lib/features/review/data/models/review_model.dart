@@ -39,7 +39,8 @@ class ReviewModel extends Equatable {
       memberId: json['memberId'] as String,
       rating: json['rating'] as int?,
       content: json['content'] as String?,
-      images: (json['images'] as List<dynamic>?)
+      images:
+          (json['images'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],
@@ -88,17 +89,17 @@ class ReviewModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        shopId,
-        shopName,
-        shopImage,
-        memberId,
-        rating,
-        content,
-        images,
-        createdAt,
-        updatedAt,
-        ownerReplyContent,
-        ownerReplyCreatedAt,
-      ];
+    id,
+    shopId,
+    shopName,
+    shopImage,
+    memberId,
+    rating,
+    content,
+    images,
+    createdAt,
+    updatedAt,
+    ownerReplyContent,
+    ownerReplyCreatedAt,
+  ];
 }

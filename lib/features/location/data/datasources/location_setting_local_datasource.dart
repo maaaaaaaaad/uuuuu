@@ -5,7 +5,8 @@ abstract class LocationSettingLocalDataSource {
   Future<void> setLocationEnabled(bool enabled);
 }
 
-class LocationSettingLocalDataSourceImpl implements LocationSettingLocalDataSource {
+class LocationSettingLocalDataSourceImpl
+    implements LocationSettingLocalDataSource {
   static const String _locationEnabledKey = 'location_enabled';
 
   @override

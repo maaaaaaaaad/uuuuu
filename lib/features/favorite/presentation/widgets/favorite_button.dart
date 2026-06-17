@@ -8,11 +8,7 @@ class FavoriteButton extends ConsumerStatefulWidget {
   final String shopId;
   final double size;
 
-  const FavoriteButton({
-    super.key,
-    required this.shopId,
-    this.size = 40,
-  });
+  const FavoriteButton({super.key, required this.shopId, this.size = 40});
 
   @override
   ConsumerState<FavoriteButton> createState() => _FavoriteButtonState();
@@ -31,9 +27,10 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.3,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -68,7 +65,9 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton>
 
   @override
   Widget build(BuildContext context) {
-    final favoriteStatusAsync = ref.watch(favoriteStatusProvider(widget.shopId));
+    final favoriteStatusAsync = ref.watch(
+      favoriteStatusProvider(widget.shopId),
+    );
 
     return favoriteStatusAsync.when(
       loading: () => _buildButton(
@@ -101,10 +100,7 @@ class _FavoriteButtonState extends ConsumerState<FavoriteButton>
       child: AnimatedBuilder(
         animation: _scaleAnimation,
         builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
-          );
+          return Transform.scale(scale: _scaleAnimation.value, child: child);
         },
         child: Container(
           width: widget.size,

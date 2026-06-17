@@ -15,11 +15,13 @@ class LocalNotificationService {
   LocalNotificationService({
     FlutterLocalNotificationsPlugin? plugin,
     void Function(String?)? onNotificationTap,
-  })  : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
-        _onNotificationTap = onNotificationTap;
+  }) : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
+       _onNotificationTap = onNotificationTap;
 
   Future<void> initialize() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const darwinSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -51,7 +53,8 @@ class LocalNotificationService {
 
     await _plugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(channel);
   }
 

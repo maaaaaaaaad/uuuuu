@@ -13,10 +13,6 @@ class GetShopReviewsUseCase {
     int page = 0,
     int size = 20,
   }) {
-    return repository.getShopReviews(
-      shopId: shopId,
-      page: page,
-      size: size,
-    );
+    return repository.getShopReviews(shopId: shopId, page: page, size: size);
   }
 }

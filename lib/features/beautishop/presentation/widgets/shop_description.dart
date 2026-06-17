@@ -28,10 +28,7 @@ class _ShopDescriptionState extends State<ShopDescription> {
         children: [
           const Text(
             '샵 소개',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           LayoutBuilder(

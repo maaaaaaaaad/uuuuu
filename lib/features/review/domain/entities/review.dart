@@ -33,7 +33,8 @@ class Review extends Equatable {
   bool get hasOwnerReply =>
       ownerReplyContent != null && ownerReplyContent!.isNotEmpty;
 
-  bool get isEdited => updatedAt.isAfter(createdAt.add(const Duration(seconds: 1)));
+  bool get isEdited =>
+      updatedAt.isAfter(createdAt.add(const Duration(seconds: 1)));
 
   String get formattedDate {
     final now = DateTime.now();
@@ -55,17 +56,17 @@ class Review extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        shopId,
-        shopName,
-        shopImage,
-        memberId,
-        rating,
-        content,
-        images,
-        createdAt,
-        updatedAt,
-        ownerReplyContent,
-        ownerReplyCreatedAt,
-      ];
+    id,
+    shopId,
+    shopName,
+    shopImage,
+    memberId,
+    rating,
+    content,
+    images,
+    createdAt,
+    updatedAt,
+    ownerReplyContent,
+    ownerReplyCreatedAt,
+  ];
 }

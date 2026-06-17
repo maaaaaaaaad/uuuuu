@@ -5,11 +5,7 @@ class SearchSection extends StatelessWidget {
   final String? locationText;
   final VoidCallback? onSearchTap;
 
-  const SearchSection({
-    super.key,
-    this.locationText,
-    this.onSearchTap,
-  });
+  const SearchSection({super.key, this.locationText, this.onSearchTap});
 
   @override
   Widget build(BuildContext context) {

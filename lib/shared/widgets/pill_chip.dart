@@ -20,13 +20,16 @@ class PillChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveSelectedColor = selectedColor ?? SemanticColors.background.chipSelected;
+    final effectiveSelectedColor =
+        selectedColor ?? SemanticColors.background.chipSelected;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? effectiveSelectedColor : SemanticColors.special.transparent,
+          color: isSelected
+              ? effectiveSelectedColor
+              : SemanticColors.special.transparent,
           borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
           border: isSelected
               ? Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1)
@@ -53,7 +56,9 @@ class PillChip extends StatelessWidget {
               Icon(
                 icon,
                 size: 16,
-                color: isSelected ? SemanticColors.icon.onDark : SemanticColors.icon.secondary,
+                color: isSelected
+                    ? SemanticColors.icon.onDark
+                    : SemanticColors.icon.secondary,
               ),
               const SizedBox(width: 6),
             ],
@@ -62,7 +67,9 @@ class PillChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? SemanticColors.text.onDark : SemanticColors.icon.primary,
+                color: isSelected
+                    ? SemanticColors.text.onDark
+                    : SemanticColors.icon.primary,
               ),
             ),
           ],

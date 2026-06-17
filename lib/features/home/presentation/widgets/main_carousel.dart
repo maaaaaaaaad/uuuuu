@@ -86,7 +86,9 @@ class PageIndicator extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: index == currentIndex ? SemanticColors.indicator.carouselActive : SemanticColors.indicator.carouselInactive,
+            color: index == currentIndex
+                ? SemanticColors.indicator.carouselActive
+                : SemanticColors.indicator.carouselInactive,
           ),
         ),
       ),

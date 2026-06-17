@@ -17,18 +17,17 @@ final locationRepositoryProvider = Provider<LocationRepository>(
   (ref) => sl<LocationRepository>(),
 );
 
-final currentLocationProvider =
-    FutureProvider.autoDispose<UserLocation?>((ref) async {
-  final isEnabled =
-      await ref.watch(locationSettingRepositoryProvider).isLocationEnabled();
+final currentLocationProvider = FutureProvider.autoDispose<UserLocation?>((
+  ref,
+) async {
+  final isEnabled = await ref
+      .watch(locationSettingRepositoryProvider)
+      .isLocationEnabled();
   if (!isEnabled) return null;
 
   final useCase = ref.watch(getCurrentLocationUseCaseProvider);
   final result = await useCase();
-  return result.fold(
-    (failure) => null,
-    (location) => location,
-  );
+  return result.fold((failure) => null, (location) => location);
 });
 
 final locationPermissionStatusProvider = FutureProvider<bool>((ref) async {
@@ -57,9 +56,13 @@ class RouteParams extends Equatable {
   List<Object?> get props => [startLat, startLng, endLat, endLng];
 }
 
-final routeProvider =
-    FutureProvider.autoDispose.family<Route?, RouteParams>((ref, params) async {
-  debugPrint('[routeProvider] Fetching route: start=(${params.startLat}, ${params.startLng}), end=(${params.endLat}, ${params.endLng})');
+final routeProvider = FutureProvider.autoDispose.family<Route?, RouteParams>((
+  ref,
+  params,
+) async {
+  debugPrint(
+    '[routeProvider] Fetching route: start=(${params.startLat}, ${params.startLng}), end=(${params.endLat}, ${params.endLng})',
+  );
   final repository = ref.watch(directionsRepositoryProvider);
   final result = await repository.getRoute(
     startLat: params.startLat,
@@ -73,7 +76,9 @@ final routeProvider =
       return null;
     },
     (route) {
-      debugPrint('[routeProvider] Route fetched: ${route.coordinates.length} coords, ${route.distanceInMeters}m');
+      debugPrint(
+        '[routeProvider] Route fetched: ${route.coordinates.length} coords, ${route.distanceInMeters}m',
+      );
       return route;
     },
   );

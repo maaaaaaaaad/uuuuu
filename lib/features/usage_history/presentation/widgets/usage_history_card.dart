@@ -74,10 +74,7 @@ class UsageHistoryCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             history.treatmentName,
-            style: TextStyle(
-              fontSize: 14,
-              color: SemanticColors.text.primary,
-            ),
+            style: TextStyle(fontSize: 14, color: SemanticColors.text.primary),
           ),
           const SizedBox(height: 4),
           Text(

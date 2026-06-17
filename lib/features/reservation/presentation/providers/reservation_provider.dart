@@ -7,18 +7,21 @@ import 'package:jellomark/features/reservation/domain/usecases/cancel_reservatio
 import 'package:jellomark/features/reservation/domain/usecases/create_reservation_usecase.dart';
 import 'package:jellomark/features/reservation/domain/usecases/get_my_reservations_usecase.dart';
 
-final createReservationUseCaseProvider =
-    Provider<CreateReservationUseCase>((ref) {
+final createReservationUseCaseProvider = Provider<CreateReservationUseCase>((
+  ref,
+) {
   return sl<CreateReservationUseCase>();
 });
 
-final getMyReservationsUseCaseProvider =
-    Provider<GetMyReservationsUseCase>((ref) {
+final getMyReservationsUseCaseProvider = Provider<GetMyReservationsUseCase>((
+  ref,
+) {
   return sl<GetMyReservationsUseCase>();
 });
 
-final cancelReservationUseCaseProvider =
-    Provider<CancelReservationUseCase>((ref) {
+final cancelReservationUseCaseProvider = Provider<CancelReservationUseCase>((
+  ref,
+) {
   return sl<CancelReservationUseCase>();
 });
 
@@ -28,10 +31,10 @@ enum ReservationSortOrder {
   upcomingFirst;
 
   String get label => switch (this) {
-        newest => '최신순',
-        oldest => '오래된순',
-        upcomingFirst => '예약 날짜순',
-      };
+    newest => '최신순',
+    oldest => '오래된순',
+    upcomingFirst => '예약 날짜순',
+  };
 }
 
 class MyReservationsState {
@@ -75,13 +78,16 @@ class MyReservationsState {
 
   List<Reservation> get filteredReservations {
     if (filterStatus == null) {
-      return List.of(reservations)
-        ..sort((a, b) =>
-            (_statusPriority[a.status] ?? 99)
-                .compareTo(_statusPriority[b.status] ?? 99));
+      return List.of(reservations)..sort(
+        (a, b) => (_statusPriority[a.status] ?? 99).compareTo(
+          _statusPriority[b.status] ?? 99,
+        ),
+      );
     }
 
-    final filtered = reservations.where((r) => r.status == filterStatus).toList();
+    final filtered = reservations
+        .where((r) => r.status == filterStatus)
+        .toList();
     switch (sortOrder) {
       case ReservationSortOrder.newest:
         filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -131,10 +137,7 @@ class MyReservationsNotifier extends StateNotifier<MyReservationsState> {
         state = state.copyWith(isLoading: false, error: failure.message);
       },
       (reservations) {
-        state = state.copyWith(
-          reservations: reservations,
-          isLoading: false,
-        );
+        state = state.copyWith(reservations: reservations, isLoading: false);
       },
     );
   }
@@ -159,12 +162,9 @@ class MyReservationsNotifier extends StateNotifier<MyReservationsState> {
     final result = await useCase(id);
 
     if (result.isLeft()) {
-      result.fold(
-        (failure) {
-          state = state.copyWith(error: failure.message);
-        },
-        (_) {},
-      );
+      result.fold((failure) {
+        state = state.copyWith(error: failure.message);
+      }, (_) {});
     } else {
       await loadReservations();
     }
@@ -175,10 +175,11 @@ class MyReservationsNotifier extends StateNotifier<MyReservationsState> {
   }
 }
 
-final myReservationsNotifierProvider = StateNotifierProvider.autoDispose<
-    MyReservationsNotifier, MyReservationsState>(
-  (ref) => MyReservationsNotifier(ref),
-);
+final myReservationsNotifierProvider =
+    StateNotifierProvider.autoDispose<
+      MyReservationsNotifier,
+      MyReservationsState
+    >((ref) => MyReservationsNotifier(ref));
 
 class CreateReservationState {
   final bool isLoading;
@@ -207,8 +208,7 @@ class CreateReservationState {
 class CreateReservationNotifier extends StateNotifier<CreateReservationState> {
   final Ref _ref;
 
-  CreateReservationNotifier(this._ref)
-      : super(const CreateReservationState());
+  CreateReservationNotifier(this._ref) : super(const CreateReservationState());
 
   Future<void> createReservation(CreateReservationParams params) async {
     state = state.copyWith(isLoading: true, error: null, isSuccess: false);
@@ -231,7 +231,8 @@ class CreateReservationNotifier extends StateNotifier<CreateReservationState> {
   }
 }
 
-final createReservationNotifierProvider = StateNotifierProvider.autoDispose<
-    CreateReservationNotifier, CreateReservationState>(
-  (ref) => CreateReservationNotifier(ref),
-);
+final createReservationNotifierProvider =
+    StateNotifierProvider.autoDispose<
+      CreateReservationNotifier,
+      CreateReservationState
+    >((ref) => CreateReservationNotifier(ref));

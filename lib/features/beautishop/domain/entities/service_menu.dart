@@ -54,12 +54,12 @@ class ServiceMenu extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        price,
-        durationMinutes,
-        description,
-        category,
-        discountPrice,
-      ];
+    id,
+    name,
+    price,
+    durationMinutes,
+    description,
+    category,
+    discountPrice,
+  ];
 }

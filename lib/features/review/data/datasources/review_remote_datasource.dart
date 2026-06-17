@@ -30,17 +30,14 @@ abstract class ReviewRemoteDataSource {
     List<String>? images,
   });
 
-  Future<void> deleteReview({
-    required String shopId,
-    required String reviewId,
-  });
+  Future<void> deleteReview({required String shopId, required String reviewId});
 }
 
 class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   final ApiClient _apiClient;
 
   ReviewRemoteDataSourceImpl({required ApiClient apiClient})
-      : _apiClient = apiClient;
+    : _apiClient = apiClient;
 
   @override
   Future<PagedReviewsModel> getShopReviews({

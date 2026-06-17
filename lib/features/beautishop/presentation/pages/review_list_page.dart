@@ -30,7 +30,9 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
     super.initState();
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(reviewListNotifierProvider(widget.shopId).notifier).loadReviews();
+      ref
+          .read(reviewListNotifierProvider(widget.shopId).notifier)
+          .loadReviews();
     });
   }
 
@@ -59,10 +61,7 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
           children: [
             Text(
               widget.shopName,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             Text(
               '리뷰 ${state.totalElements}개',
@@ -88,9 +87,7 @@ class _ReviewListPageState extends ConsumerState<ReviewListPage> {
           child: Column(
             children: [
               _buildSortTabs(state.sortType),
-              Expanded(
-                child: _buildReviewList(state),
-              ),
+              Expanded(child: _buildReviewList(state)),
             ],
           ),
         ),

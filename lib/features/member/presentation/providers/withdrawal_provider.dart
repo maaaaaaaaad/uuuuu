@@ -36,8 +36,9 @@ class WithdrawalState {
   }) {
     return WithdrawalState(
       step: step ?? this.step,
-      selectedReason:
-          clearReason ? null : (selectedReason ?? this.selectedReason),
+      selectedReason: clearReason
+          ? null
+          : (selectedReason ?? this.selectedReason),
       agreements: agreements ?? this.agreements,
       confirmText: confirmText ?? this.confirmText,
       status: status ?? this.status,

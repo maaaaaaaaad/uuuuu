@@ -37,7 +37,7 @@ class ReservationDetailNotifier extends StateNotifier<ReservationDetailState> {
   final String _reservationId;
 
   ReservationDetailNotifier(this._ref, this._reservationId)
-      : super(const ReservationDetailState());
+    : super(const ReservationDetailState());
 
   Future<void> loadReservation() async {
     final myState = _ref.read(myReservationsNotifierProvider);
@@ -54,17 +54,17 @@ class ReservationDetailNotifier extends StateNotifier<ReservationDetailState> {
     result.fold(
       (failure) =>
           state = state.copyWith(isLoading: false, error: failure.message),
-      (reservation) =>
-          state = ReservationDetailState(reservation: reservation),
+      (reservation) => state = ReservationDetailState(reservation: reservation),
     );
   }
 }
 
 final reservationDetailNotifierProvider = StateNotifierProvider.autoDispose
-    .family<ReservationDetailNotifier, ReservationDetailState, String>(
-  (ref, reservationId) {
-    final notifier = ReservationDetailNotifier(ref, reservationId);
-    notifier.loadReservation();
-    return notifier;
-  },
-);
+    .family<ReservationDetailNotifier, ReservationDetailState, String>((
+      ref,
+      reservationId,
+    ) {
+      final notifier = ReservationDetailNotifier(ref, reservationId);
+      notifier.loadReservation();
+      return notifier;
+    });

@@ -5,13 +5,15 @@ import 'package:jellomark/features/reservation/domain/entities/available_slots_r
 import 'package:jellomark/features/reservation/domain/usecases/get_available_dates_usecase.dart';
 import 'package:jellomark/features/reservation/domain/usecases/get_available_slots_usecase.dart';
 
-final getAvailableDatesUseCaseProvider =
-    Provider<GetAvailableDatesUseCase>((ref) {
+final getAvailableDatesUseCaseProvider = Provider<GetAvailableDatesUseCase>((
+  ref,
+) {
   return sl<GetAvailableDatesUseCase>();
 });
 
-final getAvailableSlotsUseCaseProvider =
-    Provider<GetAvailableSlotsUseCase>((ref) {
+final getAvailableSlotsUseCaseProvider = Provider<GetAvailableSlotsUseCase>((
+  ref,
+) {
   return sl<GetAvailableSlotsUseCase>();
 });
 
@@ -45,7 +47,10 @@ class AvailableDatesNotifier extends StateNotifier<AvailableDatesState> {
   AvailableDatesNotifier(this._ref) : super(const AvailableDatesState());
 
   Future<void> loadDates(
-      String shopId, String treatmentId, String yearMonth) async {
+    String shopId,
+    String treatmentId,
+    String yearMonth,
+  ) async {
     state = state.copyWith(isLoading: true, error: null);
 
     final useCase = _ref.read(getAvailableDatesUseCaseProvider);
@@ -66,10 +71,11 @@ class AvailableDatesNotifier extends StateNotifier<AvailableDatesState> {
   }
 }
 
-final availableDatesNotifierProvider = StateNotifierProvider.autoDispose<
-    AvailableDatesNotifier, AvailableDatesState>(
-  (ref) => AvailableDatesNotifier(ref),
-);
+final availableDatesNotifierProvider =
+    StateNotifierProvider.autoDispose<
+      AvailableDatesNotifier,
+      AvailableDatesState
+    >((ref) => AvailableDatesNotifier(ref));
 
 class AvailableSlotsState {
   final List<AvailableSlot> slots;
@@ -108,8 +114,7 @@ class AvailableSlotsNotifier extends StateNotifier<AvailableSlotsState> {
 
   AvailableSlotsNotifier(this._ref) : super(const AvailableSlotsState());
 
-  Future<void> loadSlots(
-      String shopId, String treatmentId, String date) async {
+  Future<void> loadSlots(String shopId, String treatmentId, String date) async {
     state = state.copyWith(isLoading: true, error: null);
 
     final useCase = _ref.read(getAvailableSlotsUseCaseProvider);
@@ -135,7 +140,8 @@ class AvailableSlotsNotifier extends StateNotifier<AvailableSlotsState> {
   }
 }
 
-final availableSlotsNotifierProvider = StateNotifierProvider.autoDispose<
-    AvailableSlotsNotifier, AvailableSlotsState>(
-  (ref) => AvailableSlotsNotifier(ref),
-);
+final availableSlotsNotifierProvider =
+    StateNotifierProvider.autoDispose<
+      AvailableSlotsNotifier,
+      AvailableSlotsState
+    >((ref) => AvailableSlotsNotifier(ref));

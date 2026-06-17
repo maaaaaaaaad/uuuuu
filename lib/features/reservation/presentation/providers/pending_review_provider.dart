@@ -5,8 +5,8 @@ import 'package:jellomark/features/reservation/domain/usecases/get_pending_revie
 
 final getPendingReviewReservationsUseCaseProvider =
     Provider<GetPendingReviewReservationsUseCase>((ref) {
-  return sl<GetPendingReviewReservationsUseCase>();
-});
+      return sl<GetPendingReviewReservationsUseCase>();
+    });
 
 class PendingReviewState {
   final List<Reservation> reservations;
@@ -45,14 +45,14 @@ class PendingReviewNotifier extends StateNotifier<PendingReviewState> {
     result.fold(
       (failure) =>
           state = state.copyWith(isLoading: false, error: failure.message),
-      (reservations) =>
-          state = PendingReviewState(reservations: reservations),
+      (reservations) => state = PendingReviewState(reservations: reservations),
     );
   }
 
   void removeByReservationId(String reservationId) {
-    final updated =
-        state.reservations.where((r) => r.id != reservationId).toList();
+    final updated = state.reservations
+        .where((r) => r.id != reservationId)
+        .toList();
     state = PendingReviewState(reservations: updated);
   }
 
@@ -61,14 +61,15 @@ class PendingReviewNotifier extends StateNotifier<PendingReviewState> {
   }
 }
 
-final pendingReviewNotifierProvider = StateNotifierProvider.autoDispose<
-    PendingReviewNotifier, PendingReviewState>(
-  (ref) {
-    final notifier = PendingReviewNotifier(ref);
-    notifier.loadPendingReviews();
-    return notifier;
-  },
-);
+final pendingReviewNotifierProvider =
+    StateNotifierProvider.autoDispose<
+      PendingReviewNotifier,
+      PendingReviewState
+    >((ref) {
+      final notifier = PendingReviewNotifier(ref);
+      notifier.loadPendingReviews();
+      return notifier;
+    });
 
 final pendingReviewCountProvider = Provider.autoDispose<int>((ref) {
   final state = ref.watch(pendingReviewNotifierProvider);

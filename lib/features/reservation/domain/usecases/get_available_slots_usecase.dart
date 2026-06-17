@@ -9,7 +9,10 @@ class GetAvailableSlotsUseCase {
   GetAvailableSlotsUseCase({required this.repository});
 
   Future<Either<Failure, AvailableSlotsResult>> call(
-      String shopId, String treatmentId, String date) {
+    String shopId,
+    String treatmentId,
+    String date,
+  ) {
     return repository.getAvailableSlots(shopId, treatmentId, date);
   }
 }

@@ -114,12 +114,10 @@ class _BannerCarouselState extends State<BannerCarousel> {
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,
-                placeholder: (context, url) => Container(
-                  color: SemanticColors.special.badge,
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: SemanticColors.special.badge,
-                ),
+                placeholder: (context, url) =>
+                    Container(color: SemanticColors.special.badge),
+                errorWidget: (context, url, error) =>
+                    Container(color: SemanticColors.special.badge),
               ),
               Container(
                 decoration: BoxDecoration(
@@ -180,7 +178,9 @@ class _BannerCarouselState extends State<BannerCarousel> {
           height: 8,
           decoration: BoxDecoration(
             shape: _currentPage == index ? BoxShape.rectangle : BoxShape.circle,
-            borderRadius: _currentPage == index ? BorderRadius.circular(4) : null,
+            borderRadius: _currentPage == index
+                ? BorderRadius.circular(4)
+                : null,
             color: _currentPage == index
                 ? SemanticColors.indicator.pageActive
                 : SemanticColors.indicator.pageInactive,

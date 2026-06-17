@@ -22,6 +22,6 @@ class AppColors {
 
   static Color glassWhite = Colors.white.withValues(alpha: 0.6);
   static Color glassBorder = Colors.white.withValues(alpha: 0.3);
-  
+
   static const Color kakaoYellow = Color(0xFFFEE500);
 }

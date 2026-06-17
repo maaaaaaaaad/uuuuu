@@ -26,16 +26,14 @@ Future<T?> showAppBottomSheet<T>({
     shape: shape,
     builder: (innerContext) => DecoratedBox(
       decoration: BoxDecoration(
-        color: backgroundColor ?? Theme.of(innerContext).scaffoldBackgroundColor,
+        color:
+            backgroundColor ?? Theme.of(innerContext).scaffoldBackgroundColor,
       ),
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(innerContext).viewInsets.bottom,
         ),
-        child: SafeArea(
-          top: false,
-          child: builder(innerContext),
-        ),
+        child: SafeArea(top: false, child: builder(innerContext)),
       ),
     ),
   );
@@ -55,8 +53,6 @@ Future<T?> showAppDialog<T>({
     context: context,
     barrierDismissible: barrierDismissible,
     barrierColor: barrierColor,
-    builder: (innerContext) => SafeArea(
-      child: builder(innerContext),
-    ),
+    builder: (innerContext) => SafeArea(child: builder(innerContext)),
   );
 }

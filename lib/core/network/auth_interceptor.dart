@@ -21,17 +21,16 @@ class AuthInterceptor extends QueuedInterceptor {
   bool _isRefreshing = false;
   final _refreshCompleter = <Completer<_RefreshOutcome>>[];
 
-  AuthInterceptor({
-    required this.tokenProvider,
-    required this.baseUrl,
-  });
+  AuthInterceptor({required this.tokenProvider, required this.baseUrl});
 
   Dio get _getRefreshDio {
-    _refreshDio ??= Dio(BaseOptions(
-      baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-    ));
+    _refreshDio ??= Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+      ),
+    );
     return _refreshDio!;
   }
 

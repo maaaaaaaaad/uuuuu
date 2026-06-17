@@ -83,7 +83,9 @@ class ShopCard extends StatelessWidget {
           errorWidget: Container(
             height: 120,
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
               color: SemanticColors.background.imagePlaceholder,
             ),
             child: Center(
@@ -142,19 +144,12 @@ class ShopCard extends StatelessWidget {
   Widget _buildRatingAndDistance() {
     return Row(
       children: [
-        Icon(
-          Icons.star,
-          size: 14,
-          color: SemanticColors.icon.starSelectable,
-        ),
+        Icon(Icons.star, size: 14, color: SemanticColors.icon.starSelectable),
         const SizedBox(width: 2),
         Flexible(
           child: Text(
             '${shop.formattedRating} (${shop.reviewCount})',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -168,10 +163,7 @@ class ShopCard extends StatelessWidget {
           Flexible(
             child: Text(
               shop.formattedDistance!,
-              style: TextStyle(
-                fontSize: 12,
-                color: SemanticColors.text.hint,
-              ),
+              style: TextStyle(fontSize: 12, color: SemanticColors.text.hint),
               overflow: TextOverflow.ellipsis,
             ),
           ),

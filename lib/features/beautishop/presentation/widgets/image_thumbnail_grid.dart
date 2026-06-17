@@ -61,10 +61,7 @@ class ImageThumbnailGrid extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               '이미지가 없습니다',
-              style: TextStyle(
-                color: SemanticColors.text.hint,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: SemanticColors.text.hint, fontSize: 14),
             ),
           ],
         ),

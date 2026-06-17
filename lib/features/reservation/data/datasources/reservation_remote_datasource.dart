@@ -9,9 +9,15 @@ abstract class ReservationRemoteDataSource {
   Future<List<ReservationModel>> getMyReservations();
   Future<ReservationModel> cancelReservation(String reservationId);
   Future<AvailableDatesModel> getAvailableDates(
-      String shopId, String treatmentId, String yearMonth);
+    String shopId,
+    String treatmentId,
+    String yearMonth,
+  );
   Future<AvailableSlotsResultModel> getAvailableSlots(
-      String shopId, String treatmentId, String date);
+    String shopId,
+    String treatmentId,
+    String date,
+  );
   Future<ReservationModel> getReservation(String reservationId);
   Future<List<ReservationModel>> getPendingReviewReservations();
 }
@@ -20,11 +26,12 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
   final ApiClient _apiClient;
 
   ReservationRemoteDataSourceImpl({required ApiClient apiClient})
-      : _apiClient = apiClient;
+    : _apiClient = apiClient;
 
   @override
   Future<ReservationModel> createReservation(
-      CreateReservationRequest request) async {
+    CreateReservationRequest request,
+  ) async {
     final response = await _apiClient.post(
       '/api/reservations',
       data: request.toJson(),
@@ -53,13 +60,13 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
 
   @override
   Future<AvailableDatesModel> getAvailableDates(
-      String shopId, String treatmentId, String yearMonth) async {
+    String shopId,
+    String treatmentId,
+    String yearMonth,
+  ) async {
     final response = await _apiClient.get(
       '/api/beautishops/$shopId/available-dates',
-      queryParameters: {
-        'treatmentId': treatmentId,
-        'yearMonth': yearMonth,
-      },
+      queryParameters: {'treatmentId': treatmentId, 'yearMonth': yearMonth},
     );
 
     return AvailableDatesModel.fromJson(response.data as Map<String, dynamic>);
@@ -67,17 +74,18 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
 
   @override
   Future<AvailableSlotsResultModel> getAvailableSlots(
-      String shopId, String treatmentId, String date) async {
+    String shopId,
+    String treatmentId,
+    String date,
+  ) async {
     final response = await _apiClient.get(
       '/api/beautishops/$shopId/available-slots',
-      queryParameters: {
-        'treatmentId': treatmentId,
-        'date': date,
-      },
+      queryParameters: {'treatmentId': treatmentId, 'date': date},
     );
 
     return AvailableSlotsResultModel.fromJson(
-        response.data as Map<String, dynamic>);
+      response.data as Map<String, dynamic>,
+    );
   }
 
   @override
@@ -89,8 +97,9 @@ class ReservationRemoteDataSourceImpl implements ReservationRemoteDataSource {
 
   @override
   Future<List<ReservationModel>> getPendingReviewReservations() async {
-    final response =
-        await _apiClient.get('/api/reservations/me/pending-review');
+    final response = await _apiClient.get(
+      '/api/reservations/me/pending-review',
+    );
 
     return (response.data as List<dynamic>)
         .map((e) => ReservationModel.fromJson(e as Map<String, dynamic>))

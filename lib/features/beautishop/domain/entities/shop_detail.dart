@@ -29,10 +29,10 @@ class ShopDetail extends BeautyShop {
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        description,
-        phoneNumber,
-        operatingHoursMap,
-        notice,
-      ];
+    ...super.props,
+    description,
+    phoneNumber,
+    operatingHoursMap,
+    notice,
+  ];
 }

@@ -5,10 +5,7 @@ class AvailableSlotModel extends Equatable {
   final String startTime;
   final bool available;
 
-  const AvailableSlotModel({
-    required this.startTime,
-    required this.available,
-  });
+  const AvailableSlotModel({required this.startTime, required this.available});
 
   factory AvailableSlotModel.fromJson(Map<String, dynamic> json) {
     return AvailableSlotModel(
@@ -18,10 +15,7 @@ class AvailableSlotModel extends Equatable {
   }
 
   AvailableSlot toEntity() {
-    return AvailableSlot(
-      startTime: startTime,
-      available: available,
-    );
+    return AvailableSlot(startTime: startTime, available: available);
   }
 
   @override

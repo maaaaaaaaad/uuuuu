@@ -40,10 +40,7 @@ class AppCachedImage extends StatelessWidget {
     );
 
     if (borderRadius != null) {
-      return ClipRRect(
-        borderRadius: borderRadius!,
-        child: image,
-      );
+      return ClipRRect(borderRadius: borderRadius!, child: image);
     }
 
     return image;
@@ -111,10 +108,8 @@ class AppCachedAvatar extends StatelessWidget {
 
     return CachedNetworkImage(
       imageUrl: imageUrl!,
-      imageBuilder: (context, imageProvider) => CircleAvatar(
-        radius: radius,
-        backgroundImage: imageProvider,
-      ),
+      imageBuilder: (context, imageProvider) =>
+          CircleAvatar(radius: radius, backgroundImage: imageProvider),
       placeholder: (context, url) => CircleAvatar(
         radius: radius,
         backgroundColor: SemanticColors.background.imagePlaceholder,

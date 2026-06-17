@@ -27,18 +27,21 @@ class OperatingHoursCard extends StatelessWidget {
         children: [
           const Text(
             '영업시간',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
-          ...operatingHours.entries.map((entry) => _buildDayRow(entry.key, entry.value)),
+          ...operatingHours.entries.map(
+            (entry) => _buildDayRow(entry.key, entry.value),
+          ),
           if (notice != null) ...[
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(Icons.info_outline, size: 16, color: SemanticColors.icon.secondary),
+                Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: SemanticColors.icon.secondary,
+                ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -72,7 +75,9 @@ class OperatingHoursCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                color: isToday ? SemanticColors.special.todayHighlight : SemanticColors.state.open,
+                color: isToday
+                    ? SemanticColors.special.todayHighlight
+                    : SemanticColors.state.open,
               ),
             ),
           ),
@@ -82,7 +87,9 @@ class OperatingHoursCard extends StatelessWidget {
               hours,
               style: TextStyle(
                 fontSize: 14,
-                color: isClosed ? SemanticColors.state.closed : SemanticColors.state.open,
+                color: isClosed
+                    ? SemanticColors.state.closed
+                    : SemanticColors.state.open,
               ),
             ),
           ),

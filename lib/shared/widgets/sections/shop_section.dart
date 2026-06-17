@@ -24,11 +24,7 @@ class HorizontalShopSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(
-          title: title,
-          showMore: showMore,
-          onMoreTap: onMoreTap,
-        ),
+        SectionHeader(title: title, showMore: showMore, onMoreTap: onMoreTap),
         const SizedBox(height: 12),
         SizedBox(
           height: 280,
@@ -75,11 +71,7 @@ class VerticalShopSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(
-          title: title,
-          showMore: showMore,
-          onMoreTap: onMoreTap,
-        ),
+        SectionHeader(title: title, showMore: showMore, onMoreTap: onMoreTap),
         const SizedBox(height: 12),
         ListView.builder(
           shrinkWrap: true,

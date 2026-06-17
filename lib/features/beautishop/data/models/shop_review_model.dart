@@ -31,8 +31,9 @@ class ShopReviewModel extends ShopReview {
       authorProfileImage: json['authorProfileImage'] as String?,
       serviceName: json['serviceName'] as String?,
       ownerReplyContent: json['ownerReplyContent'] as String?,
-      ownerReplyCreatedAt:
-          replyCreatedAtStr != null ? DateTime.parse(replyCreatedAtStr) : null,
+      ownerReplyCreatedAt: replyCreatedAtStr != null
+          ? DateTime.parse(replyCreatedAtStr)
+          : null,
     );
   }
 }

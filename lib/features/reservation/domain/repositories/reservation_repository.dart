@@ -6,14 +6,20 @@ import 'package:jellomark/features/reservation/domain/entities/reservation.dart'
 
 abstract class ReservationRepository {
   Future<Either<Failure, Reservation>> createReservation(
-      CreateReservationParams params);
+    CreateReservationParams params,
+  );
   Future<Either<Failure, List<Reservation>>> getMyReservations();
-  Future<Either<Failure, Reservation>> cancelReservation(
-      String reservationId);
+  Future<Either<Failure, Reservation>> cancelReservation(String reservationId);
   Future<Either<Failure, List<String>>> getAvailableDates(
-      String shopId, String treatmentId, String yearMonth);
+    String shopId,
+    String treatmentId,
+    String yearMonth,
+  );
   Future<Either<Failure, AvailableSlotsResult>> getAvailableSlots(
-      String shopId, String treatmentId, String date);
+    String shopId,
+    String treatmentId,
+    String date,
+  );
   Future<Either<Failure, Reservation>> getReservation(String reservationId);
   Future<Either<Failure, List<Reservation>>> getPendingReviewReservations();
 }

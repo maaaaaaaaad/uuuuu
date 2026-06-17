@@ -83,13 +83,20 @@ class LoginPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, WidgetRef ref, bool isLoading) {
+  Widget _buildMainContent(
+    BuildContext context,
+    WidgetRef ref,
+    bool isLoading,
+  ) {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return SingleChildScrollView(
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          minHeight: screenHeight - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+          minHeight:
+              screenHeight -
+              MediaQuery.of(context).padding.top -
+              MediaQuery.of(context).padding.bottom,
         ),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -136,7 +143,11 @@ class LoginPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildAppleLoginButton(BuildContext context, WidgetRef ref, bool isLoading) {
+  Widget _buildAppleLoginButton(
+    BuildContext context,
+    WidgetRef ref,
+    bool isLoading,
+  ) {
     return Container(
       width: double.infinity,
       height: 56,
@@ -221,17 +232,18 @@ class LoginPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildKakaoLoginButton(BuildContext context, WidgetRef ref, bool isLoading) {
+  Widget _buildKakaoLoginButton(
+    BuildContext context,
+    WidgetRef ref,
+    bool isLoading,
+  ) {
     return Container(
       width: double.infinity,
       height: 56,
       decoration: BoxDecoration(
         color: SemanticColors.button.kakao,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: SemanticColors.button.kakaoBorder,
-          width: 1,
-        ),
+        border: Border.all(color: SemanticColors.button.kakaoBorder, width: 1),
         boxShadow: [
           BoxShadow(
             color: SemanticColors.overlay.shadowLight,
@@ -266,7 +278,9 @@ class LoginPage extends ConsumerWidget {
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(SemanticColors.text.disabled),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    SemanticColors.text.disabled,
+                  ),
                 ),
               )
             : Row(
@@ -287,10 +301,7 @@ class LoginPage extends ConsumerWidget {
                   const SizedBox(width: 12),
                   const Text(
                     '카카오로 시작하기',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),

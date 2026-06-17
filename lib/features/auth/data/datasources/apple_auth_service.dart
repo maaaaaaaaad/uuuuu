@@ -29,11 +29,10 @@ class AppleAuthServiceImpl implements AppleAuthService {
       );
     }
 
-    final composedName = [credential.givenName, credential.familyName]
-        .whereType<String>()
-        .where((p) => p.trim().isNotEmpty)
-        .join(' ')
-        .trim();
+    final composedName = [
+      credential.givenName,
+      credential.familyName,
+    ].whereType<String>().where((p) => p.trim().isNotEmpty).join(' ').trim();
 
     return AppleSignInResult(
       identityToken: identityToken,

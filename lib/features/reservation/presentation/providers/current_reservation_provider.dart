@@ -25,21 +25,24 @@ class CurrentReservationState {
     bool clearUpcoming = false,
   }) {
     return CurrentReservationState(
-      todayReservation:
-          clearToday ? null : (todayReservation ?? this.todayReservation),
-      upcomingReservation:
-          clearUpcoming ? null : (upcomingReservation ?? this.upcomingReservation),
+      todayReservation: clearToday
+          ? null
+          : (todayReservation ?? this.todayReservation),
+      upcomingReservation: clearUpcoming
+          ? null
+          : (upcomingReservation ?? this.upcomingReservation),
       isLoading: isLoading ?? this.isLoading,
       error: error,
     );
   }
 }
 
-class CurrentReservationNotifier extends StateNotifier<CurrentReservationState> {
+class CurrentReservationNotifier
+    extends StateNotifier<CurrentReservationState> {
   final Ref _ref;
 
   CurrentReservationNotifier(this._ref)
-      : super(const CurrentReservationState());
+    : super(const CurrentReservationState());
 
   Future<void> load() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -49,10 +52,9 @@ class CurrentReservationNotifier extends StateNotifier<CurrentReservationState> 
 
     result.fold(
       (failure) {
-        state = const CurrentReservationState(error: null).copyWith(
-          isLoading: false,
-          error: failure.message,
-        );
+        state = const CurrentReservationState(
+          error: null,
+        ).copyWith(isLoading: false, error: failure.message);
       },
       (reservations) {
         final confirmed = reservations
@@ -78,16 +80,19 @@ class CurrentReservationNotifier extends StateNotifier<CurrentReservationState> 
           return now.isBefore(endDateTime);
         }).toList();
 
-        final upcomingConfirmed = confirmed
-            .where((r) => r.reservationDate.compareTo(todayStr) > 0)
-            .toList()
-          ..sort((a, b) => a.reservationDate.compareTo(b.reservationDate));
+        final upcomingConfirmed =
+            confirmed
+                .where((r) => r.reservationDate.compareTo(todayStr) > 0)
+                .toList()
+              ..sort((a, b) => a.reservationDate.compareTo(b.reservationDate));
 
         state = CurrentReservationState(
-          todayReservation:
-              todayConfirmed.isNotEmpty ? todayConfirmed.first : null,
-          upcomingReservation:
-              upcomingConfirmed.isNotEmpty ? upcomingConfirmed.first : null,
+          todayReservation: todayConfirmed.isNotEmpty
+              ? todayConfirmed.first
+              : null,
+          upcomingReservation: upcomingConfirmed.isNotEmpty
+              ? upcomingConfirmed.first
+              : null,
           isLoading: false,
         );
       },
@@ -103,10 +108,11 @@ class CurrentReservationNotifier extends StateNotifier<CurrentReservationState> 
   }
 }
 
-final currentReservationNotifierProvider = StateNotifierProvider.autoDispose<
-    CurrentReservationNotifier, CurrentReservationState>(
-  (ref) {
-    ref.keepAlive();
-    return CurrentReservationNotifier(ref);
-  },
-);
+final currentReservationNotifierProvider =
+    StateNotifierProvider.autoDispose<
+      CurrentReservationNotifier,
+      CurrentReservationState
+    >((ref) {
+      ref.keepAlive();
+      return CurrentReservationNotifier(ref);
+    });

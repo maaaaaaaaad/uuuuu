@@ -7,11 +7,7 @@ class ReviewCard extends StatelessWidget {
   final ShopReview review;
   final VoidCallback? onTap;
 
-  const ReviewCard({
-    super.key,
-    required this.review,
-    this.onTap,
-  });
+  const ReviewCard({super.key, required this.review, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -82,10 +78,7 @@ class ReviewCard extends StatelessWidget {
             if (review.hasContent)
               Text(
                 review.content!,
-                style: const TextStyle(
-                  fontSize: 14,
-                  height: 1.5,
-                ),
+                style: const TextStyle(fontSize: 14, height: 1.5),
               )
             else if (review.isRatingOnly)
               Text(
@@ -105,7 +98,8 @@ class ReviewCard extends StatelessWidget {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: review.images.length,
-                  separatorBuilder: (context, index) => const SizedBox(width: 8),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 8),
                   itemBuilder: (context, index) {
                     return AppCachedImage(
                       imageUrl: review.images[index],
@@ -140,11 +134,7 @@ class ReviewCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.store,
-                size: 14,
-                color: SemanticColors.icon.accent,
-              ),
+              Icon(Icons.store, size: 14, color: SemanticColors.icon.accent),
               const SizedBox(width: 6),
               Text(
                 '사장님 답글',
@@ -175,11 +165,23 @@ class ReviewCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         if (index < rating.floor()) {
-          return Icon(Icons.star, size: 14, color: SemanticColors.icon.starFilled);
+          return Icon(
+            Icons.star,
+            size: 14,
+            color: SemanticColors.icon.starFilled,
+          );
         } else if (index < rating) {
-          return Icon(Icons.star_half, size: 14, color: SemanticColors.icon.starFilled);
+          return Icon(
+            Icons.star_half,
+            size: 14,
+            color: SemanticColors.icon.starFilled,
+          );
         } else {
-          return Icon(Icons.star_border, size: 14, color: SemanticColors.icon.starEmpty);
+          return Icon(
+            Icons.star_border,
+            size: 14,
+            color: SemanticColors.icon.starEmpty,
+          );
         }
       }),
     );

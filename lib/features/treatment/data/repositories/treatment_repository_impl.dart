@@ -9,9 +9,8 @@ import 'package:jellomark/features/treatment/domain/repositories/treatment_repos
 class TreatmentRepositoryImpl implements TreatmentRepository {
   final TreatmentRemoteDataSource _remoteDataSource;
 
-  TreatmentRepositoryImpl({
-    required TreatmentRemoteDataSource remoteDataSource,
-  }) : _remoteDataSource = remoteDataSource;
+  TreatmentRepositoryImpl({required TreatmentRemoteDataSource remoteDataSource})
+    : _remoteDataSource = remoteDataSource;
 
   @override
   Future<Either<Failure, List<ServiceMenu>>> getShopTreatments(

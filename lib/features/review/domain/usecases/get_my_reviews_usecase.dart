@@ -8,13 +8,7 @@ class GetMyReviewsUseCase {
 
   GetMyReviewsUseCase({required this.repository});
 
-  Future<Either<Failure, PagedReviews>> call({
-    int page = 0,
-    int size = 20,
-  }) {
-    return repository.getMyReviews(
-      page: page,
-      size: size,
-    );
+  Future<Either<Failure, PagedReviews>> call({int page = 0, int size = 20}) {
+    return repository.getMyReviews(page: page, size: size);
   }
 }

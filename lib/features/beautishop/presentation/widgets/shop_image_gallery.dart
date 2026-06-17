@@ -79,7 +79,11 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
                   errorWidget: (context, url, error) => Container(
                     color: SemanticColors.background.avatar,
                     child: Center(
-                      child: Icon(Icons.image, size: 48, color: SemanticColors.icon.disabled),
+                      child: Icon(
+                        Icons.image,
+                        size: 48,
+                        color: SemanticColors.icon.disabled,
+                      ),
                     ),
                   ),
                 ),
@@ -121,7 +125,9 @@ class _ShopImageGalleryState extends State<ShopImageGallery> {
       width: isActive ? 24 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color: isActive ? SemanticColors.indicator.loadingOnDark : SemanticColors.text.onDarkSecondary,
+        color: isActive
+            ? SemanticColors.indicator.loadingOnDark
+            : SemanticColors.text.onDarkSecondary,
         borderRadius: BorderRadius.circular(4),
       ),
     );

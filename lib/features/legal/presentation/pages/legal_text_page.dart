@@ -5,11 +5,7 @@ class LegalTextPage extends StatelessWidget {
   final String title;
   final String body;
 
-  const LegalTextPage({
-    super.key,
-    required this.title,
-    required this.body,
-  });
+  const LegalTextPage({super.key, required this.title, required this.body});
 
   @override
   Widget build(BuildContext context) {

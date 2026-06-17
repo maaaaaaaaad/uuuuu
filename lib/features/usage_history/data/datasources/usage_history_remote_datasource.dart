@@ -12,7 +12,9 @@ class UsageHistoryRemoteDataSourceImpl implements UsageHistoryRemoteDataSource {
 
   @override
   Future<List<UsageHistoryModel>> getMyUsageHistory() async {
-    final response = await apiClient.get<List<dynamic>>('/api/usage-history/me');
+    final response = await apiClient.get<List<dynamic>>(
+      '/api/usage-history/me',
+    );
     return response.data!
         .map((json) => UsageHistoryModel.fromJson(json as Map<String, dynamic>))
         .toList();

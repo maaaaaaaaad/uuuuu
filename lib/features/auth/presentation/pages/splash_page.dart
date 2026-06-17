@@ -41,8 +41,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   Future<void> _checkAuthStatus() async {
     try {
       final checkAuthStatus = ref.read(checkAuthStatusUseCaseProvider);
-      final result = await checkAuthStatus()
-          .timeout(const Duration(seconds: 20));
+      final result = await checkAuthStatus().timeout(
+        const Duration(seconds: 20),
+      );
 
       if (!mounted) return;
 

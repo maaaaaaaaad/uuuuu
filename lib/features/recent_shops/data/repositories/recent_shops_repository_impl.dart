@@ -7,8 +7,9 @@ import 'package:jellomark/features/recent_shops/domain/repositories/recent_shops
 class RecentShopsRepositoryImpl implements RecentShopsRepository {
   final RecentShopsLocalDataSource _localDataSource;
 
-  RecentShopsRepositoryImpl({required RecentShopsLocalDataSource localDataSource})
-      : _localDataSource = localDataSource;
+  RecentShopsRepositoryImpl({
+    required RecentShopsLocalDataSource localDataSource,
+  }) : _localDataSource = localDataSource;
 
   @override
   Future<Either<Failure, void>> addRecentShop(RecentShop shop) async {

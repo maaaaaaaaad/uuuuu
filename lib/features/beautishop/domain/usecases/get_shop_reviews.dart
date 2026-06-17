@@ -3,11 +3,7 @@ import 'package:jellomark/core/error/failure.dart';
 import 'package:jellomark/features/beautishop/domain/entities/paged_shop_reviews.dart';
 import 'package:jellomark/features/beautishop/domain/repositories/beauty_shop_repository.dart';
 
-enum ReviewSortType {
-  createdAtDesc,
-  ratingDesc,
-  ratingAsc,
-}
+enum ReviewSortType { createdAtDesc, ratingDesc, ratingAsc }
 
 extension ReviewSortTypeExtension on ReviewSortType {
   String get apiValue {
