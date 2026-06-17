@@ -63,28 +63,23 @@ void main() {
         },
       );
 
-      test('should request permission when denied (not forever)', () async {
-        final mockPosition = MockPosition();
-        when(() => mockPosition.latitude).thenReturn(37.5665);
-        when(() => mockPosition.longitude).thenReturn(126.9780);
-
+      test('should NOT auto-request permission when denied (Apple 5.1.1 compliance)', () async {
         when(
           () => mockDataSource.isLocationServiceEnabled(),
         ).thenAnswer((_) async => true);
         when(
           () => mockDataSource.checkPermissionStatus(),
         ).thenAnswer((_) async => LocationPermissionStatus.denied);
-        when(
-          () => mockDataSource.requestPermission(),
-        ).thenAnswer((_) async => true);
-        when(
-          () => mockDataSource.getCurrentPosition(),
-        ).thenAnswer((_) async => mockPosition);
 
         final result = await repository.getCurrentLocation();
 
-        verify(() => mockDataSource.requestPermission()).called(1);
-        expect(result, isA<Right>());
+        verifyNever(() => mockDataSource.requestPermission());
+        expect(result, isA<Left>());
+        result.fold(
+          (failure) =>
+              expect(failure, isA<LocationPermissionDeniedFailure>()),
+          (_) => fail('Should be Left'),
+        );
       });
 
       test(
