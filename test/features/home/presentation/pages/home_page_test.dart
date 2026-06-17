@@ -274,73 +274,12 @@ void main() {
     });
 
     group('Location Permission Alert', () {
-      testWidgets('should show location permission alert when permission denied', (
+      testWidgets('should NOT show automatic permission alert (Apple 5.1.1 compliance)', (
         tester,
       ) async {
         await tester.pumpWidget(
           createHomePage(permissionStatus: LocationPermissionResult.denied),
         );
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text('젤로마크는 위치 기반 서비스이므로 위치 정보 제공에 동의가 꼭 필요해요'),
-          findsOneWidget,
-        );
-      });
-
-      testWidgets('should not show alert when permission granted', (
-        tester,
-      ) async {
-        await tester.pumpWidget(
-          createHomePage(permissionStatus: LocationPermissionResult.granted),
-        );
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text('젤로마크는 위치 기반 서비스이므로 위치 정보 제공에 동의가 꼭 필요해요'),
-          findsNothing,
-        );
-      });
-
-      testWidgets('should close alert when cancel button tapped', (
-        tester,
-      ) async {
-        await tester.pumpWidget(
-          createHomePage(permissionStatus: LocationPermissionResult.denied),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.text('취소'), findsOneWidget);
-
-        await tester.tap(find.text('취소'));
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text('젤로마크는 위치 기반 서비스이므로 위치 정보 제공에 동의가 꼭 필요해요'),
-          findsNothing,
-        );
-      });
-
-      testWidgets('should not show alert again after cancel in same session', (
-        tester,
-      ) async {
-        await tester.pumpWidget(
-          createHomePage(permissionStatus: LocationPermissionResult.denied),
-        );
-        await tester.pumpAndSettle();
-
-        expect(
-          find.text('젤로마크는 위치 기반 서비스이므로 위치 정보 제공에 동의가 꼭 필요해요'),
-          findsOneWidget,
-        );
-
-        await tester.tap(find.text('취소'));
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byIcon(Icons.search_outlined));
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byIcon(Icons.home_outlined));
         await tester.pumpAndSettle();
 
         expect(
