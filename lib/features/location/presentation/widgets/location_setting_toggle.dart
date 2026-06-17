@@ -138,6 +138,19 @@ class _LocationSettingToggleState extends ConsumerState<LocationSettingToggle>
   }
 
   Future<void> _handleToggle(BuildContext context, WidgetRef ref) async {
-    await ref.read(locationSettingNotifierProvider.notifier).toggle();
+    final result = await ref
+        .read(locationSettingNotifierProvider.notifier)
+        .toggle();
+    if (!context.mounted) return;
+    if (result == LocationSettingToggleResult.deniedForever ||
+        result == LocationSettingToggleResult.denied ||
+        result == LocationSettingToggleResult.serviceDisabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('디바이스 설정에서 위치 권한을 변경할 수 있어요'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
   }
 }
