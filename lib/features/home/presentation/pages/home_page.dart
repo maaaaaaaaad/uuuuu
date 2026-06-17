@@ -3,9 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jellomark/features/auth/presentation/helpers/auth_action_guard.dart';
 import 'package:jellomark/features/favorite/presentation/pages/favorites_page.dart';
 import 'package:jellomark/features/home/presentation/widgets/home_tab.dart';
-import 'package:jellomark/features/location/presentation/providers/location_permission_alert_provider.dart';
-import 'package:jellomark/features/location/presentation/providers/location_setting_provider.dart';
-import 'package:jellomark/features/location/presentation/widgets/location_permission_alert_dialog.dart';
 import 'package:jellomark/features/member/presentation/pages/profile_page.dart';
 import 'package:jellomark/features/nearby_shops/presentation/pages/nearby_shops_map_page.dart';
 import 'package:jellomark/features/reservation/presentation/providers/current_reservation_provider.dart';
@@ -31,7 +28,6 @@ class _HomePageState extends ConsumerState<HomePage>
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeFcm();
-      _checkLocationPermission();
       _loadCurrentReservations();
     });
   }
@@ -55,27 +51,6 @@ class _HomePageState extends ConsumerState<HomePage>
 
   void _loadCurrentReservations() {
     ref.read(currentReservationNotifierProvider.notifier).load();
-  }
-
-  Future<void> _checkLocationPermission() async {
-    final notifier = ref.read(locationPermissionAlertProvider.notifier);
-    final shouldShow = await notifier.shouldShowAlert();
-
-    if (shouldShow && mounted) {
-      notifier.markAsShown();
-      if (mounted) {
-        await LocationPermissionAlertDialog.show(
-          context: context,
-          onAgree: _handleAgreePermission,
-          onCancel: () {},
-        );
-      }
-    }
-  }
-
-  Future<void> _handleAgreePermission() async {
-    final notifier = ref.read(locationSettingNotifierProvider.notifier);
-    await notifier.requestPermissionAndEnable();
   }
 
   void _switchToSearchTab() {
