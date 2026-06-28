@@ -64,7 +64,7 @@
 			<dict>
 				<key>CFBundleURLSchemes</key>
 				<array>
-					<string>kakao$(KAKAO_NATIVE_APP_KEY)</string>
+					<string>kakaoad02572b85e29bfae8eb15bfd1b503f0</string>
 				</array>
 			</dict>
 		</array>
